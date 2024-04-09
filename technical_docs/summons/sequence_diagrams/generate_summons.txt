@@ -1,0 +1,36 @@
+@startuml
+title Generate Summons/Warrant/Notice
+Actor "Judge" as User #879BAA
+boundary CaseDetailsUI as UI #FFEDB5
+control "OrderSvc" as O
+control "Soln:\nSummonsSvc" as C #65C728
+control "Soln:\nDocGenSvc" as DG #65C728
+control "IndividualSvc" as I
+control "FileStoreSvc" as FS
+participant "Case" as Case
+participant "MDMS" as MDMS
+participant "Advocate" as Advocate
+participant "Order" as Order 
+User -> UI: Select "Generate Summons/Warrant" \noption in Case Details Screen
+UI -> O ++: Submit CaseID, JudgeID
+  O -> C ++: Submit CaseID, JudgeID
+    C -> MDMS ++: Retrieve MDMS data for Scheduling.
+    return MDMS data for Scheduling
+    C -> Case ++: Fetch Case details based on CaseID
+    return Case Details
+    C -> I ++: Fetch Complainant details based on ComplainantID
+    return Complainant Details
+    C -> I ++: Fetch Respondant details based on RespondantID
+    return Respondant Details
+    C -> Advocate ++: Fetch advocate details based on AdvocateID
+    return Advocate Details
+    C -> FS++: Fetch Document template
+    return Document Template File
+    C -> DG++: Generate Summons based on template
+    return Summons Document
+    C -> Order++: Build Order payload
+    return Order Object
+  C -> O: Order Details along with \nSummons document 
+O -> UI: Order Details along with \nSummons document 
+UI -> User: Show the Summons details along \nwith the document attached 
+@enduml

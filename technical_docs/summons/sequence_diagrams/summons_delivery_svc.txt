@@ -1,0 +1,67 @@
+@startuml
+title Summons Delivery Service
+control "Soln:\nSummonsSvc" as C #65C728
+control "Soln:\nDeliverySvc" as SD #65C728
+control "IndividualSvc" as I
+control "FileStoreSvc" as FS
+participant "Ext:\nChannelDelivery" as CD #C8D1BA
+participant "MDMS" as MDMS
+participant "Advocate" as Advocate
+participant "Order" as Order
+participant "Soln:\nChannelDelivery" as SCD #65C728
+participant Persister as Persister
+database Postgres
+== Initial Delivery Process (Single Summons) ==
+C -> SD++: Send for Summons Delivery\n(Summons Object & Document)
+  SD -> I ++: Fetch Respondant details based on RespondantID
+  return Respondant Details
+  SD -> FS ++: Fetch Summons Document
+  return Summons Document
+  SD -> MDMS++: Fetch Summons Delivery Rules & Channel Configurations                                                                                                                                   
+  return Summons Delivery Master Data
+  loop for each channel
+    SD ->> CD++: Send Summons Document Details along with file attachment for delivery (Async)
+    return Summons Delivery Accepted Acknowledgement
+    SD -> SCD++: Prepare Summons Channel Delivery payload with Status (Initiated)
+    return Summons Channel Delivery Object
+    SD -> Persister: Push Summons Channel Delivery payload
+    Persister -> Postgres: Persist data in DB
+  end
+  SD -> SD: Calculate overall order status
+  SD -> Order++: Prepare overall order status payload
+  return Order Object
+  SD -> Persister: Push Order payload
+  Persister -> Postgres: Persist data \nin DB
+return Summons Delivery Initiated Acknowledgement
+== Daily Delivery Status Update (All undelivered Summons)==
+SD -> SCD++: Retrieve list of Summons Delivery in "Initiated" sttaus 
+return Undelivered Summons Delivery list
+loop for each Summons Delivery
+  SD -> CD++: Get the delivery status
+  return status
+  alt delivery successful
+    SD -> SCD++: Prepare Summons Channel Delivery payload with Status(Delivered)
+    return Summons Channel Delivery Object
+    SD -> Persister: Push Summons Channel Delivery payload
+    Persister -> Postgres: Persist data in DB
+  else delivery failed
+    SD -> SCD++: Prepare Summons Channel Delivery payload with Status(Not Delivered & Reason)
+    return Summons Channel Delivery Object
+    SD -> Persister: Push Summons Channel Delivery payload
+    Persister -> Postgres: Persist data in DB
+  else pending
+    alt elapsed days above limit
+      SD -> SCD++: Prepare Summons Channel Delivery payload with Status(Not Delivered & Reason)
+      return Summons Channel Delivery Object
+      SD -> Persister: Push Summons Channel Delivery payload
+      Persister -> Postgres: Persist data in DB
+    else
+    end
+  end
+  SD -> SD: Calculate overall order status
+  SD -> Order++: Prepare overall order status payload
+  return Order Object
+  SD -> Persister: Push Order payload
+  Persister -> Postgres: Persist data \nin DB
+end
+@enduml

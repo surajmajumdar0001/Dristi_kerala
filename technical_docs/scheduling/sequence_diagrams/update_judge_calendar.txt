@@ -1,0 +1,21 @@
+@startuml
+title Update Judge Calendar
+Actor "Court Staff" as User #879BAA
+participant ModifyJudgeCalendarScreen as UI #FFEDB5
+participant CalendarSvc as C #65C728
+participant MDMS as MDMS
+participant JudgeCalendar as JudgeCalendar #65C728
+participant Persister as Persister
+database Postgres #C8D1BA
+User -> UI: Make judge availability details in the calendar \n and click on Submit
+UI -> C ++: Submit Modified Calendar details
+C -> MDMS ++: Retrieve MDMS data for Calendaring.
+return Master data for Calendaring
+C -> JudgeCalendar ++: Prepare Updated Judge Calendar based on modifications.
+return Judge Calendar Object
+C -> Persister ++: Push Judge Calendar payload
+Persister -> Postgres: Persist data in DB
+return Judge Calendar created
+C -> UI: Judge Calendar Deails updated
+UI -> User: Show the message "Calendar Updated Successfully"
+@enduml

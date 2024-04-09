@@ -1,0 +1,22 @@
+@startuml
+title E-Filing OCR
+Actor "Complainant" as User #879BAA
+boundary EFilingUI as UI #FFEDB5
+control "CaseSvc" as CS
+control "Soln:\nOCRSvc" as OCR #65C728
+participant "MDMS" as MDMS
+User -> UI: Select "Upload ID" 
+UI -> CS ++: Submit File Uploaded
+  CS -> OCR ++: Submit File Uploaded
+    OCR -> MDMS ++: Retrieve MDMS data for OCR
+    return Master data for OCR Scanning
+    OCR -> OCR: Scan document
+    alt scanning failure
+      return 201 : Unable to scan \nthe document
+    else scanning successful
+      OCR -> OCR: Prepare scanned document data
+      OCR -> CS: document data
+    end
+  CS -> UI: Document data along \nwith keyword details 
+UI -> User: Show the details \nscanned from the document 
+@enduml

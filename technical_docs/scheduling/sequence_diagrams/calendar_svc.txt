@@ -1,0 +1,26 @@
+@startuml
+title Calendar Service
+boundary ScheduleHearingUI as UI #FFEDB5
+control "Soln:\nCalendarSvc" as C #65C728
+participant MDMS as MDMS
+participant Judge as Judge
+participant "Soln:\nJudgeCalendar" as JudgeCalendar #65C728
+participant "Soln:\nJudgeCalendarBooking" as JudgeCalendarBooking #65C728
+== Fetch next 5 available dates ==
+UI -> C ++: Request Calendar Availability \nwith a start date & JudgeID
+  C -> MDMS ++: Retrieve MDMS data for Scheduling.
+  return MDMS data for Scheduling
+  C -> Judge ++: Fetch Judge details based on JudgeID
+  return Judge Details
+  C -> JudgeCalendar ++: Fetch Judge Calendar details based on JudgeID 
+  return JudgeCalendar Details
+  C -> JudgeCalendarBooking ++: Fetch Judge Calendar Booking details \nbased on JudgeCalendarID & start date
+  return JudgeCalendarBooking Details
+  loop each day from start date
+    C -> C: Check if it is a working day \nand the day is fully booked
+    alt if not fully booked
+      C -> C: Add the day to available dates collection
+    end
+  end
+C -> UI: Return 5 next available dates
+@enduml

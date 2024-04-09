@@ -1,0 +1,17 @@
+@startuml
+title Create Judge Calendar
+queue Kafka #C8D1BA
+participant CalendarSvc as C #65C728
+participant MDMS as MDMS
+participant JudgeCalendar as JudgeCalendar #65C728
+participant Persister as Persister
+database Postgres #C8D1BA
+Kafka -> C: Read judge created payload
+C -> MDMS ++: Retrieve MDMS data for Calendaring.
+return Master data for Calendaring
+C -> JudgeCalendar ++: Create Judge Calendar based on default calendar.
+return Judge Calendar Object
+C -> Persister ++: Push Judge Calendar payload
+Persister -> Postgres: Persist data in DB
+return Judge Calendar created
+@enduml

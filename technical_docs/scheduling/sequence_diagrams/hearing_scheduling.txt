@@ -1,0 +1,59 @@
+@startuml
+title Schedule Hearing (Rescheduling/Voluntary Submissions)
+Actor "Judge" as User #879BAA
+boundary ScheduleHearingUI as UI #FFEDB5
+control "Soln:\nCalendarSvc" as C #65C728
+control IndividualSvc as I
+participant MDMS as MDMS
+participant Judge as Judge
+participant Case as Case
+participant Advocate as Advocate
+participant "Soln:\nJudgeCalendarBooking" as JudgeCalendarBooking #65C728
+queue Kafka #C8D1BA
+participant Persister as Persister
+database Postgres #C8D1BA
+
+== First time selected "Schedule Hearing" ==
+User -> UI: Select a start date \n and click on Submit
+  UI -> C ++: Request Calendar Availability \nwith a start date & JudgeID
+    C -> C: Calculate 5 next available dates
+  C -> UI: Return 5 next available dates
+UI -> User: Show the available dates \nwith next & previous buttons
+
+== Next button selected to get the next available 5 dates ==
+User -> UI: Select next button
+  UI -> C ++: Request Calendar Availability \nwith the new start date & JudgeID
+    C -> C: Calculate 5 next available dates
+  C -> UI: Return 5 next available dates
+UI -> User: Show the available dates \nwith next & previous buttons
+
+== Selected a particular date and submitted ==
+User -> UI: Select a date for scheduling 
+  UI -> C ++: Request Hearing Scheduling \nwith the selected date, CaseID & JudgeID
+    C -> JudgeCalendarBooking ++: Fetch Judge Calendar Booking details \nbased on JudgeCalendarID & selected date
+    return JudgeCalendarBooking Details
+    alt Already Booked
+      C -> UI: Judge Calendar Booking Failed  
+      UI -> UI: Show error message \n"Booking cannot be done for the selected date. \nPlease select a new date"
+    else Date Available
+      C -> MDMS ++: Retrieve MDMS data for Scheduling.
+      return MDMS data for Scheduling
+      C -> Case ++: Fetch Case details based on CaseID
+      return Case Details
+      C -> I ++: Fetch Complainant details \nbased on ComplainantID
+      return Complainant Details
+      C -> I ++: Fetch Respondant details \nbased on RespondantID
+      return Respondant Details
+      C -> Advocate ++: Fetch advocate Ids
+      return Advocate info
+      C -> Judge ++: Fetch Judge details \nbased on JudgeID
+      return Judge Details
+      C -> JudgeCalendarBooking: Prepare judge calendar booking payload
+      C -> Kafka: Push judge calendar booking payload
+      Persister -> Kafka: Read payload
+      Persister -> Postgres: Persist data in DB
+      C -> Notification : Send notification to \n Complainant, Respondant, Advocates & Judge
+    end
+  C -> UI: Judge Calendar Booking Completed  
+UI -> User: Show message \n"Hearing Scheduled Successfully" 
+@enduml

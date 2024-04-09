@@ -1,0 +1,44 @@
+@startuml
+title E-Sign and Issue
+Actor "Judge" as User #879BAA
+boundary CaseDetailsUI as UI #FFEDB5
+control "Soln:\nSummonsSvc" as C #65C728
+control "Soln:\nDeliverySvc" as SD #65C728
+control "FileStoreSvc" as FS
+control "Soln:\nESignSvc" as E #65C728
+participant "Ext:\nESign" as ES #C8D1BA
+participant "Ext:\nAadhaarServer" as Aadhaar #C8D1BA
+participant "Case" as Case
+participant "MDMS" as MDMS
+participant "Advocate" as Advocate
+participant "Order" as Order
+participant Persister as Persister
+database Postgres
+User -> UI: Selected "E-Sign and Issue" option \nin Summons Screen
+UI -> C++: Submit Summons Details along \nwith Summons Document
+C -> E++: Send document for E-Signing
+E -> ES++: Send document \nfor E-Signing
+group Aadhaar OTP Verificaton for signing 
+  ES -> Aadhaar++: Send Aadhaar Details \nfor OTP verification
+  Aadhaar -> UI ++: Verify based \non Aadhaar OTP
+  alt Verification failed
+    return Aadhaar OTP \nverification failed
+    UI -> UI: Show error message \n"Aadhaar OTP verification failed"
+  else Success
+    return Aadhaar OTP verified
+  end
+end
+ES -> ES: Sign document \nbased on Aadhaar
+return Signed Document
+C -> FS++: Store Signed Document
+return Storage Location URL
+C -> SD++: Send for Summons Delivery
+return Summons Delivery \nInitiated Acknowledment
+C -> C: Calculate overall order status
+C -> Order++: Prepare overall order status payload
+return Order Object
+C -> Persister: Push Order payload
+Persister -> Postgres: Persist data \nin DB
+C -> UI: OrderId generated returned 
+UI -> User: Show the message \n"Summons Issued Successfully" 
+@enduml
