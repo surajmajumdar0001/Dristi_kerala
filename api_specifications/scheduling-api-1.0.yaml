@@ -12,3 +12,104 @@ servers:
 tags:
   - name: Scheduling
     description: APIs for managing Scheduling Delivery
+
+paths:
+  /judgeCalendar/v1/create:
+    post:
+      tags:
+        - Calendar
+      summary: create judge calendar.
+      requestBody:
+        description: Details for the new judge meta data for whom the calendar should be created.
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/JudgeCalendarConfigRequest'
+        required: true
+      responses:
+        "201":
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JudgeCalendarConfigResponse'
+        "400":
+          description: judge calendar creation failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+      x-codegen-request-body-name: JudgeCalendarConfigRequest
+  /judgeCalendar/v1/update:
+    post:
+      tags:
+        - Calendar
+      summary: update judge calendar.
+      requestBody:
+        description: Details for the judge calendar data to be updated.
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/JudgeCalendarConfigUpdateRequest'
+        required: true
+      responses:
+        "201":
+          description: success
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JudgeCalendarConfigResponse'
+        "400":
+          description: judge calendar updation failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+      x-codegen-request-body-name: JudgeCalendarConfigUpdateRequest
+components:
+  schemas:
+    JudgeCalendarConfigRequest:
+      type: object
+      properties:
+        requestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        judgeId:
+          type: string
+          description: This is judgeId for whom calendar is being created
+      description: This object holds information about the hearing request
+
+    JudgeCalendarConfigUpdateRequest:
+      type: object
+      properties:
+        requestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        judgeId:
+          type: string
+          description: This is judgeId for whom calendar is being created
+        calendarConfig:
+          type: string
+          description: This is the JSON containing the configuration for calendar          
+      description: This object holds information about the hearing request
+      
+    JudgeCalendarConfigResponse:
+      type: object
+      properties:
+        responseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ResponseInfo'
+        id:
+          type: string
+          format: uuid
+          minLength: 36
+          maxLength: 36
+          readOnly: true
+          description: auto generated primary key for judge calendar
+        judgeId:
+          type: string
+          description: This is judgeId for whom calendar is being created
+        calendarConfig:
+          type: string
+          description: This is the JSON containing the configuration for calendar
+      description: This object holds information about the judge calendar setup data response
+      
+
+x-original-swagger-version: "2.0"
