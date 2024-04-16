@@ -12,16 +12,15 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-import static digit.config.ServiceConstants.EXTERNAL_SERVICE_EXCEPTION;
-import static digit.config.ServiceConstants.SEARCHER_SERVICE_EXCEPTION;
+import static digit.config.ServiceConstants.*;
 
 @Repository
 @Slf4j
 public class ServiceRequestRepository {
 
-    private final ObjectMapper mapper;
+    private ObjectMapper mapper;
 
-    private final RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
 
     @Autowired

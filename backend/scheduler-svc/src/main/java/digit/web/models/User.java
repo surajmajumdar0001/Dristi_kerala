@@ -1,18 +1,22 @@
 package digit.web.models;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import digit.web.models.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.egov.common.contract.request.Role;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Data;
+import lombok.Builder;
 
 /**
  * This is acting ID token of the authenticated user on the server. Any value provided by the clients will be ignored and actual user based on authtoken will be used on the server.
@@ -25,26 +29,30 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class User {
-
-
     @JsonProperty("tenantId")
     @NotNull
+
     private String tenantId = null;
 
     @JsonProperty("id")
+
     private Integer id = null;
 
     @JsonProperty("uuid")
+
     private String uuid = null;
 
     @JsonProperty("userName")
     @NotNull
+
     private String userName = null;
 
     @JsonProperty("mobileNumber")
+
     private String mobileNumber = null;
 
     @JsonProperty("emailId")
+
     private String emailId = null;
 
     @JsonProperty("roles")

@@ -1,12 +1,18 @@
 package digit.config;
 
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import org.egov.tracer.config.TracerConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
+
+import java.util.TimeZone;
 
 @Component
 @Data
@@ -17,26 +23,6 @@ import org.springframework.stereotype.Component;
 @Getter
 public class Configuration {
 
-    @Value("${drishti.scheduler.hearing}")
-    private String scheduleHearingTopic;
-
-    @Value("${drishti.scheduler.opt-out}")
-    private String optOutTopic;
-
-    @Value("${drishti.scheduler.opt-out.update}")
-    private String optOutUpdateTopic;
-
-    @Value("${drishti.scheduler.hearing.update}")
-    private String scheduleHearingUpdateTopic;
-
-    @Value("${drishti.scheduler.hearing.reschedule}")
-    private String rescheduleRequestCreateTopic;
-
-    @Value("${drishti.judge.calendar.update}")
-    private String updateJudgeCalendarTopic;
-
-    @Value("${drishti.scheduler.hearing.reschedule.update}")
-    private String updateRescheduleRequestTopic;
 
     // User Config
     @Value("${egov.user.host}")
@@ -63,14 +49,6 @@ public class Configuration {
     private String idGenPath;
 
 
-    // id format
-    @Value("${egov.idgen.idformat}")
-    private String hearingIdFormat;
-
-    @Value("${egov.idgen.reschedule}")
-    private String rescheduleHearingIdFormat;
-
-
     //Workflow Config
     @Value("${egov.workflow.host}")
     private String wfHost;
@@ -92,9 +70,24 @@ public class Configuration {
     @Value("${egov.mdms.search.endpoint}")
     private String mdmsEndPoint;
 
+
+    //HRMS
+    @Value("${egov.hrms.host}")
+    private String hrmsHost;
+
+    @Value("${egov.hrms.search.endpoint}")
+    private String hrmsEndPoint;
+
+
+    //URLShortening
+    @Value("${egov.url.shortner.host}")
+    private String urlShortnerHost;
+
+    @Value("${egov.url.shortner.endpoint}")
+    private String urlShortnerEndpoint;
+
+
     //SMSNotification
     @Value("${egov.sms.notification.topic}")
     private String smsNotificationTopic;
-
-
 }

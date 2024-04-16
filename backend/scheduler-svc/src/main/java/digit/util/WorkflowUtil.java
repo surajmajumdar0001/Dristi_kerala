@@ -2,12 +2,14 @@ package digit.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
-import digit.repository.ServiceRequestRepository;
-import org.egov.common.contract.models.RequestInfoWrapper;
-import org.egov.common.contract.models.Workflow;
+
+import static digit.config.ServiceConstants.*;
+
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.common.contract.workflow.*;
+import org.egov.common.contract.models.*;
+import digit.repository.ServiceRequestRepository;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +17,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static digit.config.ServiceConstants.*;
 
 @Service
 public class WorkflowUtil {
