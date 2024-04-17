@@ -9,7 +9,7 @@ import static digit.config.ServiceConstants.*;
 @Component
 public class ResponseInfoFactory {
 
-    public ResponseInfo createResponseInfoFromRequestInfo(final RequestInfo requestInfo, final Boolean success) {
+    public static ResponseInfo createResponseInfo(final RequestInfo requestInfo, final Boolean success) {
 
         final String apiId = requestInfo != null ? requestInfo.getApiId() : "";
         final String ver = requestInfo != null ? requestInfo.getVer() : "";

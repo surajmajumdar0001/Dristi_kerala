@@ -22,11 +22,12 @@ import java.util.List;
 @Builder
 public class ReScheduleHearingRequest {
 
-    @JsonProperty("RequestInfo")
+    @JsonProperty("requestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("RescheduledRequest")
+
+    @JsonProperty("rescheduledRequest")
     @Valid
     private List<ReScheduleHearing> reScheduleHearing = null;
 }
