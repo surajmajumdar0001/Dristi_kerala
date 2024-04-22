@@ -8,7 +8,7 @@ import digit.web.models.JudgeCalendarResponse;
 import digit.web.models.JudgeCalendarUpdateRequest;
 
 import java.util.ArrayList;
-import java.util.UUID;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,7 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-15T13:15:39.759211883+05:30[Asia/Kolkata]")
 @RestController("judgeCalendarApiController")
-@RequestMapping("/judge")
+@RequestMapping("")
 public class JudgeCalendarApiController {
 
     private final ObjectMapper objectMapper;
@@ -45,7 +45,7 @@ public class JudgeCalendarApiController {
     }
 
 
-    @RequestMapping(value = "/v1/calendar", method = RequestMethod.POST)
+    @RequestMapping(value = "/judge/v1/_calendar", method = RequestMethod.POST)
     public ResponseEntity<JudgeCalendarResponse> getJudgeCalendar(@Parameter(in = ParameterIn.DEFAULT, description = "Judge calendar search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest requestBody) {
         //call service here
         calendarService.getJudgeCalendar(requestBody.getCriteria());
@@ -54,7 +54,7 @@ public class JudgeCalendarApiController {
         return ResponseEntity.accepted().body(response);
     }
 
-    @RequestMapping(value = "/v1/calendar-availability", method = RequestMethod.POST)
+    @RequestMapping(value = "/judge/v1/_availability", method = RequestMethod.POST)
     public ResponseEntity<JudgeCalendarResponse> getAvailabilityOfJudge(@Parameter(in = ParameterIn.DEFAULT, description = "Judge availability search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest requestBody) {
 
 
@@ -68,7 +68,7 @@ public class JudgeCalendarApiController {
     }
 
 
-    @RequestMapping(value = " /v1/calendar-update", method = RequestMethod.POST)
+    @RequestMapping(value = "/judge/v1/_update", method = RequestMethod.POST)
     public ResponseEntity<JudgeCalendarResponse> updateJudgeCalendar(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the judge calendar data to be updated.", required = true, schema = @Schema()) @Valid @RequestBody JudgeCalendarUpdateRequest requestBody) {
         JudgeCalendarResponse response = JudgeCalendarResponse.builder().judgeCalendar(new ArrayList<>()).responseInfo(ResponseInfoFactory.createResponseInfo(requestBody.getRequestInfo(), true)).build();
 
