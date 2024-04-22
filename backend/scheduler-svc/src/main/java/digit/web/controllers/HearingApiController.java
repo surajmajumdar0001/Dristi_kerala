@@ -20,11 +20,11 @@ import java.util.ArrayList;
 
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-15T13:15:39.759211883+05:30[Asia/Kolkata]")
 @RestController("hearingApiController")
-@RequestMapping("/hearing")
+@RequestMapping("")
 public class HearingApiController {
 
 
-    @RequestMapping(value = "/v1/_schedule", method = RequestMethod.POST)
+    @RequestMapping(value = "/hearing/v1/_schedule", method = RequestMethod.POST)
     public ResponseEntity<HearingResponse> scheduleHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody ScheduleHearingRequest request) {
         //call service here
 
