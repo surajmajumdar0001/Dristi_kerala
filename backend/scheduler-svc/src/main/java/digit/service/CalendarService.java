@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class CalendarService {
 
-
+    // this method will retrieve the availability of judge for n next working from tha pass start date
     public void getJudgeAvailability(JudgeSearchCriteria searchCriteria) {
         List<JudgeCalendar> resultList = new ArrayList<>();
 
@@ -25,6 +25,9 @@ public class CalendarService {
 
 
     }
+
+
+    // this method ll provide the the judge calendar for a current month (default)
 
     public List<JudgeCalendar> getJudgeCalendar(JudgeSearchCriteria searchCriteria) {
 
@@ -41,10 +44,14 @@ public class CalendarService {
     }
 
 
+    // this ll updated default calendar of judge
     public void update(List<JudgeCalendar> judgeCalendar) {
 
 
-        //simply validate and update the judge calendar rule table for particular judge calendar
+        //validate
+        //enhance
+
+        //push to kafka
 
     }
 }
