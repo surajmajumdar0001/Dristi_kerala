@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
+
 /**
  * JudgeCalendar
  */
@@ -21,4 +23,18 @@ public class JudgeCalendar {
 
     @JsonProperty("id")
     private String id;
+
+    @JsonProperty("judgeId")
+    private String judgeId;
+
+    @JsonProperty("ruleType")
+    private String ruleType;        // possible values ----> "NON-WORKING-DAY",  "LEAVE",  “OTHER"
+
+
+    @JsonProperty("date")
+    private LocalDateTime date;     // timestamp
+
+
+    @JsonProperty("notes")
+    private String notes;
 }

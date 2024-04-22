@@ -23,6 +23,8 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class JudgeCalendarUpdateRequest {
+
+
     @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
@@ -30,7 +32,6 @@ public class JudgeCalendarUpdateRequest {
     @JsonProperty("JudgeCalendar")
     @Valid
     private List<JudgeCalendar> judgeCalendar = null;
-
 
 
 }

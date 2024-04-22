@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDateTime;
+
 
 /**
  * JudgeAvailabilitySearchCriteria
@@ -17,9 +19,23 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class JudgeAvailabilitySearchCriteria {
+public class JudgeSearchCriteria {
 
 
     @JsonProperty("judgeId")
     private String judgeId;
+
+    @JsonProperty("courtId")
+    private String courtId;
+
+    @JsonProperty("caseId")
+    private String caseId;
+
+    @JsonProperty("numberOfDays")
+    private String numberOfDays;
+
+
+    @JsonProperty("fromDate")
+    private LocalDateTime fromDate;
+
 }

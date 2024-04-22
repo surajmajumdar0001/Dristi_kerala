@@ -29,5 +29,5 @@ public class JudgeAvailabilitySearchRequest {
 
     @JsonProperty("SearchCriteria")
     @Valid
-    private JudgeAvailabilitySearchCriteria criteria = null;
+    private JudgeSearchCriteria criteria = null;
 }

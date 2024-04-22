@@ -1,6 +1,7 @@
 package digit.web.controllers;
 
 
+import digit.service.CalendarService;
 import digit.util.ResponseInfoFactory;
 import digit.web.models.JudgeAvailabilitySearchRequest;
 import digit.web.models.JudgeCalendarResponse;
@@ -33,17 +34,21 @@ public class JudgeCalendarApiController {
 
     private final HttpServletRequest request;
 
+
+    private final CalendarService calendarService;
+
     @Autowired
-    public JudgeCalendarApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public JudgeCalendarApiController(ObjectMapper objectMapper, HttpServletRequest request, CalendarService calendarService) {
         this.objectMapper = objectMapper;
         this.request = request;
+        this.calendarService = calendarService;
     }
 
 
-    // need to discuss authentication
     @RequestMapping(value = "/v1/calendar", method = RequestMethod.POST)
     public ResponseEntity<JudgeCalendarResponse> getJudgeCalendar(@Parameter(in = ParameterIn.DEFAULT, description = "Judge calendar search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest requestBody) {
         //call service here
+        calendarService.getJudgeCalendar(requestBody.getCriteria());
         JudgeCalendarResponse response = JudgeCalendarResponse.builder().judgeCalendar(new ArrayList<>()).responseInfo(ResponseInfoFactory.createResponseInfo(requestBody.getRequestInfo(), true)).build();
 
         return ResponseEntity.accepted().body(response);
@@ -52,7 +57,10 @@ public class JudgeCalendarApiController {
     @RequestMapping(value = "/v1/calendar-availability", method = RequestMethod.POST)
     public ResponseEntity<JudgeCalendarResponse> getAvailabilityOfJudge(@Parameter(in = ParameterIn.DEFAULT, description = "Judge availability search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest requestBody) {
 
+
         //call service here
+
+
         JudgeCalendarResponse response = JudgeCalendarResponse.builder().judgeCalendar(new ArrayList<>()).responseInfo(ResponseInfoFactory.createResponseInfo(requestBody.getRequestInfo(), true)).build();
 
         return ResponseEntity.accepted().body(response);
