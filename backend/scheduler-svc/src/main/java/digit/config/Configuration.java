@@ -49,6 +49,11 @@ public class Configuration {
     private String idGenPath;
 
 
+    // id format
+    @Value("${egov.idgen.idformat}")
+    private String hearingIdFormat;
+
+
     //Workflow Config
     @Value("${egov.workflow.host}")
     private String wfHost;
@@ -69,23 +74,6 @@ public class Configuration {
 
     @Value("${egov.mdms.search.endpoint}")
     private String mdmsEndPoint;
-
-
-    //HRMS
-    @Value("${egov.hrms.host}")
-    private String hrmsHost;
-
-    @Value("${egov.hrms.search.endpoint}")
-    private String hrmsEndPoint;
-
-
-    //URLShortening
-    @Value("${egov.url.shortner.host}")
-    private String urlShortnerHost;
-
-    @Value("${egov.url.shortner.endpoint}")
-    private String urlShortnerEndpoint;
-
 
     //SMSNotification
     @Value("${egov.sms.notification.topic}")

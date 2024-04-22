@@ -31,15 +31,16 @@ public class CalendarService {
 
     public List<JudgeCalendar> getJudgeCalendar(JudgeSearchCriteria searchCriteria) {
 
-
         //fetch mdms data of default calendar for court id and judge id
+
         //fetch judge calendar rule
 
         //fetch judge calendar availability for number of days
 
-        // merge all three and return the calendar
+        //merge all three and return the calendar
 
         //if slotting is there then apply slotting
+
         return null;
     }
 
@@ -47,8 +48,8 @@ public class CalendarService {
     // this ll updated default calendar of judge
     public void update(List<JudgeCalendar> judgeCalendar) {
 
-
         //validate
+
         //enhance
 
         //push to kafka
