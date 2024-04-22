@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 @Schema(description = "This object holds information about the hearing request")
 @Validated
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-15T13:15:39.759211883+05:30[Asia/Kolkata]")
@@ -22,4 +24,8 @@ public class ScheduleHearingRequest {
     @JsonProperty("requestInfo")
     @Valid
     private RequestInfo requestInfo = null;
+
+    @JsonProperty ("Hearing")
+    @Valid
+    private List<ScheduleHearing> hearing=null;
 }
