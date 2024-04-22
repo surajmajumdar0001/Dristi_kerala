@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.egov.tracer.model.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
@@ -37,4 +38,10 @@ public class JudgeCalendar {
 
     @JsonProperty("notes")
     private String notes;
+
+    @JsonProperty("tenantId")
+    private String tenantId;
+
+    @JsonProperty("auditDetails")
+    private AuditDetails auditDetails;
 }

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.egov.common.contract.models.Workflow;
+import org.egov.tracer.model.AuditDetails;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +16,9 @@ public class ReScheduleHearing {
 
     @JsonProperty("hearingBookingId")
     private String hearingBookingId;
+
+    @JsonProperty("tenantId")
+    private String tenantId;
 
     @JsonProperty("rescheduledRequestId")
     private String rescheduledRequestId;
@@ -32,8 +35,11 @@ public class ReScheduleHearing {
     @JsonProperty("actionComment")
     private String actionComment;
 
-
+    @JsonProperty("workflow")
     private Workflow workflow;
+
+    @JsonProperty("auditDetails")
+    private AuditDetails auditDetails;
 
 
 }

@@ -34,8 +34,11 @@ public class JudgeSearchCriteria {
     @JsonProperty("numberOfDays")
     private String numberOfDays;
 
-
     @JsonProperty("fromDate")
     private LocalDateTime fromDate;
+
+    @JsonProperty("tenantId")
+    private String tenantId;
+
 
 }
