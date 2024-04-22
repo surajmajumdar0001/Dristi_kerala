@@ -9,19 +9,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.egov.common.contract.response.ResponseInfo;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class HearingResponse {
 
+
     @JsonProperty("ResponseInfo")
     @Valid
     private ResponseInfo responseInfo = null;
 
-    @JsonProperty("Hearings")
+    @JsonProperty("Hearing")
     @Valid
-    private List<ScheduleHearing> hearings = null;
+    private ScheduleHearing hearing= null;
 }
