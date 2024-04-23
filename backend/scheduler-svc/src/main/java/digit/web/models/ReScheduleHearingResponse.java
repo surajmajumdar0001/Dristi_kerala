@@ -17,13 +17,12 @@ import java.util.List;
 @Builder
 public class ReScheduleHearingResponse {
 
+
     @JsonProperty("ResponseInfo")
     @Valid
-    private ResponseInfo ResponseInfo = null;
+    private ResponseInfo responseInfo = null;
 
-    @JsonProperty("Hearings")
+    @JsonProperty("Hearing")
     @Valid
     private List<ReScheduleHearing> reScheduleHearings = null;
-
-
 }

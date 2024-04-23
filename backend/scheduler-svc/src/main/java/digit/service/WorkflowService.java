@@ -3,23 +3,24 @@ package digit.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
-import digit.models.coremodels.ProcessInstance;
-import digit.models.coremodels.ProcessInstanceRequest;
-import digit.models.coremodels.ProcessInstanceResponse;
-import digit.models.coremodels.State;
 import digit.repository.ServiceRequestRepository;
 import digit.web.models.ReScheduleHearing;
 import digit.web.models.ReScheduleHearingRequest;
-import digit.web.models.Workflow;
-import org.egov.common.contract.models.RequestInfoWrapper;
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
+import digit.web.models.Workflow;
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.workflow.BusinessService;
 import org.egov.common.contract.workflow.BusinessServiceResponse;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import digit.models.coremodels.State;
+import digit.models.coremodels.ProcessInstance;
+import digit.models.coremodels.ProcessInstanceRequest;
+import digit.models.coremodels.ProcessInstanceResponse;
 import org.springframework.util.CollectionUtils;
+
+import org.egov.common.contract.models.RequestInfoWrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;

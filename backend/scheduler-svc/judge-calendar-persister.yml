@@ -2,22 +2,22 @@ serviceMaps:
   serviceName: scheduler-services
   mappings:
     - version: 1.0
-      description: Persists Judge calendar details in table
+      description: Update Judge calendar details in table
       fromTopic: judge-calendar-update
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO judge_calendar_rules (judge_id, id, rule_type, date, notes, created_by, last_modified_by, created_time, last_modified_time, row_version, tenant_id) VALUES (? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,?) ON CONFLICT (judge_id, date) DO UPDATE SET rule_type = ?, notes = ? ,last_modified_by =?, last_modified_time =? ,row_version =judge_calendar_rules.row_version +1 ,tenant_id =?;
-          basePath: $.*
+        - query: UPDATE judge_calendar_rules SET judge_id = ?,rule_type = ?, date = ? , notes = ? ,createdby =?,lastmodifiedby =?,createdtime =?, lastmodifiedtime =? WHERE judge_calendar_id=?;
+          basePath:  $.*
           jsonMaps:
             - jsonPath: $.*.judgeId
-
-            - jsonPath: $.*.id
 
             - jsonPath: $.*.ruleType
 
             - jsonPath: $.*.date
 
             - jsonPath: $.*.notes
+
+            - jsonPath: $.*.id
 
             - jsonPath: $.*.auditDetails.createdBy
 
@@ -26,18 +26,3 @@ serviceMaps:
             - jsonPath: $.*.auditDetails.createdTime
 
             - jsonPath: $.*.auditDetails.lastModifiedTime
-
-            - jsonPath: $.*.rowVersion
-
-            - jsonPath: $.*.tenantId
-
-            - jsonPath: $.*.ruleType
-
-            - jsonPath: $.*.notes
-
-            - jsonPath: $.*.auditDetails.lastModifiedBy
-
-            - jsonPath: $.*.auditDetails.lastModifiedTime
-
-            - jsonPath: $.*.tenantId
-
