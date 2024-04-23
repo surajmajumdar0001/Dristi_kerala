@@ -22,7 +22,7 @@ public class HearingResponse {
     @Valid
     private ResponseInfo responseInfo = null;
 
-    @JsonProperty("Hearing")
+    @JsonProperty("Hearings")
     @Valid
-    private List<ScheduleHearing> hearing= null;
+    private List<ScheduleHearing> hearings = null;
 }

@@ -23,6 +23,12 @@ import java.util.TimeZone;
 @Getter
 public class Configuration {
 
+    @Value("${drishti.scheduler.hearing}")
+    private String scheduleHearingTopic;
+
+    @Value("${drishti.judge.calendar.update}")
+    private String updateJudgeCalendarTopic;
+
 
     // User Config
     @Value("${egov.user.host}")

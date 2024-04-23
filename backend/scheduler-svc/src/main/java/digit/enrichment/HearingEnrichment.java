@@ -23,16 +23,16 @@ public class HearingEnrichment {
     private Configuration configuration;
 
 
-    public void enrichForScheduleHearing(RequestInfo requestInfo, List<ScheduleHearing> hearingList) {
+    public void enrichScheduleHearing(RequestInfo requestInfo, List<ScheduleHearing> hearingList) {
 
         log.info("starting update method for schedule hearing enrichment");
         log.info("generating IDs for schedule hearing enrichment using IdGenService");
         List<String> idList = idgenUtil.getIdList(requestInfo,
                 hearingList.get(0).getTenantId(),
                 configuration.getHearingIdFormat(), null, hearingList.size());
+        AuditDetails auditDetails = getAuditDetailsScheduleHearing(requestInfo);
         int index = 0;
         for (ScheduleHearing hearing : hearingList) {
-            AuditDetails auditDetails = getAuditDetailsScheduleHearing(requestInfo);
             hearing.setAuditDetails(auditDetails);
             hearing.setHearingBookingId(idList.get(index++));
         }
@@ -40,10 +40,28 @@ public class HearingEnrichment {
 
     }
 
+
+    public void enrichUpdateScheduleHearing(RequestInfo requestInfo, List<ScheduleHearing> hearingList) {
+
+        hearingList.stream().forEach((hearing) -> {
+
+            Long currentTime = System.currentTimeMillis();
+            hearing.getAuditDetails().setLastModifiedTime(currentTime);
+            hearing.getAuditDetails().setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+            hearing.setRowVersion(hearing.getRowVersion() + 1);
+
+        });
+
+    }
+
     private AuditDetails getAuditDetailsScheduleHearing(RequestInfo requestInfo) {
 
-        AuditDetails auditDetails = AuditDetails.builder()
+        return AuditDetails.builder()
+                .createdBy(requestInfo.getUserInfo().getUuid())
+                .createdTime(System.currentTimeMillis())
+                .lastModifiedBy(requestInfo.getUserInfo().getUuid())
+                .lastModifiedTime(System.currentTimeMillis())
                 .build();
-        return auditDetails;
+
     }
 }
