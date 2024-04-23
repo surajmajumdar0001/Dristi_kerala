@@ -52,4 +52,7 @@ public class ScheduleHearing {
 
     @JsonProperty("auditDetails")
     private AuditDetails auditDetails;
+
+    @JsonProperty("rowVersion")
+    private Long rowVersion = null;
 }

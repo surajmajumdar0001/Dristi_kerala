@@ -25,7 +25,7 @@ public class ScheduleHearingRequest {
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty ("Hearing")
+    @JsonProperty("Hearing")
     @Valid
-    private List<ScheduleHearing> hearing=null;
+    private List<ScheduleHearing> hearing = null;
 }

@@ -14,14 +14,14 @@ import org.egov.tracer.model.AuditDetails;
 @Builder
 public class ReScheduleHearing {
 
+    @JsonProperty("rescheduledRequestId")
+    private String rescheduledRequestId;
+
     @JsonProperty("hearingBookingId")
     private String hearingBookingId;
 
     @JsonProperty("tenantId")
     private String tenantId;
-
-    @JsonProperty("rescheduledRequestId")
-    private String rescheduledRequestId;
 
     @JsonProperty("requesterId")
     private String requesterId;
@@ -40,6 +40,17 @@ public class ReScheduleHearing {
 
     @JsonProperty("auditDetails")
     private AuditDetails auditDetails;
+
+    @JsonProperty("rowVersion")
+    private Long rowVersion = null;
+
+    // will discuss this on this fields
+
+    @JsonProperty("judgeId")
+    private String judgeId;
+
+    @JsonProperty("caseId")
+    private String caseId;
 
 
 }
