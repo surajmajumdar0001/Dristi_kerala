@@ -31,10 +31,8 @@ public class JudgeCalendar {
     @JsonProperty("ruleType")
     private String ruleType;        // possible values ----> "NON-WORKING-DAY",  "LEAVE",  “OTHER"
 
-
     @JsonProperty("date")
     private LocalDateTime date;     // timestamp
-
 
     @JsonProperty("notes")
     private String notes;
@@ -44,4 +42,7 @@ public class JudgeCalendar {
 
     @JsonProperty("auditDetails")
     private AuditDetails auditDetails;
+
+    @JsonProperty("rowVersion")
+    private Long rowVersion = null;
 }
