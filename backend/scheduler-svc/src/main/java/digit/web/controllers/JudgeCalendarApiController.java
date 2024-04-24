@@ -53,26 +53,20 @@ public class JudgeCalendarApiController {
     }
 
     @RequestMapping(value = "/judge/v1/_availability", method = RequestMethod.POST)
-    public ResponseEntity<JudgeCalendarResponse> getAvailabilityOfJudge(@Parameter(in = ParameterIn.DEFAULT, description = "Judge availability search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest request) {
-
+    public ResponseEntity<List<String>> getAvailabilityOfJudge(@Parameter(in = ParameterIn.DEFAULT, description = "Judge availability search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest request) {
 
         //call service here
+        List<String> judgeAvailability = calendarService.getJudgeAvailability(request);
 
-        calendarService.getJudgeAvailability(request);
-        JudgeCalendarResponse response = JudgeCalendarResponse.builder().judgeCalendar(new ArrayList<>()).responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true)).build();
-
-        return ResponseEntity.accepted().body(response);
+        return ResponseEntity.accepted().body(judgeAvailability);
 
     }
 
 
     @RequestMapping(value = "/judge/v1/_update", method = RequestMethod.POST)
     public ResponseEntity<JudgeCalendarResponse> updateJudgeCalendar(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the judge calendar data to be updated.", required = true, schema = @Schema()) @Valid @RequestBody JudgeCalendarUpdateRequest request) {
-
         List<JudgeCalendar> updatedJudgeCalendar = calendarService.update(request);
-
         JudgeCalendarResponse response = JudgeCalendarResponse.builder().judgeCalendar(updatedJudgeCalendar).responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true)).build();
-
         return ResponseEntity.accepted().body(response);
     }
 

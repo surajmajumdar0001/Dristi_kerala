@@ -40,13 +40,21 @@ public class HearingApiController {
     @RequestMapping(value = "/hearing/v1/_reschedule", method = RequestMethod.POST)
     public ResponseEntity<ReScheduleHearingResponse> reScheduleHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody ReScheduleHearingRequest request) {
 
-
         List<ReScheduleHearing> scheduledHearings = hearingService.reScheduleHearingRequest(request.getReScheduleHearing());
-
 
         ReScheduleHearingResponse response = ReScheduleHearingResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .reScheduleHearings(scheduledHearings).build();
 
+        return ResponseEntity.accepted().body(response);
+    }
+
+    @RequestMapping(value = "/hearing/v1/_search", method = RequestMethod.POST)
+    public ResponseEntity<ReScheduleHearingResponse> searchHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody HearingSearchRequest request) {
+
+        List<ReScheduleHearing> scheduledHearings = hearingService.search(request);
+
+        ReScheduleHearingResponse response = ReScheduleHearingResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
+                .reScheduleHearings(scheduledHearings).build();
 
         return ResponseEntity.accepted().body(response);
     }

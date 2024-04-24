@@ -7,6 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.egov.tracer.model.AuditDetails;
+import jakarta.validation.Valid;
+import org.egov.common.contract.models.Document;
+
+import java.util.List;
+
 
 @Data
 @AllArgsConstructor
@@ -51,6 +56,10 @@ public class ReScheduleHearing {
 
     @JsonProperty("caseId")
     private String caseId;
+
+    @JsonProperty("documents")
+    @Valid
+    private List<Document> documents = null;
 
 
 }

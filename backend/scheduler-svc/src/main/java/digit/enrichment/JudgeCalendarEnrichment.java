@@ -1,12 +1,10 @@
 package digit.enrichment;
 
-import digit.util.IdgenUtil;
 import digit.web.models.JudgeCalendar;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
