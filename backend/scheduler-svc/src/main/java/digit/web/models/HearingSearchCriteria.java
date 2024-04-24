@@ -7,9 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,36 +16,17 @@ import java.util.List;
 public class HearingSearchCriteria {
 
 
-    @JsonProperty("hearingIds")
-    private List<String> hearingIds;
+    @JsonProperty("fromDate")
+    private LocalDateTime fromDate;
 
     @JsonProperty("judgeId")
     private String judgeId;
 
-    @JsonProperty("courtId")
-    private String courtId;
-
-    @JsonProperty("fromDate")
-    private LocalDate fromDate;
-
     @JsonProperty("toDate")
-    private LocalDate toDate;
+    private LocalDateTime toDate;
 
-    //TODO: this should be enum
     @JsonProperty("hearingType")
     private String hearingType;
-
-    @JsonProperty("caseId")
-    private String caseId;
-
-    @JsonProperty("tenantId")
-    private String tenantId;
-    // to search in a one date between hours (to make it more flexible search)
-    @JsonProperty("startDateTime")
-    private LocalDateTime startDateTime;
-
-    @JsonProperty("endDateTime")
-    private LocalDateTime endDateTime;
 
 
 }
