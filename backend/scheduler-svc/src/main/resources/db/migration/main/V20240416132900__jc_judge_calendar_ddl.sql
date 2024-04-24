@@ -1,12 +1,18 @@
 CREATE TABLE judge_calendar_rules (
 
 
-    judge_id                varchar(64),
-    judge_calendar_id       varchar(64),
-    rule_type               varchar(64),
-    date                    varchar(64),
-    notes                   varchar(64),
-    CONSTRAINT pk_judge_calendar_rules_id PRIMARY KEY (judge_calendar_id)
+    judgeId              varchar(64),
+    id                   varchar(64),
+    ruleType             varchar(64),
+    date                 varchar(64),
+    notes                varchar(2000),
+    createdBy            character varying(64),
+    createdTime          bigint,
+    lastModifiedBy       character varying(64),
+    lastModifiedTime     bigint,
+    rowVersion           bigint,
+    tenantId             character varying(1000),
+    CONSTRAINT pk_judge_calendar_rules_id PRIMARY KEY (id)
 
 
 );

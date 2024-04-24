@@ -1,18 +1,24 @@
 CREATE TABLE hearing_booking
 (
 
-    court_id                character varying(64),
-    judge_id                character varying(64),
-    case_id                 character varying(64),
-    hearing_booking_id      character varying(64),
-    date                    character varying(64),
-    event_type              character varying(64),
-    title                   character varying(64),
-    description             character varying(64),
-    status                  character varying(64),
-    start_time              character varying(64),
-    end_time                character varying(64),
+    courtId              character varying(64),
+    judgeId              character varying(64),
+    caseId               character varying(64),
+    hearingBookingId     character varying(64),
+    date                 character varying(64),
+    eventType            character varying(64),
+    title                character varying(2000),
+    description          character varying(2000),
+    status               character varying(64),
+    startTime            character varying(64),
+    endTime              character varying(64),
+    createdBy            character varying(64),
+    createdTime          bigint,
+    lastModifiedBy       character varying(64),
+    lastModifiedTime     bigint,
+    rowVersion           bigint,
+    tenantId             character varying(1000),
 
-    CONSTRAINT pk_hearing_booking_id PRIMARY KEY (hearing_booking_id)
+    CONSTRAINT pk_hearing_booking_id PRIMARY KEY (hearingBookingId)
 
 );
