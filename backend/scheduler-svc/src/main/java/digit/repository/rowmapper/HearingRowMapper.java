@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 @Slf4j
@@ -15,11 +17,11 @@ public class HearingRowMapper implements RowMapper<ScheduleHearing> {
     public ScheduleHearing mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 
         ScheduleHearing hearing = ScheduleHearing.builder()
-                .date(resultSet.getString("date"))
+                .date(LocalDate.parse(resultSet.getString("date")))
                 .description(resultSet.getString("description"))
                 .hearingBookingId(resultSet.getString("hearingBookingId"))
                 .judgeId(resultSet.getString(""))
                 .build();
-        return null;
+        return hearing;
     }
 }

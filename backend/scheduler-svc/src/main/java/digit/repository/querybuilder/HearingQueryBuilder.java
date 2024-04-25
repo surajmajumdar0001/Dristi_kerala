@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Component;
 
+
 import java.util.List;
+
 
 @Component
 @Slf4j
@@ -30,6 +32,36 @@ public class HearingQueryBuilder {
             addClauseIfRequired(query, preparedStmtList);
             query.append(" hb.judgeId = ? ");
             preparedStmtList.add(hearingSearchCriteria.getJudgeId());
+
+        }
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getCourtId())) {
+            addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.courtid = ? ");
+            preparedStmtList.add(hearingSearchCriteria.getCourtId());
+
+        }
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getCaseId())) {
+            addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.caseid = ? ");
+            preparedStmtList.add(hearingSearchCriteria.getCaseId());
+
+        }
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getHearingType())) {
+            addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.eventtype = ? ");
+            preparedStmtList.add(hearingSearchCriteria.getHearingType());
+
+        }
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getFromDate())) {
+            addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.date >= ? ");
+            preparedStmtList.add(hearingSearchCriteria.getFromDate().toString());
+
+        }
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getToDate().toString())) {
+            addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.date <= ? ");
+            preparedStmtList.add(hearingSearchCriteria.getToDate().toString());
 
         }
 

@@ -1,14 +1,12 @@
 package digit.web.models;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import digit.models.coremodels.AuditDetails;
-import digit.web.models.enums.JudgeRuleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.egov.tracer.model.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
@@ -31,11 +29,10 @@ public class JudgeCalendarRule {
     private String judgeId;
 
     @JsonProperty("ruleType")
-    private JudgeRuleType ruleType;
+    private String ruleType;        // possible values ----> "NON-WORKING-DAY",  "LEAVE",  “OTHER"
 
     @JsonProperty("date")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+    private LocalDate date;     // timestamp
 
     @JsonProperty("notes")
     private String notes;
@@ -47,5 +44,5 @@ public class JudgeCalendarRule {
     private AuditDetails auditDetails;
 
     @JsonProperty("rowVersion")
-    private Integer rowVersion = null;
+    private Long rowVersion = null;
 }

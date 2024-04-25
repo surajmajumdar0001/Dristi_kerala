@@ -1,12 +1,18 @@
 package digit.web.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.egov.tracer.model.AuditDetails;
+import org.egov.tracer.model.Error;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -30,7 +36,7 @@ public class ScheduleHearing {
     private String caseId;
 
     @JsonProperty("date")
-    private String date;
+    private LocalDate date;
 
     @JsonProperty("eventType")
     private String eventType;
@@ -45,14 +51,18 @@ public class ScheduleHearing {
     private String status;
 
     @JsonProperty("startTime")
-    private String startTime;
+    private LocalDateTime startTime;
 
     @JsonProperty("endTime")
-    private String endTime;
+    private LocalDateTime endTime;
 
     @JsonProperty("auditDetails")
     private AuditDetails auditDetails;
 
     @JsonProperty("rowVersion")
     private Long rowVersion = null;
+
+    @JsonProperty("error")
+    @JsonIgnore
+    private Error errors = null;
 }

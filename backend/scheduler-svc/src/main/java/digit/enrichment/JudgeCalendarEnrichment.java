@@ -1,6 +1,6 @@
 package digit.enrichment;
 
-import digit.web.models.JudgeCalendar;
+import digit.web.models.JudgeCalendarRule;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,10 +14,10 @@ import java.util.List;
 public class JudgeCalendarEnrichment {
 
 
-    public void enrichUpdateJudgeCalendar(RequestInfo requestInfo, List<JudgeCalendar> judgeCalendar) {
+    public void enrichUpdateJudgeCalendar(RequestInfo requestInfo, List<JudgeCalendarRule> judgeCalendarRule) {
 
 
-        judgeCalendar.stream().forEach((calendar) -> {
+        judgeCalendarRule.stream().forEach((calendar) -> {
 
             Long currentTime = System.currentTimeMillis();
             calendar.getAuditDetails().setLastModifiedTime(currentTime);

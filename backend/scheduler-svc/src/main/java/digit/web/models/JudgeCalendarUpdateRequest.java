@@ -29,9 +29,9 @@ public class JudgeCalendarUpdateRequest {
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("JudgeCalendar")
+    @JsonProperty("JudgeCalendarRule")
     @Valid
-    private List<JudgeCalendar> judgeCalendar = null;
+    private List<JudgeCalendarRule> judgeCalendarRule = null;
 
 
 }

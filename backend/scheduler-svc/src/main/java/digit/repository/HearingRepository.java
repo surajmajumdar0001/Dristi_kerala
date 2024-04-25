@@ -1,13 +1,9 @@
 package digit.repository;
 
 
-import digit.repository.querybuilder.CalendarQueryBuilder;
 import digit.repository.querybuilder.HearingQueryBuilder;
-import digit.repository.rowmapper.CalendarRowMapper;
 import digit.repository.rowmapper.HearingRowMapper;
 import digit.web.models.HearingSearchCriteria;
-import digit.web.models.JudgeCalendar;
-import digit.web.models.JudgeSearchCriteria;
 import digit.web.models.ScheduleHearing;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,4 +43,6 @@ public class HearingRepository {
 
 
     }
+
+
 }

@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,17 +18,30 @@ import java.time.LocalDateTime;
 public class HearingSearchCriteria {
 
 
+    @JsonProperty("hearingIds")
+    private List<String> hearingIds;
+
     @JsonProperty("fromDate")
-    private LocalDateTime fromDate;
+    private LocalDate fromDate;
 
     @JsonProperty("judgeId")
     private String judgeId;
 
+    @JsonProperty("courtId")
+    private String courtId;
+
     @JsonProperty("toDate")
-    private LocalDateTime toDate;
+    private LocalDate toDate;
 
     @JsonProperty("hearingType")
     private String hearingType;
+
+    @JsonProperty("caseId")
+    private String caseId;
+
+    @JsonProperty("tenantId")
+    private String tenantId;
+
 
 
 }

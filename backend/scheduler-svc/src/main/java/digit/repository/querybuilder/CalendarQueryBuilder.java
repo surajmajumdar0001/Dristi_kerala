@@ -35,6 +35,7 @@ public class CalendarQueryBuilder {
         return query.toString();
     }
 
+
     private void addClauseIfRequired(StringBuilder query, List<String> preparedStmtList) {
         if (preparedStmtList.isEmpty()) {
             query.append(" WHERE ");

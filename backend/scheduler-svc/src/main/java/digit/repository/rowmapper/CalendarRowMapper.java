@@ -1,26 +1,26 @@
 package digit.repository.rowmapper;
 
-import digit.web.models.JudgeCalendar;
-import lombok.extern.apachecommons.CommonsLog;
+import digit.web.models.JudgeCalendarRule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
 @Component
 @Slf4j
-public class CalendarRowMapper implements RowMapper<JudgeCalendar> {
+public class CalendarRowMapper implements RowMapper<JudgeCalendarRule> {
     @Override
-    public JudgeCalendar mapRow(ResultSet resultSet, int rowNum) throws SQLException {
+    public JudgeCalendarRule mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 
 
-        JudgeCalendar calendar = JudgeCalendar.builder()
+        JudgeCalendarRule calendar = JudgeCalendarRule.builder()
                 .id(resultSet.getString("id"))
-                .date(LocalDateTime.parse(resultSet.getString("date")))
+                .date(LocalDate.parse(resultSet.getString("date")))
                 .notes(resultSet.getString("notes"))
                 .judgeId(resultSet.getString("judgeId"))
                 .ruleType(resultSet.getString("ruleType")).build();

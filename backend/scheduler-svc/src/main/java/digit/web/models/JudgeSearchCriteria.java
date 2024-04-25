@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -36,11 +37,23 @@ public class JudgeSearchCriteria {
     private Integer numberOfSuggestedDays;
 
     @JsonProperty("fromDate")
-    private LocalDateTime fromDate;
+    private LocalDate fromDate;
 
     @JsonProperty("tenantId")
     @NotNull
     private String tenantId;
+
+    @JsonProperty ("toDate")
+    private LocalDate toDate;
+
+    @JsonProperty("currentDate")
+    private Boolean currentDate;
+
+    @JsonProperty("currentWeek")
+    private Boolean currentWeek;
+
+    @JsonProperty("currentMonth")
+    private Boolean currentMonth;
 
 
     @JsonProperty("duration")
