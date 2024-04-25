@@ -51,5 +51,10 @@ public class ServiceConstants {
 
     public final String DEFAULT_JUDGE_CALENDAR_MASTER_NAME = "COURT000334";
 
+    public final String DEFAULT_COURT_MODULE_NAME = "court";
+
+    public final String DEFAULT_SLOTTING_MASTER_NAME = "slots";
+
+    public final String DEFAULT_HEARING_MASTER_NAME = "hearing";
 
 }
