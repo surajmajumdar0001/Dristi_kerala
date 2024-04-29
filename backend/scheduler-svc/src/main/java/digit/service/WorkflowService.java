@@ -9,6 +9,7 @@ import digit.models.coremodels.ProcessInstanceResponse;
 import digit.models.coremodels.State;
 import digit.repository.ServiceRequestRepository;
 import digit.web.models.ReScheduleHearing;
+import digit.web.models.ReScheduleHearingRequest;
 import digit.web.models.Workflow;
 import org.egov.common.contract.models.RequestInfoWrapper;
 import org.egov.common.contract.request.RequestInfo;
