@@ -65,7 +65,7 @@ public class HearingValidator {
             if (map.containsKey(key.toString())) {
                 occupiedBandwidthOfJudgeForDay = map.get(key.toString());
             } else {
-                List<ScheduleHearing> judgeHearing = repository.getJudgeHearing(searchCriteria);
+                List<ScheduleHearing> judgeHearing = repository.getHearings(searchCriteria);
                 occupiedBandwidthOfJudgeForDay = judgeHearing.stream().reduce(0.0, (total, element) ->
                                 total + (element.getEndTime().getHour() - element.getStartTime().getHour()) +
                                         (element.getEndTime().getMinute() - element.getStartTime().getMinute()) / 60.0 +

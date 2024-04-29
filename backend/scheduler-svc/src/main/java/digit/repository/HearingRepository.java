@@ -25,10 +25,10 @@ public class HearingRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<ScheduleHearing> getJudgeHearing(HearingSearchCriteria hearingSearchCriteria) {
+    public List<ScheduleHearing> getHearings(HearingSearchCriteria hearingSearchCriteria) {
 
-        List<String> preparedStmtList = new ArrayList<>();
-        String query = queryBuilder.getJudgeHearingQuery(hearingSearchCriteria, preparedStmtList);
+        List<Object> preparedStmtList = new ArrayList<>();
+        String query = queryBuilder.getHearingQuery(hearingSearchCriteria, preparedStmtList);
         log.debug("Final query: " + query);
         return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 
@@ -36,7 +36,7 @@ public class HearingRepository {
 
     public List<String> getAvailableDatesOfJudges(HearingSearchCriteria hearingSearchCriteria) {
 
-        List<String> preparedStmtList = new ArrayList<>();
+        List<Object> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getJudgeAvailableDatesQuery(hearingSearchCriteria, preparedStmtList);
         log.debug("Final query: " + query);
         return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);

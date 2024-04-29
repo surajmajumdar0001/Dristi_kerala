@@ -34,6 +34,4 @@ public class JudgeAvailabilitySearchCriteria implements SearchCriteria {
     @JsonProperty("toDate")
     private LocalDate toDate;
 
-    @JsonProperty("duration")
-    private Long duration;
 }

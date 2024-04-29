@@ -9,6 +9,7 @@ import digit.repository.CalendarRepository;
 import digit.util.MdmsUtil;
 import digit.validator.JudgeCalendarValidator;
 import digit.web.models.*;
+import digit.web.models.enums.PeriodType;
 import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class CalendarService {
         //validating required fields
         validator.validateSearchRequest(criteria);
         //TODO:CONFIGURE
-        if (criteria.getNumberOfSuggestedDays()==null) criteria.setNumberOfSuggestedDays(5);
+        if (criteria.getNumberOfSuggestedDays() == null) criteria.setNumberOfSuggestedDays(5);
         List<String> resultList = new ArrayList<>();
         HashMap<String, Boolean> dateMap = new HashMap<>();
 
@@ -100,16 +101,15 @@ public class CalendarService {
         LocalDate endDate = lastDateInDefaultCalendar.isBefore(dateAfterSixMonths) ? lastDateInDefaultCalendar.with(TemporalAdjusters.lastDayOfMonth()) : dateAfterSixMonths;
         // check startDate in date map if its exits and value is true then add to the result list
         Stream.iterate(criteria.getFromDate(), startDate -> startDate.isBefore(endDate), startDate -> startDate.plusDays(1))
-                .takeWhile(startDate->resultList.size()!=criteria.getNumberOfSuggestedDays()).forEach(startDate -> {
-            if (dateMap.containsKey(startDate.toString()) && dateMap.get(startDate.toString()))
-                resultList.add(startDate.toString());
+                .takeWhile(startDate -> resultList.size() != criteria.getNumberOfSuggestedDays()).forEach(startDate -> {
+                    if (dateMap.containsKey(startDate.toString()) && dateMap.get(startDate.toString()))
+                        resultList.add(startDate.toString());
 
-            // this case will cover no holiday,no leave and no hearing for day
-            if (!dateMap.containsKey(startDate.toString())) resultList.add(startDate.toString());
+                    // this case will cover no holiday,no leave and no hearing for day
+                    if (!dateMap.containsKey(startDate.toString())) resultList.add(startDate.toString());
 
 
-
-        });
+                });
         //TODO: throw error if there is no date in next six month after from date
 
         return resultList;
@@ -168,7 +168,7 @@ public class CalendarService {
 
         });
 
-        //merge all three and return the calendar
+        //generating calendar response
         for (LocalDate start = hearingSearchCriteria.getFromDate(); start.isBefore(hearingSearchCriteria.getToDate()) || start.isEqual(hearingSearchCriteria.getToDate()); start = start.plusDays(1)) {
             List<ScheduleHearing> hearingOfaDay = dayHearingMap.getOrDefault(start, new ArrayList<>());
 
@@ -187,14 +187,53 @@ public class CalendarService {
         return calendar;
     }
 
+    //TODO: CHANGE TO UPSERT( change in persister file only )
+    public List<JudgeCalendarRule> upsert(JudgeCalendarUpdateRequest judgeCalendarUpdateRequest) {
+
+        //validate
+        validator.validateUpdateJudgeCalendar(judgeCalendarUpdateRequest.getJudgeCalendarRule());
+
+        //enrich
+        enrichment.enrichUpdateJudgeCalendar(judgeCalendarUpdateRequest.getRequestInfo(), judgeCalendarUpdateRequest.getJudgeCalendarRule());
+
+        //push to kafka
+        producer.push(config.getUpdateJudgeCalendarTopic(), judgeCalendarUpdateRequest.getJudgeCalendarRule());
+
+        return judgeCalendarUpdateRequest.getJudgeCalendarRule();
+
+    }
+
+
     //TODO:create helper class and move this into the class
     private HearingSearchCriteria getHearingSearchCriteriaFromJudgeSearch(CalendarSearchCriteria criteria) {
 
         LocalDate fromDate = null, toDate = null;
 
-        LocalDate currentDate = LocalDate.now();
+        Pair<LocalDate, LocalDate> pair = getFromAndToDateFromPeriodType(criteria.getPeriodType());
+        fromDate = pair.getKey();
+        toDate = pair.getValue();
+        //this ll override the switch case result (providing the highest priority to custom range)
+        if (criteria.getFromDate() != null && criteria.getToDate() != null) {
+            fromDate = criteria.getFromDate();
+            toDate = criteria.getToDate();
+        }
 
-        switch (criteria.getPeriodType()) {
+        return HearingSearchCriteria.builder()
+                .judgeId(criteria.getJudgeId())
+                .tenantId(criteria.getTenantId())
+                .fromDate(fromDate)
+                .toDate(toDate).build();
+    }
+
+
+
+    public Pair<LocalDate, LocalDate> getFromAndToDateFromPeriodType(PeriodType periodType) {
+
+        Pair<LocalDate, LocalDate> pair = new Pair<>();
+
+        LocalDate fromDate = null, toDate = null;
+        LocalDate currentDate = LocalDate.now();
+        switch (periodType) {
 
             case CURRENT_DATE -> toDate = fromDate = currentDate;
             case CURRENT_WEEK -> {
@@ -218,34 +257,9 @@ public class CalendarService {
 
             }
         }
-        //this ll override the switch case result (providing the highest priority to custom range)
-        if (criteria.getFromDate() != null && criteria.getToDate() != null) {
-            fromDate = criteria.getFromDate();
-            toDate = criteria.getToDate();
-        }
-
-
-        return HearingSearchCriteria.builder()
-                .judgeId(criteria.getJudgeId())
-                .tenantId(criteria.getTenantId())
-                .fromDate(fromDate)
-                .toDate(toDate).build();
-    }
-
-
-    //TODO: CHANGE TO UPSERT( change in persister file only )
-    public List<JudgeCalendarRule> upsert(JudgeCalendarUpdateRequest judgeCalendarUpdateRequest) {
-
-        //validate
-        validator.validateUpdateJudgeCalendar(judgeCalendarUpdateRequest.getJudgeCalendarRule());
-
-        //enrich
-        enrichment.enrichUpdateJudgeCalendar(judgeCalendarUpdateRequest.getRequestInfo(), judgeCalendarUpdateRequest.getJudgeCalendarRule());
-
-        //push to kafka
-        producer.push(config.getUpdateJudgeCalendarTopic(), judgeCalendarUpdateRequest.getJudgeCalendarRule());
-
-        return judgeCalendarUpdateRequest.getJudgeCalendarRule();
+        pair.setKey(fromDate);
+        pair.setValue(toDate);
+        return pair;
 
     }
 }

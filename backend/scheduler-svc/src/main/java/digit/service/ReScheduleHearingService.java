@@ -4,9 +4,11 @@ package digit.service;
 import digit.web.models.ReScheduleHearing;
 import digit.web.models.ReScheduleHearingReqSearchRequest;
 import digit.web.models.ReScheduleHearingRequest;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ReScheduleHearingService {
 
     public List<ReScheduleHearing> create(ReScheduleHearingRequest reScheduleHearingsRequest) {

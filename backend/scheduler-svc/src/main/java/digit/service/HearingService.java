@@ -6,7 +6,10 @@ import digit.enrichment.HearingEnrichment;
 import digit.kafka.Producer;
 import digit.repository.HearingRepository;
 import digit.validator.HearingValidator;
-import digit.web.models.*;
+import digit.web.models.HearingSearchCriteria;
+import digit.web.models.HearingSearchRequest;
+import digit.web.models.ScheduleHearing;
+import digit.web.models.ScheduleHearingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +65,9 @@ public class HearingService {
 
     public List<ScheduleHearing> search(HearingSearchRequest request) {
 
-        return null;
+        return hearingRepository.getHearings(request.getCriteria());
+
+
     }
 
 
