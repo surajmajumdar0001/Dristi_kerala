@@ -4,8 +4,6 @@ package digit.web.controllers;
 import digit.service.HearingService;
 import digit.util.ResponseInfoFactory;
 import digit.web.models.*;
-
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,38 +22,28 @@ import java.util.List;
 @RequestMapping("")
 public class HearingApiController {
 
-
     @Autowired
     private HearingService hearingService;
 
 
     @RequestMapping(value = "/hearing/v1/_schedule", method = RequestMethod.POST)
     public ResponseEntity<HearingResponse> scheduleHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody ScheduleHearingRequest request) {
-
-        List<ScheduleHearing> scheduledHearings = hearingService.scheduleHearing(request);
+        //service call
+        List<ScheduleHearing> scheduledHearings = hearingService.schedule(request);
         HearingResponse response = HearingResponse.builder().hearings(scheduledHearings).responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true)).build();
         return ResponseEntity.accepted().body(response);
     }
 
-    @RequestMapping(value = "/hearing/v1/_reschedule", method = RequestMethod.POST)
-    public ResponseEntity<ReScheduleHearingResponse> reScheduleHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody ReScheduleHearingRequest request) {
-
-        List<ReScheduleHearing> scheduledHearings = hearingService.reScheduleHearingRequest(request.getReScheduleHearing());
-
-        ReScheduleHearingResponse response = ReScheduleHearingResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
-                .reScheduleHearings(scheduledHearings).build();
-
-        return ResponseEntity.accepted().body(response);
-    }
 
     @RequestMapping(value = "/hearing/v1/_search", method = RequestMethod.POST)
-    public ResponseEntity<ReScheduleHearingResponse> searchHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody HearingSearchRequest request) {
+    public ResponseEntity<HearingResponse> searchHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody HearingSearchRequest request) {
 
-        List<ReScheduleHearing> scheduledHearings = hearingService.search(request);
+        List<ScheduleHearing> scheduledHearings = hearingService.search(request);
 
-        ReScheduleHearingResponse response = ReScheduleHearingResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
-                .reScheduleHearings(scheduledHearings).build();
+        HearingResponse response = HearingResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
+                .hearings(scheduledHearings).build();
 
         return ResponseEntity.accepted().body(response);
     }
+
 }

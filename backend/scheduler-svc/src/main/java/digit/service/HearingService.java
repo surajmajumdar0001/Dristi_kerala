@@ -36,7 +36,7 @@ public class HearingService {
     }
 
 
-    public List<ScheduleHearing> scheduleHearing(ScheduleHearingRequest schedulingRequests) {
+    public List<ScheduleHearing> schedule(ScheduleHearingRequest schedulingRequests) {
 
         //validate hearing request here
         hearingValidator.validateHearing(schedulingRequests.getHearing());
@@ -51,7 +51,7 @@ public class HearingService {
     }
 
     // to update the status of existing hearing to reschedule
-    private void updateScheduledHearing(List<ScheduleHearing> updateScheduleHearingRequest) {
+    private void update(List<ScheduleHearing> updateScheduleHearingRequest) {
         //  validate request
 
         //  enrich the request
@@ -60,29 +60,16 @@ public class HearingService {
         //  push to kafka
     }
 
+    public List<ScheduleHearing> search(HearingSearchRequest request) {
 
-    public List<ReScheduleHearing> reScheduleHearingRequest(List<ReScheduleHearing> reScheduleHearingsRequest) {
-
-
-        return reScheduleHearingsRequest;
-
-    }
-
-
-    public List<ScheduleHearing> getJudgeHearing(HearingSearchCriteria searchCriteria) {
-
-        List<ScheduleHearing> judgeHearings = hearingRepository.getJudgeHearing(searchCriteria);
         return null;
     }
+
 
     public List<String> getAvailableDateForHearing(HearingSearchCriteria hearingSearchCriteria) {
 
-
-        List<String> availableDates = hearingRepository.getAvailableDatesOfJudges(hearingSearchCriteria);
-        return availableDates;
+        return hearingRepository.getAvailableDatesOfJudges(hearingSearchCriteria);
     }
 
-    public List<ReScheduleHearing> search(HearingSearchRequest request) {
-        return null;
-    }
+
 }

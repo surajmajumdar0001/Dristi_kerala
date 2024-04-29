@@ -47,9 +47,9 @@ public class ServiceConstants {
     public static final String BUSINESS_SERVICES = "&businessServices=";
 
 
-    public final String DEFAULT_JUDGE_CALENDAR_MODULE_NAME = "some module name";
+    public final String DEFAULT_JUDGE_CALENDAR_MODULE_NAME = "schedule-hearing";
 
-    public final String DEFAULT_JUDGE_CALENDAR_MASTER_NAME = "some master name";
+    public final String DEFAULT_JUDGE_CALENDAR_MASTER_NAME = "COURT000334";
 
 
 }

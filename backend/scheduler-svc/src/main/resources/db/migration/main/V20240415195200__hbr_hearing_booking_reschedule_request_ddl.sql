@@ -16,6 +16,6 @@ CREATE TABLE hearing_booking_reschedule_request (
     judgeId                 character varying(64),
     documents               jsonb,
 
-    CONSTRAINT pk_hearing_booking_reschedule_request_id PRIMARY KEY (reschedule_request_id)
+    CONSTRAINT pk_hearing_booking_reschedule_request_id PRIMARY KEY (rescheduleRequestId)
 
 );

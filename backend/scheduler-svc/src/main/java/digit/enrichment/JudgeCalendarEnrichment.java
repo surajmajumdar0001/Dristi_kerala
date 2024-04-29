@@ -1,9 +1,7 @@
 package digit.enrichment;
 
 import digit.web.models.JudgeCalendarRule;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.stereotype.Component;
 

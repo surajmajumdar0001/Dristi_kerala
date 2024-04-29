@@ -10,6 +10,7 @@ import org.egov.tracer.model.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +25,17 @@ public class HearingValidator {
         schedulingRequests.forEach(application -> {
             if (ObjectUtils.isEmpty(application.getTenantId()))
                 throw new CustomException("DK_SH_APP_ERR", "tenantId is mandatory for schedule a hearing");
+
+            if (ObjectUtils.isEmpty(application.getDate())){
+                throw new CustomException("DK_SH_APP_ERR", "date is mandatory for schedule a hearing");
+            }else{
+                LocalDate date = application.getDate();
+                if (date.isBefore(LocalDate.now())){
+                    throw new CustomException("DK_SH_APP_ERR", "cannot schedule a hearing for past date: " +date);
+
+                }
+            }
+
         });
 
         verifyHearingDates(schedulingRequests);
@@ -31,6 +43,8 @@ public class HearingValidator {
 
     private void verifyHearingDates(List<ScheduleHearing> hearingRequest) {
         HashMap<String, Double> map = new HashMap<>(); // to avoid extra call to db
+
+        //TODO: need to configure
         Double judgeBandwidth = 8.0;
 
         for (ScheduleHearing hearing : hearingRequest) {

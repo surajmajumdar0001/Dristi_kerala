@@ -3,7 +3,10 @@ package digit.web.controllers;
 
 import digit.service.ReScheduleHearingService;
 import digit.util.ResponseInfoFactory;
-import digit.web.models.*;
+import digit.web.models.ReScheduleHearing;
+import digit.web.models.ReScheduleHearingReqSearchRequest;
+import digit.web.models.ReScheduleHearingRequest;
+import digit.web.models.ReScheduleHearingResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 import java.util.List;
 
-@RestController("reScheduleHearingApiController")
+@RestController("hearingApiController")
 @RequestMapping("")
 public class ReScheduleHearingController {
 
@@ -39,10 +42,10 @@ public class ReScheduleHearingController {
     @RequestMapping(value = "/hearing/v1/reschedule/_update", method = RequestMethod.POST)
     public ResponseEntity<ReScheduleHearingResponse> updateReScheduleHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody ReScheduleHearingRequest request) {
         //service call
-        List<ReScheduleHearing> scheduledHearings = reScheduleHearingService.update(request);
+        ReScheduleHearing scheduledHearings = reScheduleHearingService.update(request);
 
         ReScheduleHearingResponse response = ReScheduleHearingResponse.builder().ResponseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
-                .reScheduleHearings(scheduledHearings).build();
+                .reScheduleHearings(Collections.singletonList(scheduledHearings)).build();
 
         return ResponseEntity.accepted().body(response);
     }
@@ -51,18 +54,6 @@ public class ReScheduleHearingController {
     public ResponseEntity<ReScheduleHearingResponse> searchRescheduleHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody ReScheduleHearingReqSearchRequest request) {
         //service call
         List<ReScheduleHearing> scheduledHearings = reScheduleHearingService.search(request);
-
-        ReScheduleHearingResponse response = ReScheduleHearingResponse.builder().ResponseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
-                .reScheduleHearings(scheduledHearings).build();
-
-        return ResponseEntity.accepted().body(response);
-    }
-
-
-    @RequestMapping(value = "/hearing/v1/bulk/_reschedule", method = RequestMethod.POST)
-    public ResponseEntity<ReScheduleHearingResponse> bulkRescheduleHearing(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody BulkReScheduleHearingRequest request) {
-        //service call
-        List<ReScheduleHearing> scheduledHearings = reScheduleHearingService.bulkReschedule(request);
 
         ReScheduleHearingResponse response = ReScheduleHearingResponse.builder().ResponseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .reScheduleHearings(scheduledHearings).build();

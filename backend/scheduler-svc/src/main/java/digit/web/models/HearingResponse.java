@@ -17,7 +17,6 @@ import java.util.List;
 @Builder
 public class HearingResponse {
 
-
     @JsonProperty("ResponseInfo")
     @Valid
     private ResponseInfo responseInfo = null;

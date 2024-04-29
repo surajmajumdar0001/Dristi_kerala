@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -21,18 +20,19 @@ public class HearingSearchCriteria {
     @JsonProperty("hearingIds")
     private List<String> hearingIds;
 
-    @JsonProperty("fromDate")
-    private LocalDate fromDate;
-
     @JsonProperty("judgeId")
     private String judgeId;
 
     @JsonProperty("courtId")
     private String courtId;
 
+    @JsonProperty("fromDate")
+    private LocalDate fromDate;
+
     @JsonProperty("toDate")
     private LocalDate toDate;
 
+    //TODO: this should be enum
     @JsonProperty("hearingType")
     private String hearingType;
 
@@ -41,7 +41,6 @@ public class HearingSearchCriteria {
 
     @JsonProperty("tenantId")
     private String tenantId;
-
 
 
 }

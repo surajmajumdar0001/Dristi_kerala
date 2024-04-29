@@ -2,11 +2,12 @@ package digit.enrichment;
 
 
 import digit.config.Configuration;
+import digit.models.coremodels.AuditDetails;
 import digit.util.IdgenUtil;
 import digit.web.models.ScheduleHearing;
+import digit.web.models.enums.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.tracer.model.AuditDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,11 @@ public class HearingEnrichment {
         for (ScheduleHearing hearing : hearingList) {
             hearing.setAuditDetails(auditDetails);
             hearing.setHearingBookingId(idList.get(index++));
+            hearing.setRowVersion(1);
+            hearing.setStatus(Status.SCHEDULED);
         }
+
+
 
 
     }

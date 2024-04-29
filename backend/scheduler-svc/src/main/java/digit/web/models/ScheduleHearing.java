@@ -3,13 +3,14 @@ package digit.web.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import digit.models.coremodels.AuditDetails;
+import digit.web.models.enums.EventType;
+import digit.web.models.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.egov.tracer.model.AuditDetails;
 import org.egov.tracer.model.Error;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,8 +39,9 @@ public class ScheduleHearing {
     @JsonProperty("date")
     private LocalDate date;
 
+    //TODO: this should be enum
     @JsonProperty("eventType")
-    private String eventType;
+    private EventType eventType;
 
     @JsonProperty("title")
     private String title;
@@ -47,8 +49,9 @@ public class ScheduleHearing {
     @JsonProperty("description")
     private String description;
 
+    //TODO: this should be enum
     @JsonProperty("status")
-    private String status;
+    private Status status;
 
     @JsonProperty("startTime")
     private LocalDateTime startTime;
@@ -60,7 +63,7 @@ public class ScheduleHearing {
     private AuditDetails auditDetails;
 
     @JsonProperty("rowVersion")
-    private Long rowVersion = null;
+    private Integer rowVersion = null;
 
     @JsonProperty("error")
     @JsonIgnore

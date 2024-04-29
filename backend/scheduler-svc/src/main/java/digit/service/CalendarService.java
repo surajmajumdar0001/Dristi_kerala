@@ -11,12 +11,11 @@ import digit.validator.JudgeCalendarValidator;
 import digit.web.models.*;
 import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Stream;
@@ -27,7 +26,7 @@ public class CalendarService {
     private final JudgeCalendarValidator validator;
     private final JudgeCalendarEnrichment enrichment;
     private final Producer producer;
-    private Configuration config;
+    private final Configuration config;
 
     @Autowired
     private MdmsUtil mdmsUtil;
@@ -51,48 +50,67 @@ public class CalendarService {
     }
 
 
-    public List<String> getJudgeAvailability(JudgeCalendarSearchRequest searchCriteriaRequest) {
+    public List<String> getJudgeAvailability(JudgeAvailabilitySearchRequest searchCriteriaRequest) {
 
+        JudgeAvailabilitySearchCriteria criteria = searchCriteriaRequest.getCriteria();
+
+        //validating required fields
+        validator.validateSearchRequest(criteria);
+        //TODO:CONFIGURE
+        if (criteria.getNumberOfSuggestedDays()==null) criteria.setNumberOfSuggestedDays(5);
         List<String> resultList = new ArrayList<>();
         HashMap<String, Boolean> dateMap = new HashMap<>();
 
-        int calendarLength;
-        int hearingLength;
-        JudgeSearchCriteria criteria = searchCriteriaRequest.getCriteria();
-
-        //  fetch mdms data of default calendar for court id
+        //TODO: need to configure
+        // fetch mdms data of default calendar for court id
         Map<String, Map<String, JSONArray>> defaultCalendarResponse = mdmsUtil.fetchMdmsData(searchCriteriaRequest.getRequestInfo(), criteria.getTenantId(), serviceConstants.DEFAULT_JUDGE_CALENDAR_MODULE_NAME, Collections.singletonList(serviceConstants.DEFAULT_JUDGE_CALENDAR_MASTER_NAME));
+        JSONArray court000334 = defaultCalendarResponse.get("schedule-hearing").get("COURT000334");
 
         //  fetch judge calendar rule for next thirty days
         List<JudgeCalendarRule> judgeCalendarRule = calendarRepository.getJudgeRule(criteria);
 
-
-        calendarLength = judgeCalendarRule.size();
-
+        int calendarLength = judgeCalendarRule.size();
 
         HearingSearchCriteria hearingSearchCriteria = HearingSearchCriteria.builder().fromDate(criteria.getFromDate()).judgeId(criteria.getJudgeId()).toDate(criteria.getFromDate().plusDays(30)).build();
 
         List<String> availableDateForHearing = hearingService.getAvailableDateForHearing(hearingSearchCriteria);
-        hearingLength = availableDateForHearing.size();
+        int hearingLength = availableDateForHearing.size();
 
-
-        int loopLength = Math.max(calendarLength, hearingLength);  // need to add mdms as well
-
+        //TODO: need to add mdms as well
+        int loopLength = Math.max(Math.max(calendarLength, hearingLength), court000334.size());
+        LocalDate lastDateInDefaultCalendar = null;
         for (int i = 0; i < loopLength; i++) {
 
             if (i < calendarLength) dateMap.put(judgeCalendarRule.get(i).getDate().toString(), false);
             if (i < hearingLength) dateMap.put(availableDateForHearing.get(i), true);
+            if (i < court000334.size()) {
+                LinkedHashMap map = (LinkedHashMap) court000334.get(i);
+                if (map.containsKey("date")) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    String date = String.valueOf(map.get("date"));
+                    dateMap.put(LocalDate.parse(date, formatter).toString(), false);
+                    lastDateInDefaultCalendar = LocalDate.parse(date, formatter);
+                }
 
-            //one more if condition for mdms
+            }
+            //TODO: need to add mdms as well
+
         }
-
-        LocalDate endDate = criteria.getFromDate().plusDays(30);
+        LocalDate dateAfterSixMonths = criteria.getFromDate().plusDays(30 * 6);   // configurable?
+        LocalDate endDate = lastDateInDefaultCalendar.isBefore(dateAfterSixMonths) ? lastDateInDefaultCalendar.with(TemporalAdjusters.lastDayOfMonth()) : dateAfterSixMonths;
         // check startDate in date map if its exits and value is true then add to the result list
-        Stream.iterate(criteria.getFromDate(), startDate -> startDate.isBefore(endDate), startDate -> startDate.plusDays(1)).forEach(startDate -> {
+        Stream.iterate(criteria.getFromDate(), startDate -> startDate.isBefore(endDate), startDate -> startDate.plusDays(1))
+                .takeWhile(startDate->resultList.size()!=criteria.getNumberOfSuggestedDays()).forEach(startDate -> {
             if (dateMap.containsKey(startDate.toString()) && dateMap.get(startDate.toString()))
                 resultList.add(startDate.toString());
-            else resultList.add(startDate.toString());
+
+            // this case will cover no holiday,no leave and no hearing for day
+            if (!dateMap.containsKey(startDate.toString())) resultList.add(startDate.toString());
+
+
+
         });
+        //TODO: throw error if there is no date in next six month after from date
 
         return resultList;
 
@@ -102,26 +120,43 @@ public class CalendarService {
 
     public List<HearingCalendar> getJudgeCalendar(JudgeCalendarSearchRequest searchCriteriaRequest) {
 
+        CalendarSearchCriteria criteria = searchCriteriaRequest.getCriteria();
+        validator.validateSearchRequest(criteria);
+
         List<HearingCalendar> calendar = new ArrayList<>();
         HashMap<LocalDate, List<ScheduleHearing>> dayHearingMap = new HashMap<>();
         HashMap<LocalDate, Object> leaveMap = new HashMap<>();
 
-        JudgeSearchCriteria criteria = searchCriteriaRequest.getCriteria();
 
+        //TODO: need to configure
         //fetch mdms data of default calendar for court id and judge id
         Map<String, Map<String, JSONArray>> defaultCourtCalendar = mdmsUtil.fetchMdmsData(searchCriteriaRequest.getRequestInfo(), criteria.getTenantId(), serviceConstants.DEFAULT_JUDGE_CALENDAR_MODULE_NAME, Collections.singletonList(serviceConstants.DEFAULT_JUDGE_CALENDAR_MASTER_NAME));
+        JSONArray court000334 = defaultCourtCalendar.get("schedule-hearing").get("COURT000334");
+
 
         //fetch judge calendar rule
         List<JudgeCalendarRule> judgeCalendarRule = calendarRepository.getJudgeRule(criteria);
-        for (JudgeCalendarRule calendarRule : judgeCalendarRule) {
 
-            leaveMap.put(calendarRule.getDate(), calendarRule);
+        int loopLength = Math.max(judgeCalendarRule.size(), court000334.size());
+        for (int i = 0; i < loopLength; i++) {
+
+            if (i < judgeCalendarRule.size())
+                leaveMap.put(judgeCalendarRule.get(i).getDate(), judgeCalendarRule.get(i));
+            if (i < court000334.size()) {
+                LinkedHashMap map = (LinkedHashMap) court000334.get(i);
+                if (map.containsKey("date")) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    String date = String.valueOf(map.get("date"));
+                    leaveMap.put(LocalDate.parse(date, formatter), map);
+                }
+
+            }
 
         }
 
         HearingSearchCriteria hearingSearchCriteria = getHearingSearchCriteriaFromJudgeSearch(criteria);
         // sort on the basis of start time
-        List<ScheduleHearing> hearings = hearingService.getJudgeHearing(hearingSearchCriteria);
+        List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().criteria(hearingSearchCriteria).build());
 
         hearings.forEach((hearing) -> {
 
@@ -134,14 +169,13 @@ public class CalendarService {
         });
 
         //merge all three and return the calendar
-
         for (LocalDate start = hearingSearchCriteria.getFromDate(); start.isBefore(hearingSearchCriteria.getToDate()) || start.isEqual(hearingSearchCriteria.getToDate()); start = start.plusDays(1)) {
             List<ScheduleHearing> hearingOfaDay = dayHearingMap.getOrDefault(start, new ArrayList<>());
 
             HearingCalendar calendarOfDay = HearingCalendar.builder()
                     .judgeId(criteria.getJudgeId())
-                    .isOnLeave(leaveMap.containsKey(start))
-                    .isHoliday(leaveMap.containsKey(start))
+                    .isOnLeave(leaveMap.containsKey(start) && leaveMap.get(start) instanceof JudgeCalendarRule)
+                    .isHoliday(leaveMap.containsKey(start) && leaveMap.get(start) instanceof LinkedHashMap<?, ?>)
                     .notes("notes for now")
                     .date(start)
                     .description("description for now")
@@ -153,29 +187,39 @@ public class CalendarService {
         return calendar;
     }
 
-
-    private HearingSearchCriteria getHearingSearchCriteriaFromJudgeSearch(JudgeSearchCriteria criteria) {
+    //TODO:create helper class and move this into the class
+    private HearingSearchCriteria getHearingSearchCriteriaFromJudgeSearch(CalendarSearchCriteria criteria) {
 
         LocalDate fromDate = null, toDate = null;
 
-        if (criteria.getCurrentDate()) {
-            toDate = fromDate = LocalDate.now();
+        LocalDate currentDate = LocalDate.now();
 
-        } else if (criteria.getCurrentWeek()) {
-            LocalDate currentDate = LocalDate.now();
+        switch (criteria.getPeriodType()) {
 
-            DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
-            // Calculate the start date of the current week (assuming Monday as the start of the week)
-            fromDate = currentDate.minusDays(dayOfWeek.getValue() - 1);
-            // Calculate the end date of the current week (assuming Sunday as the end of the week)
-            toDate = fromDate.plusDays(6);
-        } else if (criteria.getCurrentMonth()) {
-            LocalDate currentDate = LocalDate.now();
-            // Calculate the start date of the current month
-            fromDate = currentDate.with(TemporalAdjusters.firstDayOfMonth());
-            // Calculate the end date of the current month
-            toDate = currentDate.with(TemporalAdjusters.lastDayOfMonth());
-        } else if (criteria.getFromDate() != null && criteria.getToDate() != null) {
+            case CURRENT_DATE -> toDate = fromDate = currentDate;
+            case CURRENT_WEEK -> {
+                DayOfWeek dayOfWeek = currentDate.getDayOfWeek();
+                // Calculate the start date of the current week (assuming Monday as the start of the week)
+                fromDate = currentDate.minusDays(dayOfWeek.getValue() - 1);
+                // Calculate the end date of the current week (assuming Sunday as the end of the week)
+                toDate = fromDate.plusDays(6);
+            }
+            case CURRENT_MONTH -> {
+                // Calculate the start date of the current month
+                fromDate = currentDate.with(TemporalAdjusters.firstDayOfMonth());
+                // Calculate the end date of the current month
+                toDate = currentDate.with(TemporalAdjusters.lastDayOfMonth());
+            }
+            case CURRENT_YEAR -> {
+                // Calculate the start date of the current year
+                fromDate = currentDate.with(TemporalAdjusters.firstDayOfYear());
+                // Calculate the end date of the current year
+                toDate = currentDate.with(TemporalAdjusters.lastDayOfYear());
+
+            }
+        }
+        //this ll override the switch case result (providing the highest priority to custom range)
+        if (criteria.getFromDate() != null && criteria.getToDate() != null) {
             fromDate = criteria.getFromDate();
             toDate = criteria.getToDate();
         }
@@ -189,8 +233,8 @@ public class CalendarService {
     }
 
 
-    // this ll updated default calendar of judge
-    public List<JudgeCalendarRule> update(JudgeCalendarUpdateRequest judgeCalendarUpdateRequest) {
+    //TODO: CHANGE TO UPSERT( change in persister file only )
+    public List<JudgeCalendarRule> upsert(JudgeCalendarUpdateRequest judgeCalendarUpdateRequest) {
 
         //validate
         validator.validateUpdateJudgeCalendar(judgeCalendarUpdateRequest.getJudgeCalendarRule());

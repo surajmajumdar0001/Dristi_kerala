@@ -21,7 +21,7 @@ import java.util.List;
 @Builder
 public class ScheduleHearingRequest {
 
-    @JsonProperty("requestInfo")
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 

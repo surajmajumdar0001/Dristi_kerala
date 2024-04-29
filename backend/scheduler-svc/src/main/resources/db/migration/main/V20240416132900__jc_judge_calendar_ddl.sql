@@ -1,6 +1,5 @@
 CREATE TABLE judge_calendar_rules (
 
-
     judgeId              varchar(64),
     id                   varchar(64),
     ruleType             varchar(64),

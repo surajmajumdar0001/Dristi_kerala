@@ -2,12 +2,13 @@ package digit.web.models;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import digit.models.coremodels.AuditDetails;
+import digit.web.models.enums.Status;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.egov.tracer.model.AuditDetails;
-import jakarta.validation.Valid;
 import org.egov.common.contract.models.Document;
 
 import java.util.List;
@@ -28,6 +29,12 @@ public class ReScheduleHearing {
     @JsonProperty("tenantId")
     private String tenantId;
 
+    @JsonProperty("judgeId")
+    private String judgeId;
+
+    @JsonProperty("caseId")
+    private String caseId;
+
     @JsonProperty("requesterId")
     private String requesterId;
 
@@ -35,7 +42,7 @@ public class ReScheduleHearing {
     private String reason;
 
     @JsonProperty("status")
-    private String status;
+    private Status status;
 
     @JsonProperty("actionComment")
     private String actionComment;
@@ -48,14 +55,6 @@ public class ReScheduleHearing {
 
     @JsonProperty("rowVersion")
     private Long rowVersion = null;
-
-    // will discuss this on this fields
-
-    @JsonProperty("judgeId")
-    private String judgeId;
-
-    @JsonProperty("caseId")
-    private String caseId;
 
     @JsonProperty("documents")
     @Valid

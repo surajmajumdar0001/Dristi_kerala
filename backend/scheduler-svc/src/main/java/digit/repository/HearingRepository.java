@@ -30,7 +30,7 @@ public class HearingRepository {
         List<String> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getJudgeHearingQuery(hearingSearchCriteria, preparedStmtList);
         log.debug("Final query: " + query);
-        return jdbcTemplate.query(query, rowMapper);
+        return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 
     }
 
@@ -39,7 +39,7 @@ public class HearingRepository {
         List<String> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getJudgeAvailableDatesQuery(hearingSearchCriteria, preparedStmtList);
         log.debug("Final query: " + query);
-        return jdbcTemplate.queryForList(query, String.class);
+        return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
 
 
     }
