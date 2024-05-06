@@ -3,6 +3,7 @@ package digit.service;
 
 import digit.config.Configuration;
 import digit.enrichment.ReScheduleRequestEnrichment;
+import digit.helper.HearingScheduler;
 import digit.kafka.Producer;
 import digit.repository.ReScheduleRequestRepository;
 import digit.validator.ReScheduleRequestValidator;
@@ -41,6 +42,9 @@ public class ReScheduleHearingService {
     private CalendarService calendarService;
 
     @Autowired
+    private HearingScheduler hearingScheduler;
+
+    @Autowired
     public ReScheduleHearingService(ReScheduleRequestRepository repository, ReScheduleRequestValidator validator, ReScheduleRequestEnrichment enrichment, Producer producer, Configuration config) {
         this.repository = repository;
         this.validator = validator;
@@ -56,7 +60,7 @@ public class ReScheduleHearingService {
 
         enrichment.enrichRescheduleRequest(reScheduleHearingsRequest);
 
-        workflowService.updateWorkflowStatus(reScheduleHearingsRequest);
+//        workflowService.updateWorkflowStatus(reScheduleHearingsRequest);
 
         producer.push(config.getRescheduleRequestCreateTopic(), reScheduleHearing);
 
@@ -75,6 +79,10 @@ public class ReScheduleHearingService {
 
         workflowService.updateWorkflowStatus(reScheduleHearingsRequest);
 
+        // here if its approved we need to calculate date
+        // then schedule dummy hearings for judge to block the calendar
+        hearingScheduler.scheduleHearingForApprovalStatus(reScheduleHearingsRequest);
+
         producer.push(config.getUpdateRescheduleRequestTopic(), reScheduleHearing);
 
         return reScheduleHearing;
@@ -89,13 +97,13 @@ public class ReScheduleHearingService {
 
         BulkReschedulingOfHearings bulkRescheduling = request.getBulkRescheduling();
 
-
+        String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
         String judgeId = bulkRescheduling.getJudgeId();
         LocalDateTime endTime = bulkRescheduling.getEndTime();
         LocalDateTime startTime = bulkRescheduling.getStartTime();
         LocalDate fromDate = bulkRescheduling.getFromDate();
 
-        HearingSearchCriteria criteria = HearingSearchCriteria.builder().judgeId(judgeId).startDateTime(startTime).endDateTime(endTime).build();
+        HearingSearchCriteria criteria = HearingSearchCriteria.builder().judgeId(judgeId).startDateTime(startTime).endDateTime(endTime).tenantId(tenantId).build();
 
         List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().requestInfo(request.getRequestInfo()).criteria(criteria).build());
 
@@ -115,7 +123,7 @@ public class ReScheduleHearingService {
                                 .fromDate(fromDate)
                                 .courtId("0001")
                                 .numberOfSuggestedDays(hearings.size())
-                                .tenantId(criteria.getTenantId())// need to configure some where
+                                .tenantId(tenantId)// need to configure some where
                                 .build()).build()
         );
 

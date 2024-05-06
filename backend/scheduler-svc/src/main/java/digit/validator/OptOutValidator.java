@@ -25,7 +25,7 @@ public class OptOutValidator {
                 throw new CustomException("DK_SH_APP_ERR", "tenantId is mandatory for opt out dates");
             if (ObjectUtils.isEmpty(application.getIndividualId()))
                 throw new CustomException("DK_SH_APP_ERR", "individual id is mandatory for opt out dates");
-            if (ObjectUtils.isEmpty(application.getHearingRescheduleRequestId()))
+            if (ObjectUtils.isEmpty(application.getRescheduleRequestId()))
                 throw new CustomException("DK_SH_APP_ERR", "reschedule request id is mandatory for opt out dates");
         });
     }

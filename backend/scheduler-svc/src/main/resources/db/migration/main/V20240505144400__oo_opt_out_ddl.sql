@@ -6,7 +6,7 @@ CREATE TABLE opt_out
     judgeId                         character varying(64),
     caseId                          character varying(64),
     reschedulerequestid             character varying(64),
-    optoutDates                     jsonb
+    optoutDates                     jsonb,
     createdBy                       character varying(64),
     createdTime                     bigint,
     lastModifiedBy                  character varying(64),
@@ -14,6 +14,6 @@ CREATE TABLE opt_out
     rowVersion                      bigint,
     tenantId                        character varying(1000),
 
-    CONSTRAINT pk_hearing_booking_id PRIMARY KEY (hearingBookingId)
+    CONSTRAINT pk_opt_out_id PRIMARY KEY (id)
 
 );

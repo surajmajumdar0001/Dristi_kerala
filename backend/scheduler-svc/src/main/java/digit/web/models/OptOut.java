@@ -30,8 +30,8 @@ public class OptOut {
     @JsonProperty("caseId")
     private String caseId;
 
-    @JsonProperty("hearingRescheduleRequestId")
-    private String hearingRescheduleRequestId;
+    @JsonProperty("rescheduleRequestId")
+    private String rescheduleRequestId;
 
     @JsonProperty("judgeId")
     private String judgeId;

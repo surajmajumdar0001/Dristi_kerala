@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.egov.common.contract.models.Document;
 
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -40,6 +41,9 @@ public class ReScheduleHearing {
 
     @JsonProperty("reason")
     private String reason;
+
+    @JsonProperty("availableAfter")
+    private LocalDate availableAfter;
 
     @JsonProperty("status")
     private Status status;

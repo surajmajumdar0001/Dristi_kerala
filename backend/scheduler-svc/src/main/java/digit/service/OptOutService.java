@@ -9,6 +9,7 @@ import digit.validator.OptOutValidator;
 import digit.web.models.OptOut;
 import digit.web.models.OptOutRequest;
 import digit.web.models.OptOutSearchRequest;
+import digit.web.models.Workflow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,9 @@ public class OptOutService {
 
     @Autowired
     private Configuration config;
+
+    @Autowired
+    private WorkflowService workflowService;
 
 
     public List<OptOut> create(OptOutRequest request) {

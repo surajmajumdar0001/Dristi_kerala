@@ -26,10 +26,10 @@ public class ReScheduleRequestValidator {
 
         rescheduleRequests.stream().peek((element) -> {
             if (ObjectUtils.isEmpty(element.getTenantId())) {
-                throw new CustomException("error code", "tenantId is required to reschedule the hearing");
+                throw new CustomException("DK_SH_APP_ERR", "tenantId is required to reschedule the hearing");
             }
             if (ObjectUtils.isEmpty(element.getHearingBookingId())) {
-                throw new CustomException("error code", "hearing Id is required to reschedule the hearing");
+                throw new CustomException("DK_SH_APP_ERR", "hearing Id is required to reschedule the hearing");
             }
 
             //TODO: provide other required fields
@@ -41,7 +41,7 @@ public class ReScheduleRequestValidator {
 
         if (hearingsToReschedule.size() != ids.size()) {
             //TODO: proper error msg
-            throw new CustomException("error code", "provide proper error msg here ");
+            throw new CustomException("DK_SH_APP_ERR", "Hearing does not exist in db");
         }
     }
 
@@ -53,7 +53,7 @@ public class ReScheduleRequestValidator {
         List<ReScheduleHearing> existingReScheduleRequests = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().rescheduledRequestId(ids).build());
         if (existingReScheduleRequests.size() != ids.size()) {
             //TODO: proper error msg
-            throw new CustomException("error code", "provide proper error msg here ");
+            throw new CustomException("DK_SH_APP_ERR", "Request does not exist in db");
         }
 
         return existingReScheduleRequests;
