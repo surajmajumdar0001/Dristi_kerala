@@ -6,7 +6,6 @@ import digit.web.models.OptOutRequest;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.stereotype.Component;
 
-import java.util.Random;
 import java.util.UUID;
 
 @Component
@@ -15,7 +14,7 @@ public class OptOutEnrichment {
 
         AuditDetails auditDetails = getAuditDetailsScheduleHearing(request.getRequestInfo());
 
-        request.getOptOuts().forEach((application)->{
+        request.getOptOuts().forEach((application) -> {
             application.setId(UUID.randomUUID().toString());
             application.setAuditDetails(auditDetails);
             application.setRowVersion(1);
@@ -24,7 +23,19 @@ public class OptOutEnrichment {
     }
 
     public void enrichUpdateRequest(OptOutRequest request) {
+
+        RequestInfo requestInfo = request.getRequestInfo();
+        request.getOptOuts().forEach((application) -> {
+
+            Long currentTime = System.currentTimeMillis();
+            application.getAuditDetails().setLastModifiedTime(currentTime);
+            application.getAuditDetails().setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+            application.setRowVersion(application.getRowVersion() + 1);
+
+        });
     }
+
+
 
     private AuditDetails getAuditDetailsScheduleHearing(RequestInfo requestInfo) {
 

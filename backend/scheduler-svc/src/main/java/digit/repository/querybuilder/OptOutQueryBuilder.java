@@ -17,7 +17,7 @@ public class OptOutQueryBuilder {
     private QueryBuilderHelper queryBuilderHelper;
 
 
-    private final String BASE_APPLICATION_QUERY = "SELECT   oo.createdby,oo.lastmodifiedby,oo.createdtime,oo.lastmodifiedtime, oo.rowversion ";
+    private final String BASE_APPLICATION_QUERY = "SELECT  oo.id ,oo.individualId ,oo.judgeId ,oo.caseId ,oo.reschedulerequestid ,oo.optoutDates , oo.createdby,oo.lastmodifiedby,oo.createdtime,oo.lastmodifiedtime, oo.rowversion ";
 
     private static final String FROM_TABLES = " FROM opt_out oo ";
 

@@ -5,7 +5,7 @@ CREATE TABLE opt_out
     individualId                    character varying(64),
     judgeId                         character varying(64),
     caseId                          character varying(64),
-    hearingRescheduleRequestId      character varying(64),
+    reschedulerequestid             character varying(64),
     optoutDates                     jsonb
     createdBy                       character varying(64),
     createdTime                     bigint,
