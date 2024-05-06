@@ -20,9 +20,23 @@ public class Configuration {
     @Value("${drishti.scheduler.hearing}")
     private String scheduleHearingTopic;
 
+    @Value("${drishti.scheduler.opt-out}")
+    private String optOutTopic;
+
+    @Value("${drishti.scheduler.opt-out.update}")
+    private String optOutUpdateTopic;
+
+    @Value("${drishti.scheduler.hearing.update}")
+    private String scheduleHearingUpdateTopic;
+
+    @Value("${drishti.scheduler.hearing.reschedule}")
+    private String rescheduleRequestCreateTopic;
+
     @Value("${drishti.judge.calendar.update}")
     private String updateJudgeCalendarTopic;
 
+    @Value("${drishti.scheduler.hearing.reschedule.update}")
+    private String updateRescheduleRequestTopic;
 
     // User Config
     @Value("${egov.user.host}")
@@ -53,6 +67,9 @@ public class Configuration {
     @Value("${egov.idgen.idformat}")
     private String hearingIdFormat;
 
+    @Value("${egov.idgen.reschedule}")
+    private String rescheduleHearingIdFormat;
+
 
     //Workflow Config
     @Value("${egov.workflow.host}")
@@ -78,4 +95,6 @@ public class Configuration {
     //SMSNotification
     @Value("${egov.sms.notification.topic}")
     private String smsNotificationTopic;
+
+
 }

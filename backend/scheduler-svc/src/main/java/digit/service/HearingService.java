@@ -6,10 +6,8 @@ import digit.enrichment.HearingEnrichment;
 import digit.kafka.Producer;
 import digit.repository.HearingRepository;
 import digit.validator.HearingValidator;
-import digit.web.models.HearingSearchCriteria;
-import digit.web.models.HearingSearchRequest;
-import digit.web.models.ScheduleHearing;
-import digit.web.models.ScheduleHearingRequest;
+import digit.web.models.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,24 +52,26 @@ public class HearingService {
     }
 
     // to update the status of existing hearing to reschedule
-    private void update(List<ScheduleHearing> updateScheduleHearingRequest) {
-        //  validate request
+    public  List<ScheduleHearing> update(ScheduleHearingRequest scheduleHearingRequest) {
 
-        //  enrich the request
-        //  updateStatus and audit details
+        hearingValidator.validateHearingOnUpdate(scheduleHearingRequest);
 
-        //  push to kafka
+        hearingEnrichment.enrichUpdateScheduleHearing(scheduleHearingRequest.getRequestInfo(), scheduleHearingRequest.getHearing());
+
+        producer.push(config.getScheduleHearingUpdateTopic(), scheduleHearingRequest.getHearing());
+
+        return scheduleHearingRequest.getHearing();
+
     }
 
     public List<ScheduleHearing> search(HearingSearchRequest request) {
 
         return hearingRepository.getHearings(request.getCriteria());
 
-
     }
 
 
-    public List<String> getAvailableDateForHearing(HearingSearchCriteria hearingSearchCriteria) {
+    public List<AvailabilityDTO> getAvailableDateForHearing(HearingSearchCriteria hearingSearchCriteria) {
 
         return hearingRepository.getAvailableDatesOfJudges(hearingSearchCriteria);
     }

@@ -51,7 +51,7 @@ public class CalendarService {
     }
 
 
-    public List<String> getJudgeAvailability(JudgeAvailabilitySearchRequest searchCriteriaRequest) {
+    public List<AvailabilityDTO> getJudgeAvailability(JudgeAvailabilitySearchRequest searchCriteriaRequest) {
 
         JudgeAvailabilitySearchCriteria criteria = searchCriteriaRequest.getCriteria();
 
@@ -59,8 +59,8 @@ public class CalendarService {
         validator.validateSearchRequest(criteria);
         //TODO:CONFIGURE
         if (criteria.getNumberOfSuggestedDays() == null) criteria.setNumberOfSuggestedDays(5);
-        List<String> resultList = new ArrayList<>();
-        HashMap<String, Boolean> dateMap = new HashMap<>();
+        List<AvailabilityDTO> resultList = new ArrayList<>();
+        HashMap<String, Double> dateMap = new HashMap<>();
 
         //TODO: need to configure
         // fetch mdms data of default calendar for court id
@@ -74,7 +74,7 @@ public class CalendarService {
 
         HearingSearchCriteria hearingSearchCriteria = HearingSearchCriteria.builder().fromDate(criteria.getFromDate()).judgeId(criteria.getJudgeId()).toDate(criteria.getFromDate().plusDays(30)).build();
 
-        List<String> availableDateForHearing = hearingService.getAvailableDateForHearing(hearingSearchCriteria);
+        List<AvailabilityDTO> availableDateForHearing = hearingService.getAvailableDateForHearing(hearingSearchCriteria);
         int hearingLength = availableDateForHearing.size();
 
         //TODO: need to add mdms as well
@@ -82,14 +82,15 @@ public class CalendarService {
         LocalDate lastDateInDefaultCalendar = null;
         for (int i = 0; i < loopLength; i++) {
 
-            if (i < calendarLength) dateMap.put(judgeCalendarRule.get(i).getDate().toString(), false);
-            if (i < hearingLength) dateMap.put(availableDateForHearing.get(i), true);
+            if (i < calendarLength) dateMap.put(judgeCalendarRule.get(i).getDate().toString(), -1.0);
+            if (i < hearingLength)
+                dateMap.put(availableDateForHearing.get(i).getDate(), availableDateForHearing.get(i).getOccupiedBandwidth());
             if (i < court000334.size()) {
                 LinkedHashMap map = (LinkedHashMap) court000334.get(i);
                 if (map.containsKey("date")) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                     String date = String.valueOf(map.get("date"));
-                    dateMap.put(LocalDate.parse(date, formatter).toString(), false);
+                    dateMap.put(LocalDate.parse(date, formatter).toString(), -1.0);
                     lastDateInDefaultCalendar = LocalDate.parse(date, formatter);
                 }
 
@@ -102,11 +103,17 @@ public class CalendarService {
         // check startDate in date map if its exits and value is true then add to the result list
         Stream.iterate(criteria.getFromDate(), startDate -> startDate.isBefore(endDate), startDate -> startDate.plusDays(1))
                 .takeWhile(startDate -> resultList.size() != criteria.getNumberOfSuggestedDays()).forEach(startDate -> {
-                    if (dateMap.containsKey(startDate.toString()) && dateMap.get(startDate.toString()))
-                        resultList.add(startDate.toString());
+
+                    if (dateMap.containsKey(startDate.toString()) && dateMap.get(startDate.toString()) != -1.0)
+                        resultList.add(AvailabilityDTO.builder()
+                                .date(startDate.toString())
+                                .occupiedBandwidth(dateMap.get(startDate.toString())).build());
 
                     // this case will cover no holiday,no leave and no hearing for day
-                    if (!dateMap.containsKey(startDate.toString())) resultList.add(startDate.toString());
+                    if (!dateMap.containsKey(startDate.toString()))
+                        resultList.add(AvailabilityDTO.builder()
+                                .date(startDate.toString())
+                                .occupiedBandwidth(0.0).build());
 
 
                 });
@@ -224,7 +231,6 @@ public class CalendarService {
                 .fromDate(fromDate)
                 .toDate(toDate).build();
     }
-
 
 
     public Pair<LocalDate, LocalDate> getFromAndToDateFromPeriodType(PeriodType periodType) {

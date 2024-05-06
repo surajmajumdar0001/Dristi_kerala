@@ -15,7 +15,7 @@ public class JudgeCalendarEnrichment {
     public void enrichUpdateJudgeCalendar(RequestInfo requestInfo, List<JudgeCalendarRule> judgeCalendarRule) {
 
 
-        judgeCalendarRule.stream().forEach((calendar) -> {
+        judgeCalendarRule.forEach((calendar) -> {
 
             Long currentTime = System.currentTimeMillis();
             calendar.getAuditDetails().setLastModifiedTime(currentTime);

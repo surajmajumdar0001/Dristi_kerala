@@ -28,14 +28,13 @@ public class ReScheduleHearingRowMapper implements RowMapper<ReScheduleHearing> 
                 .reason(resultSet.getString("reason"))
                 .status(Status.valueOf(resultSet.getString("status")))
                 .actionComment(resultSet.getString("actionComment"))
-
                 .auditDetails(AuditDetails.builder()
-                        .createdBy(resultSet.getString("auditDetails.createdBy"))
-                        .createdTime(resultSet.getLong("auditDetails.createdTime"))
-                        .lastModifiedBy(resultSet.getString("auditDetails.lastModifiedBy"))
-                        .lastModifiedTime(resultSet.getLong("auditDetails.lastModifiedTime"))
+                        .createdBy(resultSet.getString("createdby"))
+                        .createdTime(resultSet.getLong("createdtime"))
+                        .lastModifiedBy(resultSet.getString("lastmodifiedby"))
+                        .lastModifiedTime(resultSet.getLong("lastmodifiedtime"))
                         .build())
-                .rowVersion(resultSet.getLong("rowVersion"))
+                .rowVersion(resultSet.getInt("rowVersion"))
                 .build();
         return reScheduleHearing;
     }

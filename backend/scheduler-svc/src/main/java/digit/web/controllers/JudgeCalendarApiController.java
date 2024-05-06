@@ -49,10 +49,10 @@ public class JudgeCalendarApiController {
     }
 
     @RequestMapping(value = "/judge/v1/_availability", method = RequestMethod.POST)
-    public ResponseEntity<List<String>> getAvailabilityOfJudge(@Parameter(in = ParameterIn.DEFAULT, description = "Judge availability search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest request) {
+    public ResponseEntity<List<AvailabilityDTO>> getAvailabilityOfJudge(@Parameter(in = ParameterIn.DEFAULT, description = "Judge availability search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest request) {
 
         //service call
-        List<String> judgeAvailability = calendarService.getJudgeAvailability(request);
+        List<AvailabilityDTO> judgeAvailability = calendarService.getJudgeAvailability(request);
 
         return ResponseEntity.accepted().body(judgeAvailability);
 

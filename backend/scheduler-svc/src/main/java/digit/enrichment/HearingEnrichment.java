@@ -33,7 +33,7 @@ public class HearingEnrichment {
                 configuration.getHearingIdFormat(), null, hearingList.size());
         AuditDetails auditDetails = getAuditDetailsScheduleHearing(requestInfo);
         int index = 0;
-        for (ScheduleHearing hearing : hearingList) {
+            for (ScheduleHearing hearing : hearingList) {
             hearing.setAuditDetails(auditDetails);
             hearing.setHearingBookingId(idList.get(index++));
             hearing.setRowVersion(1);

@@ -4,6 +4,7 @@ package digit.validator;
 import digit.repository.HearingRepository;
 import digit.web.models.HearingSearchCriteria;
 import digit.web.models.ScheduleHearing;
+import digit.web.models.ScheduleHearingRequest;
 import org.apache.commons.lang3.ObjectUtils;
 import org.egov.tracer.model.CustomException;
 import org.egov.tracer.model.Error;
@@ -90,6 +91,9 @@ public class HearingValidator {
         }
 
 
+    }
+
+    public void validateHearingOnUpdate(ScheduleHearingRequest scheduleHearingRequest) {
     }
 }
 

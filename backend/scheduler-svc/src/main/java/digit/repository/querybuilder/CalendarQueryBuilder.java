@@ -3,6 +3,7 @@ package digit.repository.querybuilder;
 import digit.helper.QueryBuilderHelper;
 import digit.web.models.SearchCriteria;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,25 +29,25 @@ public class CalendarQueryBuilder {
         StringBuilder query = new StringBuilder(BASE_APPLICATION_QUERY);
         query.append(FROM_TABLES);
 
-        if (searchCriteria.getTenantId() != null && !searchCriteria.getTenantId().isEmpty()) {
+        if (!ObjectUtils.isEmpty(searchCriteria.getTenantId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" jc.tenantid = ? ");
             preparedStmtList.add(searchCriteria.getTenantId());
         }
 
-        if (searchCriteria.getJudgeId() != null && !searchCriteria.getJudgeId().isEmpty()) {
+        if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" jc.judgeid = ? ");
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 
-        if (searchCriteria.getFromDate() != null) {
+        if (!ObjectUtils.isEmpty(searchCriteria.getFromDate())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" jc.date >= ? ");
             preparedStmtList.add(searchCriteria.getFromDate());
         }
 
-        if (searchCriteria.getToDate() != null) {
+        if (!ObjectUtils.isEmpty(searchCriteria.getToDate())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" jc.date <= ? ");
             preparedStmtList.add(searchCriteria.getToDate());

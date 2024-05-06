@@ -1,0 +1,44 @@
+package digit.validator;
+
+
+import digit.repository.OptOutRepository;
+import digit.web.models.OptOut;
+import digit.web.models.OptOutRequest;
+import digit.web.models.OptOutSearchCriteria;
+import org.apache.commons.lang3.ObjectUtils;
+import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class OptOutValidator {
+
+    @Autowired
+    private OptOutRepository repository;
+
+    public void validateRequest(OptOutRequest request) {
+
+        request.getOptOuts().forEach(application -> {
+            if (ObjectUtils.isEmpty(application.getTenantId()))
+                throw new CustomException("DK_SH_APP_ERR", "tenantId is mandatory for opt out dates");
+            if (ObjectUtils.isEmpty(application.getIndividualId()))
+                throw new CustomException("DK_SH_APP_ERR", "individual id is mandatory for opt out dates");
+            if (ObjectUtils.isEmpty(application.getHearingRescheduleRequestId()))
+                throw new CustomException("DK_SH_APP_ERR", "reschedule request id is mandatory for opt out dates");
+        });
+    }
+
+    public void validateUpdateRequest(OptOutRequest request) {
+
+        List<String> ids = request.getOptOuts().stream().map((OptOut::getId)).toList();
+
+        List<OptOut> existingList = repository.getOptOut(OptOutSearchCriteria.builder().ids(ids).tenantId(request.getOptOuts().get(0).getTenantId()).build());
+
+
+        if (ids.size() != existingList.size())
+            throw new CustomException("DK_SH_APP_ERR", "requested update does not exist in db");
+
+    }
+}

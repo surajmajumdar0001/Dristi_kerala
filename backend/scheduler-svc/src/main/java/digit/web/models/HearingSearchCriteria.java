@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -41,6 +42,12 @@ public class HearingSearchCriteria {
 
     @JsonProperty("tenantId")
     private String tenantId;
+    // to search in a one date between hours (to make it more flexible search)
+    @JsonProperty("startDateTime")
+    private LocalDateTime startDateTime;
+
+    @JsonProperty("endDateTime")
+    private LocalDateTime endDateTime;
 
 
 }

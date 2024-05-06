@@ -39,7 +39,7 @@ public class HearingQueryBuilder {
     }
 
     public String getJudgeAvailableDatesQuery(HearingSearchCriteria hearingSearchCriteria, List<Object> preparedStmtList) {
-        StringBuilder query = new StringBuilder("SELECT meeting_hours.date ");
+        StringBuilder query = new StringBuilder("SELECT meeting_hours.date AS date,meeting_hours.total_hours  AS hours ");
         query.append("FROM (");
         query.append("SELECT hb.date, SUM(EXTRACT(EPOCH FROM (hb.endtime - hb.starttime)) / 3600) AS total_hours ");
         query.append("FROM hearing_booking hb ");
@@ -97,6 +97,18 @@ public class HearingQueryBuilder {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hb.date <= ? ");
             preparedStmtList.add(hearingSearchCriteria.getToDate());
+
+        }
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getStartDateTime())) {
+            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.starttime >= ? ");
+            preparedStmtList.add(hearingSearchCriteria.getStartDateTime());
+
+        }
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getEndDateTime())) {
+            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.endtime <= ? ");
+            preparedStmtList.add(hearingSearchCriteria.getEndDateTime());
 
         }
     }

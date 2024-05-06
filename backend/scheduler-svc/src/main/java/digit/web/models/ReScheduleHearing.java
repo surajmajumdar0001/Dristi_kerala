@@ -54,7 +54,7 @@ public class ReScheduleHearing {
     private AuditDetails auditDetails;
 
     @JsonProperty("rowVersion")
-    private Long rowVersion = null;
+    private Integer rowVersion = null;
 
     @JsonProperty("documents")
     @Valid

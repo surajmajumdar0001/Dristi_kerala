@@ -2,7 +2,9 @@ package digit.repository;
 
 
 import digit.repository.querybuilder.HearingQueryBuilder;
+import digit.repository.rowmapper.AvailabilityRowMapper;
 import digit.repository.rowmapper.HearingRowMapper;
+import digit.web.models.AvailabilityDTO;
 import digit.web.models.HearingSearchCriteria;
 import digit.web.models.ScheduleHearing;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Repository
@@ -25,6 +28,9 @@ public class HearingRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private AvailabilityRowMapper availabilityRowMapper;
+
     public List<ScheduleHearing> getHearings(HearingSearchCriteria hearingSearchCriteria) {
 
         List<Object> preparedStmtList = new ArrayList<>();
@@ -34,13 +40,12 @@ public class HearingRepository {
 
     }
 
-    public List<String> getAvailableDatesOfJudges(HearingSearchCriteria hearingSearchCriteria) {
+    public List<AvailabilityDTO> getAvailableDatesOfJudges(HearingSearchCriteria hearingSearchCriteria) {
 
         List<Object> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getJudgeAvailableDatesQuery(hearingSearchCriteria, preparedStmtList);
         log.debug("Final query: " + query);
-        return jdbcTemplate.queryForList(query, preparedStmtList.toArray(), String.class);
-
+        return jdbcTemplate.query(query, preparedStmtList.toArray(),availabilityRowMapper);
 
     }
 
