@@ -3,7 +3,6 @@ package digit.service;
 
 import digit.config.Configuration;
 import digit.enrichment.ReScheduleRequestEnrichment;
-import digit.helper.HearingScheduler;
 import digit.kafka.Producer;
 import digit.repository.ReScheduleRequestRepository;
 import digit.validator.ReScheduleRequestValidator;

@@ -28,19 +28,15 @@ public class HearingEnrichment {
 
         log.info("starting update method for schedule hearing enrichment");
         log.info("generating IDs for schedule hearing enrichment using IdGenService");
-        List<String> idList = idgenUtil.getIdList(requestInfo,
-                hearingList.get(0).getTenantId(),
-                configuration.getHearingIdFormat(), null, hearingList.size());
+        List<String> idList = idgenUtil.getIdList(requestInfo, hearingList.get(0).getTenantId(), configuration.getHearingIdFormat(), null, hearingList.size());
         AuditDetails auditDetails = getAuditDetailsScheduleHearing(requestInfo);
         int index = 0;
-            for (ScheduleHearing hearing : hearingList) {
+        for (ScheduleHearing hearing : hearingList) {
             hearing.setAuditDetails(auditDetails);
             hearing.setHearingBookingId(idList.get(index++));
             hearing.setRowVersion(1);
             hearing.setStatus(Status.SCHEDULED);
         }
-
-
 
 
     }
@@ -61,12 +57,7 @@ public class HearingEnrichment {
 
     private AuditDetails getAuditDetailsScheduleHearing(RequestInfo requestInfo) {
 
-        return AuditDetails.builder()
-                .createdBy(requestInfo.getUserInfo().getUuid())
-                .createdTime(System.currentTimeMillis())
-                .lastModifiedBy(requestInfo.getUserInfo().getUuid())
-                .lastModifiedTime(System.currentTimeMillis())
-                .build();
+        return AuditDetails.builder().createdBy(requestInfo.getUserInfo().getUuid()).createdTime(System.currentTimeMillis()).lastModifiedBy(requestInfo.getUserInfo().getUuid()).lastModifiedTime(System.currentTimeMillis()).build();
 
     }
 }
