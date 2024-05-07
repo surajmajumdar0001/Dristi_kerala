@@ -1,4 +1,4 @@
-CREATE TABLE opt_out
+CREATE TABLE reschedule_request_opt_out_detail
 (
 
     id                                  character varying(64),
