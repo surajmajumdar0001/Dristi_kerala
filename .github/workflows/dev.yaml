@@ -19,10 +19,10 @@ jobs:
       - name: Login to Azure Container Registry
         run: docker login -u pucarsolutionsdev -p ${{ secrets.ACR_PASSWORD }} pucarsolutionsdev.azurecr.io
 
-#      - name: Build and Push Docker image for Scheduler-svc
-#        run: |
-#          docker build --build-arg WORK_DIR="backend/scheduler-svc" -t pucarsolutionsdev.azurecr.io/scheduler-svc:v1.0.0-${{ github.sha }} -f build/maven/Dockerfile .
-#          docker push pucarsolutionsdev.azurecr.io/scheduler-svc:v1.0.0-${{ github.sha }}
+      - name: Build and Push Docker image for Scheduler-svc
+        run: |
+         docker build --build-arg WORK_DIR="backend/scheduler-svc" -t pucarsolutionsdev.azurecr.io/scheduler-svc:v1.0.0-${{ github.sha }} -f build/maven/Dockerfile .
+         docker push pucarsolutionsdev.azurecr.io/scheduler-svc:v1.0.0-${{ github.sha }}
 
       - name: Build and Push Docker image for scheduler-svc_DB
         run: |
