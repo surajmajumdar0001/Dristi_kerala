@@ -16,6 +16,9 @@ public class JudgeCalendarValidator {
         judgeCalendarRule.forEach(application -> {
             if (ObjectUtils.isEmpty(application.getTenantId()))
                 throw new CustomException("DK_SH_APP_ERR", "tenantId is mandatory for updating judge calendar");
+
+            if (ObjectUtils.isEmpty(application.getJudgeId()))
+                throw new CustomException("DK_SH_APP_ERR", "Judge Id is mandatory for updating judge calendar");
         });
     }
 

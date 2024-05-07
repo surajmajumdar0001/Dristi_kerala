@@ -1,6 +1,7 @@
 package digit.web.models;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import digit.models.coremodels.AuditDetails;
 import digit.web.models.enums.JudgeRuleType;
@@ -33,6 +34,7 @@ public class JudgeCalendarRule {
     private JudgeRuleType ruleType;
 
     @JsonProperty("date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     @JsonProperty("notes")
