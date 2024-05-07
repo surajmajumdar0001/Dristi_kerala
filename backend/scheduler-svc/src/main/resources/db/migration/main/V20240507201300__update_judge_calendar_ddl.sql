@@ -1,0 +1,1 @@
+ALTER TABLE judge_calendar_rules ALTER COLUMN date TYPE VARCHAR(64);
