@@ -21,18 +21,18 @@ public class CalendarRowMapper implements RowMapper<JudgeCalendarRule> {
 
         JudgeCalendarRule calendar = JudgeCalendarRule.builder()
                 .id(resultSet.getString("id"))
-                .judgeId(resultSet.getString("judgeId"))
-                .ruleType(JudgeRuleType.valueOf(resultSet.getString("ruleType")))
+                .judgeId(resultSet.getString("judge_id"))
+                .ruleType(JudgeRuleType.valueOf(resultSet.getString("rule_type")))
                 .date(LocalDate.parse(resultSet.getString("date")))
                 .notes(resultSet.getString("notes"))
-                .tenantId(resultSet.getString("tenantId"))
+                .tenantId(resultSet.getString("tenant_id"))
                 .auditDetails(AuditDetails.builder()
-                        .createdBy(resultSet.getString("createdby"))
-                        .createdTime(resultSet.getLong("createdtime"))
-                        .lastModifiedBy(resultSet.getString("lastmodifiedby"))
-                        .lastModifiedTime(resultSet.getLong("lastmodifiedtime"))
+                        .createdBy(resultSet.getString("created_by"))
+                        .createdTime(resultSet.getLong("created_time"))
+                        .lastModifiedBy(resultSet.getString("last_modified_by"))
+                        .lastModifiedTime(resultSet.getLong("last_modified_time"))
                         .build())
-                .rowVersion(resultSet.getInt("rowVersion"))
+                .rowVersion(resultSet.getInt("row_version"))
                 .build();
 
         return calendar;

@@ -26,20 +26,20 @@ public class OptOutRowMapper implements RowMapper<OptOut> {
         try {
             return OptOut.builder()
                     .id(rs.getString("id"))
-                    .judgeId(rs.getString("judgeId"))
-                    .caseId(rs.getString("caseId"))
-                    .rescheduleRequestId(rs.getString("reschedulingrequestid"))
-                    .individualId(rs.getString(""))
-                    .optoutDates(rs.getString("optoutDates") == null ? null : objectMapper.readValue(rs.getString(""), new TypeReference<List<LocalDate>>() {
+                    .judgeId(rs.getString("judge_id"))
+                    .caseId(rs.getString("case_id"))
+                    .rescheduleRequestId(rs.getString("reschedule_request_id"))
+                    .individualId(rs.getString("individual_id"))
+                    .optoutDates(rs.getString("opt_out_dates") == null ? null : objectMapper.readValue(rs.getString(""), new TypeReference<List<LocalDate>>() {
                     }))
-                    .rowVersion(rs.getInt("rowversion"))
+                    .rowVersion(rs.getInt("row_version"))
                     .auditDetails(AuditDetails.builder()
-                            .createdBy(rs.getString("createdby"))
-                            .createdTime(rs.getLong("createdtime"))
-                            .lastModifiedBy(rs.getString("lastmodifiedby"))
-                            .lastModifiedTime(rs.getLong("lastmodifiedtime"))
+                            .createdBy(rs.getString("created_by"))
+                            .createdTime(rs.getLong("created_time"))
+                            .lastModifiedBy(rs.getString("last_modified_by"))
+                            .lastModifiedTime(rs.getLong("last_modified_time"))
                             .build())
-                    .tenantId(rs.getString(""))
+                    .tenantId(rs.getString("tenant_id"))
                     .build();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

@@ -19,7 +19,7 @@ public class ReScheduleHearingQueryBuilder {
     @Autowired
     private QueryBuilderHelper helper;
 
-    private final String BASE_APPLICATION_QUERY = "SELECT hbr.rescheduledRequestId, hbr.hearingBookingId, hbr.tenantId, hbr.judgeId, hbr.caseId,hbr.requesterId,hbr.reason,hbr.status,hbr.actionComment,hbr.documents, hbr.createdby,hbr.lastmodifiedby,hbr.createdtime,hbr.lastmodifiedtime, hbr.rowversion  ";
+    private final String BASE_APPLICATION_QUERY = "SELECT hbr.rescheduled_request_id, hbr.hearing_booking_id, hbr.tenant_id, hbr.judge_id, hbr.case_id,hbr.requester_id,hbr.reason,hbr.status,hbr.action_comment,hbr.documents, hbr.created_by,hbr.last_modified_by,hbr.created_time,hbr.last_modified_time, hbr.row_version  ";
 
     private static final String FROM_TABLES = " FROM hearing_booking_reschedule_request hbr ";
 
@@ -33,36 +33,36 @@ public class ReScheduleHearingQueryBuilder {
 
         if (!CollectionUtils.isEmpty(searchCriteria.getRescheduledRequestId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hbr.rescheduledRequestId IN ( ").append(helper.createQuery(searchCriteria.getRescheduledRequestId())).append(" ) ");
+            query.append(" hbr.rescheduled_request_id IN ( ").append(helper.createQuery(searchCriteria.getRescheduledRequestId())).append(" ) ");
             helper.addToPreparedStatement(preparedStmtList, searchCriteria.getRescheduledRequestId());
         }
 
         if (!ObjectUtils.isEmpty(searchCriteria.getTenantId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hbr.tenantid = ? ");
+            query.append(" hbr.tenant_id = ? ");
             preparedStmtList.add(searchCriteria.getTenantId());
         }
 
         if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hbr.judgeid = ? ");
+            query.append(" hbr.judge_id = ? ");
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 
         if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hbr.caseId = ? ");
+            query.append(" hbr.case_id = ? ");
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 
         if (!ObjectUtils.isEmpty(searchCriteria.getHearingBookingId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hbr.hearingBookingId = ? ");
+            query.append(" hbr.hearing_booking_id = ? ");
             preparedStmtList.add(searchCriteria.getHearingBookingId());
         }
         if (!ObjectUtils.isEmpty(searchCriteria.getRequesterId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hbr.requesterId = ? ");
+            query.append(" hbr.requester_id = ? ");
             preparedStmtList.add(searchCriteria.getRequesterId());
         }
         if (!ObjectUtils.isEmpty(searchCriteria.getStatus())) {

@@ -16,7 +16,7 @@ public class CalendarQueryBuilder {
     @Autowired
     private QueryBuilderHelper queryBuilderHelper;
 
-    private final String BASE_APPLICATION_QUERY = "SELECT jc.judgeid, jc.id, jc.ruletype, jc.date, jc.notes, jc.createdby,jc.lastmodifiedby,jc.createdtime,jc.lastmodifiedtime, jc.rowversion ,jc.tenantid ";
+    private final String BASE_APPLICATION_QUERY = "SELECT jc.judge_id, jc.id, jc.rule_type, jc.date, jc.notes, jc.created_by,jc.last_modified_by,jc.created_time,jc.last_modified_time, jc.row_version ,jc.tenant_id ";
 
     private static final String FROM_TABLES = " FROM judge_calendar_rules jc ";
 
@@ -31,13 +31,13 @@ public class CalendarQueryBuilder {
 
         if (!ObjectUtils.isEmpty(searchCriteria.getTenantId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" jc.tenantid = ? ");
+            query.append(" jc.tenant_id = ? ");
             preparedStmtList.add(searchCriteria.getTenantId());
         }
 
         if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" jc.judgeid = ? ");
+            query.append(" jc.judge_id = ? ");
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 

@@ -18,7 +18,7 @@ public class HearingQueryBuilder {
     @Autowired
     private QueryBuilderHelper queryBuilderHelper;
 
-    private final String BASE_APPLICATION_QUERY = "SELECT  hb.hearingbookingid, hb.tenantid, hb.courtid, hb.judgeid, hb.caseid, hb.date, hb.eventtype, hb.title, hb.description, hb.status, hb.starttime, hb.endtime, hb.createdby,hb.lastmodifiedby,hb.createdtime,hb.lastmodifiedtime, hb.rowversion ";
+    private final String BASE_APPLICATION_QUERY = "SELECT  hb.hearing_booking_id, hb.tenant_id, hb.court_id, hb.judge_id, hb.case_id, hb.date, hb.event_type, hb.title, hb.description, hb.status, hb.start_time, hb.end_time, hb.created_by,hb.last_modified_by,hb.created_time,hb.last_modified_time, hb.row_version ";
 
     private static final String FROM_TABLES = " FROM hearing_booking hb ";
 
@@ -59,31 +59,31 @@ public class HearingQueryBuilder {
 
         if (!CollectionUtils.isEmpty(hearingSearchCriteria.getHearingIds())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.hearingbookingid IN ( ").append(queryBuilderHelper.createQuery(hearingSearchCriteria.getHearingIds())).append(" ) ");
+            query.append(" hb.hearing_booking_id IN ( ").append(queryBuilderHelper.createQuery(hearingSearchCriteria.getHearingIds())).append(" ) ");
             queryBuilderHelper.addToPreparedStatement(preparedStmtList, hearingSearchCriteria.getHearingIds());
         }
 
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getJudgeId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.judgeId = ? ");
+            query.append(" hb.judge_id = ? ");
             preparedStmtList.add(hearingSearchCriteria.getJudgeId());
 
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getCourtId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.courtid = ? ");
+            query.append(" hb.court_id = ? ");
             preparedStmtList.add(hearingSearchCriteria.getCourtId());
 
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getCaseId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.caseid = ? ");
+            query.append(" hb.case_id = ? ");
             preparedStmtList.add(hearingSearchCriteria.getCaseId());
 
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getHearingType())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.eventtype = ? ");
+            query.append(" hb.event_type = ? ");
             preparedStmtList.add(hearingSearchCriteria.getHearingType());
 
         }
@@ -101,13 +101,13 @@ public class HearingQueryBuilder {
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getStartDateTime())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.starttime >= ? ");
+            query.append(" hb.start_time >= ? ");
             preparedStmtList.add(hearingSearchCriteria.getStartDateTime());
 
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getEndDateTime())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.endtime <= ? ");
+            query.append(" hb.end_time <= ? ");
             preparedStmtList.add(hearingSearchCriteria.getEndDateTime());
 
         }

@@ -17,7 +17,7 @@ public class OptOutQueryBuilder {
     private QueryBuilderHelper queryBuilderHelper;
 
 
-    private final String BASE_APPLICATION_QUERY = "SELECT  oo.id ,oo.individualId ,oo.judgeId ,oo.caseId ,oo.reschedulerequestid ,oo.optoutDates , oo.createdby,oo.lastmodifiedby,oo.createdtime,oo.lastmodifiedtime, oo.rowversion ";
+    private final String BASE_APPLICATION_QUERY = "SELECT  oo.id ,oo.individual_id ,oo.judge_id ,oo.case_id ,oo.reschedule_request_id ,oo.opt_out_dates , oo.created_by,oo.last_modified_by,oo.created_time,oo.last_modified_time, oo.row_version ";
 
     private static final String FROM_TABLES = " FROM opt_out oo ";
 
@@ -39,32 +39,32 @@ public class OptOutQueryBuilder {
 
         if (!ObjectUtils.isEmpty(optOutSearchCriteria.getJudgeId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" oo.judgeId = ? ");
+            query.append(" oo.judge_id = ? ");
             preparedStmtList.add(optOutSearchCriteria.getJudgeId());
 
         }
         if (!ObjectUtils.isEmpty(optOutSearchCriteria.getCaseId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" oo.caseid = ? ");
+            query.append(" oo.case_id = ? ");
             preparedStmtList.add(optOutSearchCriteria.getCaseId());
 
         }
 
         if (!ObjectUtils.isEmpty(optOutSearchCriteria.getIndividualId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" oo.individualid = ? ");
+            query.append(" oo.individual_id = ? ");
             preparedStmtList.add(optOutSearchCriteria.getIndividualId());
 
         }
         if (!ObjectUtils.isEmpty(optOutSearchCriteria.getRescheduleRequestId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" oo.reschedulerequestid = ? ");
+            query.append(" oo.reschedule_request_id = ? ");
             preparedStmtList.add(optOutSearchCriteria.getRescheduleRequestId());
 
         }
         if (!ObjectUtils.isEmpty(optOutSearchCriteria.getTenantId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" oo.tenantid = ? ");
+            query.append(" oo.tenant_id = ? ");
             preparedStmtList.add(optOutSearchCriteria.getTenantId());
 
         }
