@@ -1,7 +1,6 @@
 CREATE TABLE reschedule_request_opt_out_detail
 (
 
-    id                                  character varying(64),
     individual_id                       character varying(64),
     judge_id                            character varying(64),
     case_id                             character varying(64),
@@ -14,6 +13,6 @@ CREATE TABLE reschedule_request_opt_out_detail
     row_version                         bigint,
     tenant_id                           character varying(64),
 
-    CONSTRAINT pk_opt_out_id PRIMARY KEY (id)
+    CONSTRAINT pk_opt_out_id PRIMARY KEY (individual_id, reschedule_request_id)
 
 );
