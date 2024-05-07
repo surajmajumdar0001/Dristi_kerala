@@ -19,6 +19,6 @@ CREATE TABLE hearing_booking
     row_version             bigint,
     tenant_id               character varying(64),
 
-    CONSTRAINT pk_hearing_booking_id PRIMARY KEY (hearingBookingId)
+    CONSTRAINT pk_hearing_booking_id PRIMARY KEY (hearing_booking_id)
 
 );

@@ -38,7 +38,6 @@ public class HearingEnrichment {
             hearing.setStatus(Status.SCHEDULED);
         }
 
-
     }
 
 
