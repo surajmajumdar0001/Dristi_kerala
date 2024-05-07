@@ -1,6 +1,7 @@
 package digit.web.models;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import digit.models.coremodels.AuditDetails;
 import digit.web.models.enums.Status;
@@ -43,6 +44,7 @@ public class ReScheduleHearing {
     private String reason;
 
     @JsonProperty("availableAfter")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate availableAfter;
 
     @JsonProperty("status")

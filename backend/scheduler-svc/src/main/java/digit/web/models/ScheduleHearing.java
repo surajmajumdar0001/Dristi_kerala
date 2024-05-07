@@ -1,6 +1,7 @@
 package digit.web.models;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import digit.models.coremodels.AuditDetails;
@@ -37,6 +38,7 @@ public class ScheduleHearing {
     private String caseId;
 
     @JsonProperty("date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
     //TODO: this should be enum
@@ -54,9 +56,11 @@ public class ScheduleHearing {
     private Status status;
 
     @JsonProperty("startTime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;
 
     @JsonProperty("endTime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
 
     @JsonProperty("auditDetails")

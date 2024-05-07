@@ -18,7 +18,7 @@ public class HearingQueryBuilder {
     @Autowired
     private QueryBuilderHelper queryBuilderHelper;
 
-    private final String BASE_APPLICATION_QUERY = "SELECT  hb.hearing_booking_id, hb.tenant_id, hb.court_id, hb.judge_id, hb.case_id, hb.date, hb.event_type, hb.title, hb.description, hb.status, hb.start_time, hb.end_time, hb.created_by,hb.last_modified_by,hb.created_time,hb.last_modified_time, hb.row_version ";
+    private final String BASE_APPLICATION_QUERY = "SELECT  hb.hearing_booking_id, hb.tenant_id, hb.court_id, hb.judge_id, hb.case_id, hb.hearing_date, hb.event_type, hb.title, hb.description, hb.status, hb.start_time, hb.end_time, hb.created_by,hb.last_modified_by,hb.created_time,hb.last_modified_time, hb.row_version ";
 
     private static final String FROM_TABLES = " FROM hearing_booking hb ";
 
@@ -39,14 +39,14 @@ public class HearingQueryBuilder {
     }
 
     public String getJudgeAvailableDatesQuery(HearingSearchCriteria hearingSearchCriteria, List<Object> preparedStmtList) {
-        StringBuilder query = new StringBuilder("SELECT meeting_hours.date AS date,meeting_hours.total_hours  AS hours ");
+        StringBuilder query = new StringBuilder("SELECT meeting_hours.hearing_date AS date,meeting_hours.total_hours  AS hours ");
         query.append("FROM (");
-        query.append("SELECT hb.date, SUM(EXTRACT(EPOCH FROM (hb.endtime - hb.starttime)) / 3600) AS total_hours ");
+        query.append("SELECT hb.hearing_date, SUM(EXTRACT(EPOCH FROM (TO_TIMESTAMP(hb.end_time, 'YYYY-MM-DD HH24:MI:SS') - TO_TIMESTAMP(hb.start_time, 'YYYY-MM-DD HH24:MI:SS'))) / 3600) AS total_hours ");
         query.append("FROM hearing_booking hb ");
 
         getWhereFields(hearingSearchCriteria, query, preparedStmtList);
 
-        query.append("GROUP BY hb.date) AS meeting_hours ");
+        query.append("GROUP BY hb.hearing_date) AS meeting_hours ");
         query.append("WHERE meeting_hours.total_hours < ? ");
         preparedStmtList.add(8);  //TODO:need to configure
 
@@ -89,13 +89,13 @@ public class HearingQueryBuilder {
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getFromDate())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.date >= ? ");
+            query.append(" TO_DATE(hb.hearing_date, 'YYYY-MM-DD')  >= ? ");
             preparedStmtList.add(hearingSearchCriteria.getFromDate());
 
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getToDate())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.date <= ? ");
+            query.append(" TO_DATE(hb.hearing_date, 'YYYY-MM-DD') <= ? ");
             preparedStmtList.add(hearingSearchCriteria.getToDate());
 
         }
