@@ -1,7 +1,7 @@
 package digit.web.controllers;
 
 
-import digit.service.OptOutService;
+import digit.service.RescheduleRequestOptOutService;
 import digit.util.ResponseInfoFactory;
 import digit.web.models.*;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,12 +22,12 @@ import java.util.List;
 public class OptOutApiController {
 
     @Autowired
-    private OptOutService optOutService;
+    private RescheduleRequestOptOutService rescheduleRequestOptOutService;
 
     @RequestMapping(value = "/hearing/v1/_opt-out", method = RequestMethod.POST)
     public ResponseEntity<OptOutResponse> optOutDates(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody OptOutRequest request) {
         //service call
-        List<OptOut> optOutResponse = optOutService.create(request);
+        List<OptOut> optOutResponse = rescheduleRequestOptOutService.create(request);
 
         OptOutResponse response = OptOutResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .optOuts(optOutResponse).build();
@@ -38,7 +38,7 @@ public class OptOutApiController {
     @RequestMapping(value = "/hearing/v1/opt-out/_update", method = RequestMethod.POST)
     public ResponseEntity<OptOutResponse> updateOptOut(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody OptOutRequest request) {
         //service call
-        List<OptOut> optOutResponse = optOutService.update(request);
+        List<OptOut> optOutResponse = rescheduleRequestOptOutService.update(request);
 
         OptOutResponse response = OptOutResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .optOuts(optOutResponse).build();
@@ -49,7 +49,7 @@ public class OptOutApiController {
     @RequestMapping(value = "/hearing/v1/opt-out/_search", method = RequestMethod.POST)
     public ResponseEntity<OptOutResponse> searchOptOut(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody OptOutSearchRequest request) {
         //service call
-        List<OptOut> optOuts = optOutService.search(request);
+        List<OptOut> optOuts = rescheduleRequestOptOutService.search(request);
 
         OptOutResponse response = OptOutResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .optOuts(optOuts).build();
