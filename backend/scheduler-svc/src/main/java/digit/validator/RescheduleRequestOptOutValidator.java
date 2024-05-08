@@ -32,13 +32,13 @@ public class RescheduleRequestOptOutValidator {
 
     public void validateUpdateRequest(OptOutRequest request) {
 
-        List<String> ids = request.getOptOuts().stream().map((OptOut::getId)).toList();
+//        List<String> ids = request.getOptOuts().stream().map((OptOut::getId)).toList();
 
-        List<OptOut> existingList = repository.getOptOut(OptOutSearchCriteria.builder().ids(ids).tenantId(request.getOptOuts().get(0).getTenantId()).build());
+//        List<OptOut> existingList = repository.getOptOut(OptOutSearchCriteria.builder().ids(ids).tenantId(request.getOptOuts().get(0).getTenantId()).build());
 
 
-        if (ids.size() != existingList.size())
-            throw new CustomException("DK_SH_APP_ERR", "requested update does not exist in db");
+//        if (ids.size() != existingList.size())
+//            throw new CustomException("DK_SH_APP_ERR", "requested update does not exist in db");
 
     }
 }

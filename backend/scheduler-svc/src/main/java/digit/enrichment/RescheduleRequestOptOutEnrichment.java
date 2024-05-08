@@ -15,7 +15,7 @@ public class RescheduleRequestOptOutEnrichment {
         AuditDetails auditDetails = getAuditDetailsScheduleHearing(request.getRequestInfo());
 
         request.getOptOuts().forEach((application) -> {
-            application.setId(UUID.randomUUID().toString());
+//            application.setId(UUID.randomUUID().toString());
             application.setAuditDetails(auditDetails);
             application.setRowVersion(1);
 

@@ -21,16 +21,11 @@ import java.util.List;
 public class ReScheduleHearingService {
 
 
-    private ReScheduleRequestRepository repository;
-
-    private ReScheduleRequestValidator validator;
-
-    private ReScheduleRequestEnrichment enrichment;
-
-    private Producer producer;
-
     private final Configuration config;
-
+    private ReScheduleRequestRepository repository;
+    private ReScheduleRequestValidator validator;
+    private ReScheduleRequestEnrichment enrichment;
+    private Producer producer;
     @Autowired
     private WorkflowService workflowService;
 
@@ -70,7 +65,7 @@ public class ReScheduleHearingService {
 
     public List<ReScheduleHearing> update(ReScheduleHearingRequest reScheduleHearingsRequest) {
 
-        List<ReScheduleHearing> reScheduleHearing = reScheduleHearingsRequest.getReScheduleHearing();
+//
 
         List<ReScheduleHearing> existingReScheduleHearingsReq = validator.validateExistingApplication(reScheduleHearingsRequest);
 
@@ -82,9 +77,9 @@ public class ReScheduleHearingService {
         // then schedule dummy hearings for judge to block the calendar
         hearingScheduler.scheduleHearingForApprovalStatus(reScheduleHearingsRequest);
 
-        producer.push(config.getUpdateRescheduleRequestTopic(), reScheduleHearing);
+        producer.push(config.getUpdateRescheduleRequestTopic(), existingReScheduleHearingsReq);
 
-        return reScheduleHearing;
+        return existingReScheduleHearingsReq;
 
     }
 
@@ -130,40 +125,33 @@ public class ReScheduleHearingService {
 
         List<LocalDateTime> dateTime = new ArrayList<>();
         LocalDateTime startTimeOfHearing = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(10, 0));
-
-        int availabilityIndex = 0;
-        ///   setting start time and end time
+        LocalDateTime endTimeOfHearing = null;
+        int index = 0;
         for (ScheduleHearing hearing : hearings) {
 
-            AvailabilityDTO slot = availability.get(availabilityIndex);
-            double occupiedBandwidth = slot.getOccupiedBandwidth();
-            double remainingBandwidth = 8.0 - occupiedBandwidth;
-
-            if (remainingBandwidth > 1.0) {
-                hearing.setDate(LocalDate.parse(slot.getDate()));
-
-                LocalDateTime start, end;
+            Double occupiedBandwidth = availability.get(index).getOccupiedBandwidth();
+            if (8.0 - occupiedBandwidth > 1.0) {  // need to configure
+                hearing.setDate(LocalDate.parse(availability.get(index).getDate()));
                 if (!dateTime.isEmpty()) {
-                    start = dateTime.get(availabilityIndex).plusMinutes(30);
-                    end = start.plusHours(1);
+                    hearing.setStartTime(dateTime.get(index).plusMinutes(30));
+                    hearing.setEndTime(dateTime.get(index).plusHours(1));
+                    dateTime.add(dateTime.get(index).plusHours(1));
                 } else {
-                    start = startTimeOfHearing;
-                    end = start.plusHours(1);
+                    hearing.setStartTime(startTimeOfHearing);
+                    hearing.setEndTime(startTimeOfHearing.plusHours(1));
+                    dateTime.add(startTimeOfHearing.plusHours(1));
                 }
-                hearing.setStartTime(start);
-                hearing.setEndTime(end);
-                dateTime.add(end);
 
-                slot.setOccupiedBandwidth(occupiedBandwidth + 1.0);
+                availability.get(index).setOccupiedBandwidth(occupiedBandwidth + 1.0);  // need to configure
             } else {
-                // If bandwidth is not enough, move to the next availability slot
-                availabilityIndex++;
-                // Decrement index to process the same hearing in the next loop iteration
-                continue;
+                hearing.setDate(LocalDate.parse(availability.get(++index).getDate()));
+                hearing.setStartTime(startTimeOfHearing);
+                hearing.setEndTime(startTimeOfHearing.plusHours(1));
+                dateTime.add(startTimeOfHearing.plusHours(1));
+                availability.get(index).setOccupiedBandwidth(availability.get(index).getOccupiedBandwidth() + 1.0);  // need to configure
             }
-
-            availabilityIndex++; // Move to the next availability slot
         }
+
 
         // updated hearing in hearing table
         hearingService.update(ScheduleHearingRequest.builder()
