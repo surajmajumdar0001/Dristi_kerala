@@ -35,7 +35,7 @@ public class HearingScheduler {
 
     public void scheduleHearingForApprovalStatus(ReScheduleHearingRequest reScheduleHearingsRequest) {
 
-        List<ReScheduleHearing> hearingsNeedToBeSchedule = reScheduleHearingsRequest.getReScheduleHearing().stream().filter((element) -> Objects.equals(element.getWorkflow().getStatus(), Status.APPROVED.toString())).toList();
+        List<ReScheduleHearing> hearingsNeedToBeSchedule = reScheduleHearingsRequest.getReScheduleHearing().stream().filter((element) -> Objects.equals(element.getWorkflow().getAction(), "APPROVE")).toList();
 
         ReScheduleHearingRequest request = ReScheduleHearingRequest.builder().reScheduleHearing(hearingsNeedToBeSchedule).requestInfo(reScheduleHearingsRequest.getRequestInfo()).build();
 

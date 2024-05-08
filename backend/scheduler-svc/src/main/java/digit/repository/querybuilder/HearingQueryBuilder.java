@@ -101,13 +101,13 @@ public class HearingQueryBuilder {
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getStartDateTime())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.start_time >= ? ");
+            query.append(" TO_TIMESTAMP(hb.start_time, 'YYYY-MM-DD HH24:MI:SS') >= ? ");
             preparedStmtList.add(hearingSearchCriteria.getStartDateTime());
 
         }
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getEndDateTime())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.end_time <= ? ");
+            query.append(" TO_TIMESTAMP(hb.end_time , 'YYYY-MM-DD HH24:MI:SS') <= ? ");
             preparedStmtList.add(hearingSearchCriteria.getEndDateTime());
 
         }
