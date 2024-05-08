@@ -25,7 +25,7 @@ import java.util.List;
 @Builder
 public class CauseListResponse {
 
-    @JsonProperty("responseInfo")
+    @JsonProperty("ResponseInfo")
     @Valid
     private ResponseInfo responseInfo = null;
 

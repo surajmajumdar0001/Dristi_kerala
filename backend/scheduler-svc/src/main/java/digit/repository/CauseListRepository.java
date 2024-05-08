@@ -35,6 +35,6 @@ public class CauseListRepository {
         List<String> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getCauseListQuery(searchCriteria, preparedStmtList);
         log.debug("Final query: " + query);
-        return jdbcTemplate.query(query, rowMapper);
+        return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
     }
 }

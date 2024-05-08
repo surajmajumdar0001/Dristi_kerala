@@ -22,7 +22,7 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class CauseListSearchRequest {
 
-    @JsonProperty("requestInfo")
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 

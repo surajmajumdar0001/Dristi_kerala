@@ -23,11 +23,11 @@ import java.util.List;
 @Builder
 public class AsyncSubmissionResponse {
 
-    @JsonProperty("responseInfo")
+    @JsonProperty("ResponseInfo")
     @Valid
     private ResponseInfo responseInfo = null;
 
-    @JsonProperty("asyncSubmissions")
+    @JsonProperty("AsyncSubmissions")
     @Valid
     private List<AsyncSubmission> asyncSubmissions = null;
 

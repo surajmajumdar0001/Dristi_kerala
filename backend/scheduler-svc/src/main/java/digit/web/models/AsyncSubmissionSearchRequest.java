@@ -20,11 +20,11 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class AsyncSubmissionSearchRequest {
 
-    @JsonProperty("requestInfo")
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("asyncSubmissionSearchCriteria")
+    @JsonProperty("SearchCriteria")
     @Valid
     private AsyncSubmissionSearchCriteria asyncSubmissionSearchCriteria = null;
 

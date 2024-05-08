@@ -58,6 +58,10 @@ public class Configuration {
     @Value("${drishti.scheduler.hearing.reschedule.update}")
     private String updateRescheduleRequestTopic;
 
+    //Tenant Id
+    @Value("${egov-state-level-tenant-id}")
+    private String egovStateTenantId;
+
     // User Config
     @Value("${egov.user.host}")
     private String userHost;

@@ -34,6 +34,6 @@ public class AsyncSubmissionRepository {
         List<String> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getAsyncSubmissionQuery(searchCriteria, preparedStmtList);
         log.debug("Final query: " + query);
-        return jdbcTemplate.query(query, rowMapper);
+        return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
     }
 }

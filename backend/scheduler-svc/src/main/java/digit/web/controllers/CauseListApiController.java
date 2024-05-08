@@ -38,7 +38,7 @@ public class CauseListApiController {
         this.causeListService = causeListService;
     }
 
-    @RequestMapping(value = "/v1/view", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/_view", method = RequestMethod.POST)
     public ResponseEntity<CauseListResponse> viewCauseList(@Parameter(in = ParameterIn.DEFAULT, description = "CauseList Search criteria + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody CauseListSearchRequest searchRequest) {
         log.info("api = /causelist/v1/view, result = IN_PROGRESS");
         List<CauseList> causeLists = causeListService.viewCauseListForTomorrow(searchRequest);
@@ -50,7 +50,7 @@ public class CauseListApiController {
         return new ResponseEntity<>(causeListResponse, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/v1/download", method = RequestMethod.POST)
+    @RequestMapping(value = "/v1/_download", method = RequestMethod.POST)
     public ResponseEntity<Object> downloadCauseList(@Parameter(in = ParameterIn.DEFAULT, description = "CauseList Search criteria + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody CauseListSearchRequest searchRequest) {
         log.info("api = /causelist/v1/download, result = IN_PROGRESS");
         ByteArrayResource resource = causeListService.downloadCauseListForTomorrow(searchRequest);

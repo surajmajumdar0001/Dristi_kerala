@@ -55,6 +55,6 @@ public class ServiceConstants {
 
     public final String DEFAULT_SLOTTING_MASTER_NAME = "slots";
 
-    public final String DEFAULT_HEARING_MASTER_NAME = "hearing";
+    public final String DEFAULT_HEARING_MASTER_NAME = "hearings";
 
 }

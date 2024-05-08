@@ -1,6 +1,5 @@
 package digit.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
 import digit.config.ServiceConstants;
@@ -12,10 +11,8 @@ import digit.util.PdfServiceUtil;
 import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
-import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -25,6 +22,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -47,13 +45,14 @@ public class CauseListService {
     @Autowired
     public CauseListService(HearingRepository hearingRepository, CauseListRepository causeListRepository,
                             Producer producer, Configuration config, PdfServiceUtil pdfServiceUtil,
-                            MdmsUtil mdmsUtil) {
+                            MdmsUtil mdmsUtil, ServiceConstants serviceConstants) {
         this.hearingRepository = hearingRepository;
         this.causeListRepository = causeListRepository;
         this.producer = producer;
         this.config =  config;
         this.pdfServiceUtil = pdfServiceUtil;
         this.mdmsUtil = mdmsUtil;
+        this.serviceConstants = serviceConstants;
     }
 
     public void updateCauseListForTomorrow() {
@@ -61,18 +60,39 @@ public class CauseListService {
         List<CauseList> causeLists = new ArrayList<>();
         //TODO get judges from db once tables are ready
         List<String> judgeIds = new ArrayList<>();
+        judgeIds.add("judge001"); judgeIds.add("judge002"); judgeIds.add("judge003");
 
         // Multi Thread processing: process 10 judges at a time
         ExecutorService executorService = Executors.newCachedThreadPool();
 
-        for (String judgeId : judgeIds) {
-            // Submit a task to the executor service for each judge
-            executorService.submit(() -> generateCauseListForJudge(judgeId, causeLists));
-        }
+        // Submit tasks for each judge
+        submitTasks(executorService, judgeIds, causeLists);
+
+        // Wait for all tasks to complete
+        waitForTasksCompletion(executorService);
+
         CauseListResponse causeListResponse = CauseListResponse.builder()
                 .responseInfo(ResponseInfo.builder().build()).causeList(causeLists).build();
         producer.push(config.getCauseListInsertTopic(), causeListResponse);
         log.info("operation = updateCauseListForTomorrow, result = SUCCESS");
+    }
+
+    private void submitTasks(ExecutorService executorService, List<String> judgeIds, List<CauseList> causeLists) {
+        for (String judgeId : judgeIds) {
+            // Submit a task to the executor service for each judge
+            executorService.submit(() -> generateCauseListForJudge(judgeId, causeLists));
+        }
+    }
+
+    private void waitForTasksCompletion(ExecutorService executorService) {
+        executorService.shutdown();
+        try {
+            // Wait until all tasks are completed or timeout occurs
+            executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            log.error("Error occurred while waiting for task completion: {}", e.getMessage());
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void generateCauseListForJudge(String judgeId, List<CauseList> causeLists) {
@@ -96,99 +116,100 @@ public class CauseListService {
         log.info("operation = fillHearingTimesWithDataFromMdms, result = IN_PROGRESS, judgeId = {}", scheduleHearings.get(0).getJudgeId());
         RequestInfo requestInfo = new RequestInfo();
         //TODO finalise on tenant id and create a system user for calls without proper request info
-        Map<String, Map<String, JSONArray>> defaultHearingsData =
-                mdmsUtil.fetchMdmsData(requestInfo, "kl", serviceConstants.DEFAULT_COURT_MODULE_NAME, Collections.singletonList(serviceConstants.DEFAULT_HEARING_MASTER_NAME));
-        JSONArray jsonArray = defaultHearingsData.get("court").get("hearings");
-        Map<String, Integer> hearingTypeToTimeInMinutesMap = createHearingTypeToTimeMap(jsonArray);
+
+        List<MdmsHearing> mdmsHearings = getHearingDataFromMdms();
         for (ScheduleHearing scheduleHearing : scheduleHearings) {
-            Integer hearingTimeInMinutes = hearingTypeToTimeInMinutesMap.get(scheduleHearing.getEventType().toString());
-            if (hearingTimeInMinutes != null) {
-                scheduleHearing.setHearingTimeInMinutes(hearingTimeInMinutes);
+            Optional<MdmsHearing> optionalHearing = mdmsHearings.stream().filter(a -> a.getHearingName()
+                    .equalsIgnoreCase(scheduleHearing.getEventType().getValue())).findFirst();
+            if (optionalHearing.isPresent() && (optionalHearing.get().getHearingTime() != null)) {
+                scheduleHearing.setHearingTimeInMinutes(optionalHearing.get().getHearingTime());
             }
         }
         log.info("operation = fillHearingTimesWithDataFromMdms, result = SUCCESS, judgeId = {}", scheduleHearings.get(0).getJudgeId());
     }
 
-    private Map<String, Integer> createHearingTypeToTimeMap(JSONArray jsonArray) {
-        log.info("operation = createHearingTypeToTimeMap, result = IN_PROGRESS");
-        Map<String, Integer> hearingTypeToTimeInMinutesMap = new HashMap<>();
+    private List<MdmsHearing> getHearingDataFromMdms() {
+        log.info("operation = getHearingDataFromMdms, result = IN_PROGRESS");
+        RequestInfo requestInfo = new RequestInfo();
+        Map<String, Map<String, JSONArray>> defaultHearingsData =
+                mdmsUtil.fetchMdmsData(requestInfo, config.getEgovStateTenantId(),
+                        serviceConstants.DEFAULT_COURT_MODULE_NAME,
+                        Collections.singletonList(serviceConstants.DEFAULT_HEARING_MASTER_NAME));
+        JSONArray jsonArray = defaultHearingsData.get("court").get("hearings");
+        List<MdmsHearing> mdmsHearings = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
         for (Object obj : jsonArray) {
-            JSONObject jsonObject = (JSONObject) obj;
-            String hearingType = (String) jsonObject.get("hearingType");
-            int hearingTimeInMinutes = Integer.parseInt((String) jsonObject.get("hearingTime"));
-            hearingTypeToTimeInMinutesMap.put(hearingType, hearingTimeInMinutes);
+            MdmsHearing hearing = objectMapper.convertValue(obj, MdmsHearing.class);
+            mdmsHearings.add(hearing);
         }
-        log.info("operation = createHearingTypeToTimeMap, result = SUCCESS");
-        return hearingTypeToTimeInMinutesMap;
+        log.info("operation = getHearingDataFromMdms, result = SUCCESS");
+        return mdmsHearings;
     }
 
     private void generateCauseListFromHearings(List<ScheduleHearing> scheduleHearings, List<CauseList> causeLists) {
         log.info("operation = generateCauseListFromHearings, result = SUCCESS, judgeId = {}", scheduleHearings.get(0).getJudgeId());
-        List<Slot> slotList = getSlottingDataFromMdms();
+        List<MdmsSlot> mdmsSlotList = getSlottingDataFromMdms();
         scheduleHearings.sort(Comparator.comparing(ScheduleHearing::getEventType));
         int currentSlotIndex = 0; // Track the current slot index
         int accumulatedTime = 0; // Track accumulated hearing time within the slot
 
         for (ScheduleHearing hearing : scheduleHearings) {
-            while (currentSlotIndex < slotList.size()) {
-                Slot slot = slotList.get(currentSlotIndex);
+            while (currentSlotIndex < mdmsSlotList.size()) {
+                MdmsSlot mdmsSlot = mdmsSlotList.get(currentSlotIndex);
                 int hearingTime = hearing.getHearingTimeInMinutes();
 
-                if (accumulatedTime + hearingTime <= slot.getSlotDuration()) {
-                    CauseList causeList = getCauseListFromHearingAndSlot(hearing, slot);
+                if (accumulatedTime + hearingTime <= mdmsSlot.getSlotDuration()) {
+                    CauseList causeList = getCauseListFromHearingAndSlot(hearing, mdmsSlot);
                     causeLists.add(causeList);
                     accumulatedTime += hearingTime;
                     break; // Move to the next hearing
                 } else {
-                    // Move to the next slot
+                    // Move to the next mdmsSlot
                     currentSlotIndex++;
-                    accumulatedTime = 0; // Reset accumulated time for the new slot
+                    accumulatedTime = 0; // Reset accumulated time for the new mdmsSlot
                 }
             }
 
-            if (currentSlotIndex == slotList.size()) {
+            if (currentSlotIndex == mdmsSlotList.size()) {
                 // Add remaining cases to the last slot
-                Slot lastSlot = slotList.get(slotList.size() - 1);
-                CauseList causeList = getCauseListFromHearingAndSlot(hearing, lastSlot);
+                MdmsSlot lastMdmsSlot = mdmsSlotList.get(mdmsSlotList.size() - 1);
+                CauseList causeList = getCauseListFromHearingAndSlot(hearing, lastMdmsSlot);
                 causeLists.add(causeList);
             }
         }
         log.info("operation = generateCauseListFromHearings, result = SUCCESS, judgeId = {}", scheduleHearings.get(0).getJudgeId());
     }
 
-    private static CauseList getCauseListFromHearingAndSlot(ScheduleHearing hearing, Slot slot) {
+    private static CauseList getCauseListFromHearingAndSlot(ScheduleHearing hearing, MdmsSlot mdmsSlot) {
         return CauseList.builder()
                 .judgeId(hearing.getJudgeId())
                 .courtId(hearing.getCourtId())
+                .tenantId(hearing.getTenantId())
                 .caseId(hearing.getCaseId())
-                .typeOfHearing(hearing.getEventType().name())
-                .tentativeSlot(slot.getSlotName())
+                .typeOfHearing(hearing.getEventType().getValue())
+                .tentativeSlot(mdmsSlot.getSlotName())
                 .caseDate(hearing.getDate().toString())
                 .caseTitle(hearing.getTitle())
                 .build();
     }
 
 
-    private List<Slot> getSlottingDataFromMdms() {
+    private List<MdmsSlot> getSlottingDataFromMdms() {
         log.info("operation = getSlottingDataFromMdms, result = IN_PROGRESS");
         RequestInfo requestInfo = new RequestInfo();
         Map<String, Map<String, JSONArray>> defaultHearingsData =
-                mdmsUtil.fetchMdmsData(requestInfo, "kl", serviceConstants.DEFAULT_COURT_MODULE_NAME, Collections.singletonList(serviceConstants.DEFAULT_SLOTTING_MASTER_NAME));
+                mdmsUtil.fetchMdmsData(requestInfo, config.getEgovStateTenantId(),
+                        serviceConstants.DEFAULT_COURT_MODULE_NAME,
+                        Collections.singletonList(serviceConstants.DEFAULT_SLOTTING_MASTER_NAME));
         JSONArray jsonArray = defaultHearingsData.get("court").get("slots");
-        List<Slot> slots = new ArrayList<>();
+        List<MdmsSlot> mdmsSlots = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            for (Object obj : jsonArray) {
-                Slot slot = objectMapper.readValue(obj.toString(), Slot.class);
-                slots.add(slot);
-            }
-        } catch (JsonProcessingException e) {
-            log.error("Error occurred when reading slotting data from mdms" + e.getMessage());
-            throw new CustomException("DK_SL_APP_ERR", "Error occurred when reading slotting data from mdms");
+        for (Object obj : jsonArray) {
+            MdmsSlot mdmsSlot = objectMapper.convertValue(obj, MdmsSlot.class);
+            mdmsSlots.add(mdmsSlot);
         }
         log.info("operation = getSlottingDataFromMdms, result = SUCCESS");
-        return slots;
+        return mdmsSlots;
     }
 
     public List<CauseList> viewCauseListForTomorrow(CauseListSearchRequest searchRequest) {

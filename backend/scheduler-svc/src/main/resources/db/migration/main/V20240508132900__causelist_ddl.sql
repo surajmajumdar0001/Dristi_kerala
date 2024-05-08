@@ -7,6 +7,6 @@ CREATE TABLE cause_list (
     litigant_names       varchar(500),
     hearing_type         varchar(64),
     tentative_slot       VARCHAR(255),
-    case_date            DATE,
+    case_date            varchar(64),
     PRIMARY KEY (case_id, case_date)
 );
