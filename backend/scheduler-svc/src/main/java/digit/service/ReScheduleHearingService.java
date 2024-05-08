@@ -59,7 +59,7 @@ public class ReScheduleHearingService {
 
         enrichment.enrichRescheduleRequest(reScheduleHearingsRequest);
 
-//        workflowService.updateWorkflowStatus(reScheduleHearingsRequest);
+        workflowService.updateWorkflowStatus(reScheduleHearingsRequest);
 
         producer.push(config.getRescheduleRequestCreateTopic(), reScheduleHearing);
 

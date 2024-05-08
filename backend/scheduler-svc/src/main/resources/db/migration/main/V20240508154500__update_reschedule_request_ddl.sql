@@ -1,0 +1,2 @@
+ALTER TABLE hearing_booking_reschedule_request
+RENAME COLUMN court_id TO case_id;

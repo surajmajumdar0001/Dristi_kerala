@@ -19,14 +19,14 @@ public class ReScheduleHearingRowMapper implements RowMapper<ReScheduleHearing> 
     public ReScheduleHearing mapRow(ResultSet resultSet, int rowNum) throws SQLException {
 
         ReScheduleHearing reScheduleHearing = ReScheduleHearing.builder()
-                .rescheduledRequestId(resultSet.getString("rescheduled_request_id"))
+                .rescheduledRequestId(resultSet.getString("reschedule_request_id"))
                 .hearingBookingId(resultSet.getString("hearing_booking_id"))
                 .tenantId(resultSet.getString("tenant_id"))
                 .judgeId(resultSet.getString("judge_id"))
                 .caseId(resultSet.getString("case_id"))
                 .requesterId(resultSet.getString("requester_id"))
                 .reason(resultSet.getString("reason"))
-                .status(Status.valueOf(resultSet.getString("status")))
+                .status(resultSet.getString("status")==null?null:Status.valueOf(resultSet.getString("status")))
                 .actionComment(resultSet.getString("action_comment"))
                 .auditDetails(AuditDetails.builder()
                         .createdBy(resultSet.getString("created_by"))
