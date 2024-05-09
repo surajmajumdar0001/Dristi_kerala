@@ -2,7 +2,10 @@ name: Dristi-kerala Image Build workflow
 on:
   push:
     branches:
-      - scheduler
+      - develop
+  pull_request:
+    branches:
+      - develop
   workflow_dispatch:
 
 jobs:
