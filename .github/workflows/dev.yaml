@@ -1,4 +1,4 @@
-name: Dristi-kerala Image Build workflow for DEV
+name: Dristi-kerala Image Build workflow
 on:
   pull_request:
     branches:
