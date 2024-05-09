@@ -3,8 +3,6 @@ package digit.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.kafka.Producer;
-import digit.service.CalendarService;
-import digit.service.HearingService;
 import digit.web.models.*;
 import digit.web.models.enums.Status;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +37,8 @@ public class HearingScheduler {
 
         ReScheduleHearingRequest request = ReScheduleHearingRequest.builder().reScheduleHearing(hearingsNeedToBeSchedule).requestInfo(reScheduleHearingsRequest.getRequestInfo()).build();
 
-        producer.push("schedule-hearing-to-block-calendar", request);
+        if (!hearingsNeedToBeSchedule.isEmpty()) producer.push("schedule-hearing-to-block-calendar", request);
     }
-
 
 
     // blocked judged calendar by creating temp hearings
@@ -73,20 +70,12 @@ public class HearingScheduler {
                     hearing.setDate(LocalDate.parse(availabilityDTO.getDate()));
                     hearing.setStartTime(LocalDateTime.of(hearing.getDate(), hearing.getStartTime().toLocalTime()));
                     hearing.setEndTime(LocalDateTime.of(hearing.getDate(), hearing.getEndTime().toLocalTime()));
-
                     hearing.setStatus(Status.BLOCKED);
-
                     udpateHearingList.add(hearing);
 
                 }
-
-
                 hearingService.update(ScheduleHearingRequest.builder().requestInfo(requestInfo).hearing(udpateHearingList).build());
-
-
             }
-
-
         } catch (Exception e) {
             log.error("KAFKA_PROCESS_ERROR:", e);
         }
