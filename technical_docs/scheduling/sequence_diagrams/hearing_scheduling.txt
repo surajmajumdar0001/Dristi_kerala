@@ -2,13 +2,14 @@
 title Schedule Hearing (Rescheduling/Voluntary Submissions)
 Actor "Judge" as User #879BAA
 boundary ScheduleHearingUI as UI #FFEDB5
-control "Soln:\nCalendarSvc" as C #65C728
+control "Soln:\nSchedulerSvc" as C #65C728
 control IndividualSvc as I
 participant MDMS as MDMS
 participant Judge as Judge
 participant Case as Case
 participant Advocate as Advocate
 participant "Soln:\nJudgeCalendarBooking" as JudgeCalendarBooking #65C728
+participant "Soln:\nJudgeCalendarRule" as JudgeCalendarRule #65C728
 queue Kafka #C8D1BA
 participant Persister as Persister
 database Postgres #C8D1BA
@@ -28,16 +29,18 @@ User -> UI: Select next button
 UI -> User: Show the available dates \nwith next & previous buttons
 
 == Selected a particular date and submitted ==
-User -> UI: Select a date for scheduling 
+User -> UI: Select a date for scheduling
   UI -> C ++: Request Hearing Scheduling \nwith the selected date, CaseID & JudgeID
-    C -> JudgeCalendarBooking ++: Fetch Judge Calendar Booking details \nbased on JudgeCalendarID & selected date
+    C -> MDMS ++: Retrieve MDMS data for default calendar.
+      return MDMS data for calendaring
+    C ->JudgeCalendarRule ++: Retrieve judge calendar rules by judgeId.
+      return Judge calendar rules
+    C -> JudgeCalendarBooking ++: Fetch Judge Calendar Booking details \nbased on judgeId & selected date
     return JudgeCalendarBooking Details
-    alt Already Booked
-      C -> UI: Judge Calendar Booking Failed  
+    alt Already Booked or Non Working Day
+      C -> UI: Judge Calendar Booking Failed
       UI -> UI: Show error message \n"Booking cannot be done for the selected date. \nPlease select a new date"
     else Date Available
-      C -> MDMS ++: Retrieve MDMS data for Scheduling.
-      return MDMS data for Scheduling
       C -> Case ++: Fetch Case details based on CaseID
       return Case Details
       C -> I ++: Fetch Complainant details \nbased on ComplainantID
@@ -52,8 +55,8 @@ User -> UI: Select a date for scheduling
       C -> Kafka: Push judge calendar booking payload
       Persister -> Kafka: Read payload
       Persister -> Postgres: Persist data in DB
-      C -> Notification : Send notification to \n Complainant, Respondant, Advocates & Judge
     end
-  C -> UI: Judge Calendar Booking Completed  
-UI -> User: Show message \n"Hearing Scheduled Successfully" 
+  C -> UI: Judge Calendar Booking Completed
+ C -> Notification: (async)Send notification to \n Complainant, Respondant, Advocates & Judge
+UI -> User: Show message \n"Hearing Scheduled Successfully"
 @enduml
