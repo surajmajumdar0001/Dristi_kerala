@@ -21,16 +21,11 @@ import java.util.List;
 public class ReScheduleHearingService {
 
 
-    private ReScheduleRequestRepository repository;
-
-    private ReScheduleRequestValidator validator;
-
-    private ReScheduleRequestEnrichment enrichment;
-
-    private Producer producer;
-
     private final Configuration config;
-
+    private ReScheduleRequestRepository repository;
+    private ReScheduleRequestValidator validator;
+    private ReScheduleRequestEnrichment enrichment;
+    private Producer producer;
     @Autowired
     private WorkflowService workflowService;
 
@@ -62,7 +57,6 @@ public class ReScheduleHearingService {
         workflowService.updateWorkflowStatus(reScheduleHearingsRequest);
 
         producer.push(config.getRescheduleRequestCreateTopic(), reScheduleHearing);
-
 
         return reScheduleHearing;
 
