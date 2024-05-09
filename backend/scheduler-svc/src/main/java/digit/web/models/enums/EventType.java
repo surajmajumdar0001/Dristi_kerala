@@ -5,7 +5,8 @@ import lombok.Getter;
 
 @Getter
 public enum EventType {
-    ADMISSION_HEARING("Admission Hearing");
+    ADMISSION_HEARING("Admission Hearing"),
+    TRIAL_HEARING("Trial Hearing");
 
     private String value;
     EventType(String value){

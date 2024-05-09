@@ -72,4 +72,7 @@ public class ScheduleHearing {
     @JsonProperty("error")
     @JsonIgnore
     private Error errors = null;
+
+    @JsonProperty("hearingTimeInMinutes")
+    private Integer hearingTimeInMinutes = null;
 }
