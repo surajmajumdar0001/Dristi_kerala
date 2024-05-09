@@ -68,7 +68,7 @@ public class ReScheduleHearingQueryBuilder {
         if (!ObjectUtils.isEmpty(searchCriteria.getStatus())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.status = ? ");
-            preparedStmtList.add(searchCriteria.getStatus());
+            preparedStmtList.add(searchCriteria.getStatus().toString());
         }
 
 
