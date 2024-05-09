@@ -18,9 +18,6 @@ import java.util.List;
 public class OptOut {
 
 
-    @JsonProperty("id")
-    private String id;
-
     @JsonProperty("tenantId")
     private String tenantId;
 
