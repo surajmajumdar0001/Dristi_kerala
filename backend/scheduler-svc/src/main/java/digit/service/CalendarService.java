@@ -216,9 +216,11 @@ public class CalendarService {
 
         LocalDate fromDate = null, toDate = null;
 
-        Pair<LocalDate, LocalDate> pair = getFromAndToDateFromPeriodType(criteria.getPeriodType());
-        fromDate = pair.getKey();
-        toDate = pair.getValue();
+        if (criteria.getPeriodType() != null) {
+            Pair<LocalDate, LocalDate> pair = getFromAndToDateFromPeriodType(criteria.getPeriodType());
+            fromDate = pair.getKey();
+            toDate = pair.getValue();
+        }
         //this ll override the switch case result (providing the highest priority to custom range)
         if (criteria.getFromDate() != null && criteria.getToDate() != null) {
             fromDate = criteria.getFromDate();
@@ -239,6 +241,7 @@ public class CalendarService {
 
         LocalDate fromDate = null, toDate = null;
         LocalDate currentDate = LocalDate.now();
+
         switch (periodType) {
 
             case CURRENT_DATE -> toDate = fromDate = currentDate;
@@ -263,6 +266,7 @@ public class CalendarService {
 
             }
         }
+
         pair.setKey(fromDate);
         pair.setValue(toDate);
         return pair;

@@ -61,9 +61,9 @@ public class WorkflowService {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setBusinessId(application.getRescheduledRequestId());
         processInstance.setAction(workflow.getAction());
-        processInstance.setModuleName("scheduler-services");
+        processInstance.setModuleName("reschedule-hearing-services-test");
         processInstance.setTenantId(application.getTenantId());
-        processInstance.setBusinessService("scheduler");
+        processInstance.setBusinessService("RESCHEDULER-test");
         processInstance.setDocuments(workflow.getDocuments());
         processInstance.setComment(workflow.getComment());
 
@@ -107,7 +107,7 @@ public class WorkflowService {
 
     private BusinessService getBusinessService(ReScheduleHearing application, RequestInfo requestInfo) {
         String tenantId = application.getTenantId();
-        StringBuilder url = getSearchURLWithParams(tenantId, "scheduler");
+        StringBuilder url = getSearchURLWithParams(tenantId, "RESCHEDULER-test");
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
         Object result = repository.fetchResult(url, requestInfoWrapper);
         BusinessServiceResponse response = null;
@@ -118,7 +118,7 @@ public class WorkflowService {
         }
 
         if (CollectionUtils.isEmpty(response.getBusinessServices()))
-            throw new CustomException("BUSINESSSERVICE_NOT_FOUND", "The businessService " + "scheduler" + " is not found");
+            throw new CustomException("BUSINESSSERVICE_NOT_FOUND", "The businessService " + "RESCHEDULER-test" + " is not found");
 
         return response.getBusinessServices().get(0);
     }
