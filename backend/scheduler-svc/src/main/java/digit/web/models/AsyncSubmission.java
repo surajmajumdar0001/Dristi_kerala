@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 import org.egov.common.contract.models.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.LocalDate;
-
 /**
  * AsyncSubmission
  */
@@ -51,11 +49,11 @@ public class AsyncSubmission {
 
     @JsonProperty("submissionDate")
     @Valid
-    private LocalDate submissionDate = null;
+    private String submissionDate = null;
 
     @JsonProperty("responseDate")
     @Valid
-    private LocalDate responseDate = null;
+    private String responseDate = null;
 
     @JsonProperty("auditDetails")
     @Valid
@@ -63,6 +61,5 @@ public class AsyncSubmission {
 
     @JsonProperty("rowVersion")
     private Integer rowVersion = null;
-
 
 }

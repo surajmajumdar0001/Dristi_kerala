@@ -21,62 +21,54 @@ import java.util.List;
 
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-04-29T18:15:41.472193800+05:30[Asia/Calcutta]")
 @Controller
-@RequestMapping("/submission")
+@RequestMapping("/async-submission")
 @Slf4j
-public class SubmissionApiController{
+public class AsyncSubmissionApiController {
 
     private final AsyncSubmissionService asyncSubmissionService;
 
     @Autowired
-    public SubmissionApiController(AsyncSubmissionService asyncSubmissionService) {
+    public AsyncSubmissionApiController(AsyncSubmissionService asyncSubmissionService) {
         this.asyncSubmissionService = asyncSubmissionService;
     }
 
-    @RequestMapping(value="/v1/duedates", method = RequestMethod.POST)
+    @RequestMapping(value="/v1/_duedates", method = RequestMethod.POST)
     public ResponseEntity<AsyncSubmissionResponse> getDueDates(@Parameter(in = ParameterIn.DEFAULT, description = "Give due dates for which files must be submitted and response must be given.", required=true, schema=@Schema()) @Valid @RequestBody AsyncSubmissionRequest submissionRequest) {
-        log.info("api = /submission/v1/duedates, result = IN_PROGRESS");
+        log.info("api = /submission/v1/_duedates, result = IN_PROGRESS");
         AsyncSubmission asyncSubmission = asyncSubmissionService.getDueDates(submissionRequest);
         AsyncSubmissionResponse asyncSubmissionResponse = AsyncSubmissionResponse.builder()
                 .responseInfo(ResponseInfoFactory.createResponseInfo(submissionRequest.getRequestInfo(), true))
                 .asyncSubmissions(Collections.singletonList(asyncSubmission))
                 .build();
-        log.info("api = /submission/v1/duedates, result = SUCCESS");
+        log.info("api = /submission/v1/_duedates, result = SUCCESS");
         return new ResponseEntity<>(asyncSubmissionResponse, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/v1/getSubmissions", method = RequestMethod.POST)
+    @RequestMapping(value="/v1/_getSubmissions", method = RequestMethod.POST)
     public ResponseEntity<AsyncSubmissionResponse> getSubmissions(@Parameter(in = ParameterIn.DEFAULT, description = "Searches for submissions based on criteria given and returns them.", required=true, schema=@Schema()) @Valid @RequestBody AsyncSubmissionSearchRequest searchRequest) {
-        log.info("api = /submission/v1/getSubmissions, result = IN_PROGRESS");
+        log.info("api = /submission/v1/_getSubmissions, result = IN_PROGRESS");
         List<AsyncSubmission> asyncSubmissions = asyncSubmissionService.getAsyncSubmissions(searchRequest);
         AsyncSubmissionResponse asyncSubmissionResponse = AsyncSubmissionResponse.builder()
                 .responseInfo(ResponseInfoFactory.createResponseInfo(searchRequest.getRequestInfo(), true))
                 .asyncSubmissions(asyncSubmissions)
                 .build();
-        log.info("api = /submission/v1/getSubmission, result = SUCCESS");
+        log.info("api = /submission/v1/_getSubmissions, result = SUCCESS");
         return new ResponseEntity<>(asyncSubmissionResponse, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/v1/saveDates", method = RequestMethod.POST)
+    @RequestMapping(value="/v1/_saveDates", method = RequestMethod.POST)
     public ResponseEntity<AsyncSubmissionResponse> saveSubmissionDates(@Parameter(in = ParameterIn.DEFAULT, description = "Save dates for which files must be submitted and response must be given.", required=true, schema=@Schema()) @Valid @RequestBody AsyncSubmissionRequest asyncSubmissionRequest) {
-        log.info("api = /submission/v1/saveDates, result = IN_PROGRESS");
-        AsyncSubmission asyncSubmission = asyncSubmissionService.saveAsyncSubmissions(asyncSubmissionRequest);
-        AsyncSubmissionResponse asyncSubmissionResponse = AsyncSubmissionResponse.builder()
-                .responseInfo(ResponseInfoFactory.createResponseInfo(asyncSubmissionRequest.getRequestInfo(), true))
-                .asyncSubmissions(Collections.singletonList(asyncSubmission))
-                .build();
-        log.info("api = /submission/v1/saveDates, result = SUCCESS");
+        log.info("api = /submission/v1/_saveDates, result = IN_PROGRESS");
+        AsyncSubmissionResponse asyncSubmissionResponse = asyncSubmissionService.saveAsyncSubmissions(asyncSubmissionRequest);
+        log.info("api = /submission/v1/_saveDates, result = SUCCESS");
         return new ResponseEntity<>(asyncSubmissionResponse, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value="/v1/updateDates", method = RequestMethod.POST)
+    @RequestMapping(value="/v1/_updateDates", method = RequestMethod.POST)
     public ResponseEntity<AsyncSubmissionResponse> updateSubmissionDates(@Parameter(in = ParameterIn.DEFAULT, description = "Update dates for which files must be submitted and response must be given.", required=true, schema=@Schema()) @Valid @RequestBody AsyncSubmissionRequest asyncSubmissionRequest) {
-        log.info("api = /submission/v1/updateDates, result = IN_PROGRESS");
-        AsyncSubmission asyncSubmission = asyncSubmissionService.updateAsyncSubmissions(asyncSubmissionRequest);
-        AsyncSubmissionResponse asyncSubmissionResponse = AsyncSubmissionResponse.builder()
-                .responseInfo(ResponseInfoFactory.createResponseInfo(asyncSubmissionRequest.getRequestInfo(), true))
-                .asyncSubmissions(Collections.singletonList(asyncSubmission))
-                .build();
-        log.info("api = /submission/v1/saveDates, result = SUCCESS");
+        log.info("api = /submission/v1/_updateDates, result = IN_PROGRESS");
+        AsyncSubmissionResponse asyncSubmissionResponse = asyncSubmissionService.updateAsyncSubmissions(asyncSubmissionRequest);
+        log.info("api = /submission/v1/_updateDates, result = SUCCESS");
         return new ResponseEntity<>(asyncSubmissionResponse, HttpStatus.OK);
     }
 

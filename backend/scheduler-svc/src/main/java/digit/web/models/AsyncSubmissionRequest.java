@@ -25,9 +25,7 @@ public class AsyncSubmissionRequest {
     private RequestInfo requestInfo = null;
 
     @JsonProperty("AsyncSubmission")
-
     @Valid
     private AsyncSubmission asyncSubmission = null;
-
 
 }

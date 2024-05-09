@@ -3,7 +3,6 @@ package digit.enrichment;
 import digit.config.Configuration;
 import digit.util.IdgenUtil;
 import digit.web.models.AsyncSubmission;
-import digit.web.models.ScheduleHearing;
 import digit.web.models.enums.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.models.AuditDetails;
@@ -17,19 +16,23 @@ import java.util.List;
 @Slf4j
 public class AsyncSubmissionEnrichment {
 
-    @Autowired
-    private IdgenUtil idgenUtil;
+    private IdgenUtil idGenUtil;
+
+    private Configuration config;
 
     @Autowired
-    private Configuration configuration;
+    public AsyncSubmissionEnrichment(IdgenUtil idgenUtil, Configuration config) {
+        this.idGenUtil = idgenUtil;
+        this.config = config;
+    }
 
     public void enrichAsyncSubmissions(RequestInfo requestInfo, AsyncSubmission asyncSubmission) {
 
         log.info("starting update method for schedule hearing enrichment");
         log.info("generating IDs for schedule hearing enrichment using IdGenService");
-        List<String> idList = idgenUtil.getIdList(requestInfo,
-                asyncSubmission.getTenantId(),
-                configuration.getAsyncSubmissionIdFormat(), null, 1);
+        List<String> idList = idGenUtil.getIdList(requestInfo,
+                config.getEgovStateTenantId(),
+                config.getAsyncSubmissionIdFormat(), null, 1);
         AuditDetails auditDetails = getAuditDetails(requestInfo);
         asyncSubmission.setAuditDetails(auditDetails);
         asyncSubmission.setSubmissionId(idList.get(0));

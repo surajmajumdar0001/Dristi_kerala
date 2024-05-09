@@ -23,6 +23,9 @@ import java.util.List;
 @Builder
 public class AsyncSubmissionSearchCriteria {
 
+    @JsonProperty("submissionIds")
+    private List<String> submissionIds = null;
+
     @JsonProperty("judgeIds")
     private List<String> judgeIds = null;
 

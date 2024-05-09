@@ -40,22 +40,22 @@ public class CauseListApiController {
 
     @RequestMapping(value = "/v1/_view", method = RequestMethod.POST)
     public ResponseEntity<CauseListResponse> viewCauseList(@Parameter(in = ParameterIn.DEFAULT, description = "CauseList Search criteria + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody CauseListSearchRequest searchRequest) {
-        log.info("api = /causelist/v1/view, result = IN_PROGRESS");
+        log.info("api = /causelist/v1/_view, result = IN_PROGRESS");
         List<CauseList> causeLists = causeListService.viewCauseListForTomorrow(searchRequest);
         CauseListResponse causeListResponse = CauseListResponse.builder()
                 .responseInfo(ResponseInfoFactory.createResponseInfo(searchRequest.getRequestInfo(), true))
                 .causeList(causeLists)
                 .build();
-        log.info("api = /causelist/v1/view, result = SUCCESS");
+        log.info("api = /causelist/v1/_view, result = SUCCESS");
         return new ResponseEntity<>(causeListResponse, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/v1/_download", method = RequestMethod.POST)
     public ResponseEntity<Object> downloadCauseList(@Parameter(in = ParameterIn.DEFAULT, description = "CauseList Search criteria + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody CauseListSearchRequest searchRequest) {
-        log.info("api = /causelist/v1/download, result = IN_PROGRESS");
+        log.info("api = /causelist/v1/_download, result = IN_PROGRESS");
         ByteArrayResource resource = causeListService.downloadCauseListForTomorrow(searchRequest);
         String fileName = "causelist" + LocalDate.now().plusDays(1).toString() + ".pdf";
-        log.info("api = /causelist/v1/download, result = SUCCESS");
+        log.info("api = /causelist/v1/_download, result = SUCCESS");
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                 .contentType(MediaType.APPLICATION_PDF)

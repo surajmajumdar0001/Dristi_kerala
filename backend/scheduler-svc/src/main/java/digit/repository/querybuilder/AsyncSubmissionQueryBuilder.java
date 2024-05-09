@@ -13,35 +13,45 @@ import java.util.List;
 @Slf4j
 public class AsyncSubmissionQueryBuilder {
 
-    private final String BASE_ASYNC_SUBMISSION_QUERY = "SELECT as.court_id, as.case_id, as.async_submission_id, as.submission_type, as.title, as.description, as.status, as.created_by, as.created_time, as.last_modified_by, as.last_modified_time, as.row_version, as.tenant_id ";
+    private final String BASE_ASYNC_SUBMISSION_QUERY = "SELECT asb.court_id, asb.case_id, asb.judge_id,  asb.async_submission_id, asb.submission_type, asb.title, asb.description, asb.status, asb.submission_date, asb.response_date, asb.created_by, asb.created_time, asb.last_modified_by, asb.last_modified_time, asb.row_version, asb.tenant_id ";
 
-    private static final String FROM_ASYNC_SUBMISSION = "FROM async_submission as";
+    private static final String FROM_ASYNC_SUBMISSION = "FROM async_submission asb";
 
-    private final String ORDER_BY = " ORDER BY as.case_id, as.submission_type,";
+    private final String ORDER_BY = " ORDER BY asb.case_id, asb.submission_type";
 
     public String getAsyncSubmissionQuery(AsyncSubmissionSearchCriteria searchCriteria, List<String> preparedStmtList) {
 
         StringBuilder query = new StringBuilder(BASE_ASYNC_SUBMISSION_QUERY);
         query.append(FROM_ASYNC_SUBMISSION);
 
+        if(!CollectionUtils.isEmpty(searchCriteria.getSubmissionIds())){
+            addClauseIfRequired(query, preparedStmtList);
+            query.append(" asb.async_submission_id IN ( ").append(createQuery(searchCriteria.getJudgeIds())).append(" ) ");
+            addToPreparedStatement(preparedStmtList, searchCriteria.getSubmissionIds());
+        }
+        if (!ObjectUtils.isEmpty(searchCriteria.getCourtId())) {
+            addClauseIfRequired(query, preparedStmtList);
+            query.append(" asb.court_id = ? ");
+            preparedStmtList.add(searchCriteria.getCourtId());
+        }
         if(!CollectionUtils.isEmpty(searchCriteria.getJudgeIds())){
             addClauseIfRequired(query, preparedStmtList);
-            query.append(" as.judge_id IN ( ").append(createQuery(searchCriteria.getJudgeIds())).append(" ) ");
+            query.append(" asb.judge_id IN ( ").append(createQuery(searchCriteria.getJudgeIds())).append(" ) ");
             addToPreparedStatement(preparedStmtList, searchCriteria.getJudgeIds());
         }
         if(!CollectionUtils.isEmpty(searchCriteria.getCaseIds())){
             addClauseIfRequired(query, preparedStmtList);
-            query.append(" as.case_id IN ( ").append(createQuery(searchCriteria.getJudgeIds())).append(" ) ");
+            query.append(" asb.case_id IN ( ").append(createQuery(searchCriteria.getJudgeIds())).append(" ) ");
             addToPreparedStatement(preparedStmtList, searchCriteria.getCaseIds());
         }
         if (!ObjectUtils.isEmpty(searchCriteria.getSubmissionDate())) {
             addClauseIfRequired(query, preparedStmtList);
-            query.append(" cl.submission_date = ? ");
+            query.append(" asb.submission_date = ? ");
             preparedStmtList.add(searchCriteria.getSubmissionDate().toString());
         }
         if (!ObjectUtils.isEmpty(searchCriteria.getResponseDate())) {
             addClauseIfRequired(query, preparedStmtList);
-            query.append(" cl.response_date = ? ");
+            query.append(" asb.response_date = ? ");
             preparedStmtList.add(searchCriteria.getResponseDate().toString());
         }
         query.append(ORDER_BY);

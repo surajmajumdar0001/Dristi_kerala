@@ -24,6 +24,8 @@ public class AsyncSubmissionRowMapper implements RowMapper<AsyncSubmission> {
                 .title(resultSet.getString("title"))
                 .status(resultSet.getString("status"))
                 .description(resultSet.getString("description"))
+                .submissionDate(resultSet.getString("submission_date"))
+                .responseDate(resultSet.getString("response_date"))
                 .auditDetails(AuditDetails.builder()
                         .createdBy(resultSet.getString("created_by"))
                         .createdTime(resultSet.getLong("created_time"))

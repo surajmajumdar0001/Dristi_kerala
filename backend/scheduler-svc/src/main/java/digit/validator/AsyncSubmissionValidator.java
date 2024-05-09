@@ -11,6 +11,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -40,7 +41,7 @@ public class AsyncSubmissionValidator {
             List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
             Optional<ScheduleHearing> latestHearing = findLatestHearingByStartTime(scheduleHearingList);
             if (latestHearing.isPresent()) {
-                if (asyncSubmission.getResponseDate().isAfter(latestHearing.get().getStartTime().toLocalDate())) {
+                if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {
                     producer.push(config.getAsyncSubmissionReScheduleHearing(), asyncSubmission);
                 }
             }
@@ -50,7 +51,7 @@ public class AsyncSubmissionValidator {
     }
 
     private Boolean validateSubmissionAndResponseDates(AsyncSubmission asyncSubmission) {
-        return asyncSubmission.getSubmissionDate().isBefore(asyncSubmission.getResponseDate());
+        return LocalDate.parse(asyncSubmission.getSubmissionDate()).isBefore(LocalDate.parse(asyncSubmission.getResponseDate()));
     }
 
     public static Optional<ScheduleHearing> findLatestHearingByStartTime(List<ScheduleHearing> hearings) {
