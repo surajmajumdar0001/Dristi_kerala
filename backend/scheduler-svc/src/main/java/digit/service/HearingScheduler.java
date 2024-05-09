@@ -80,4 +80,28 @@ public class HearingScheduler {
             log.error("KAFKA_PROCESS_ERROR:", e);
         }
     }
+
+    public void checkAndScheduleHearingForOptOut(HashMap<String, Object> record) {
+
+
+        try {
+            OptOutRequest optOutRequest = mapper.convertValue(record, OptOutRequest.class);
+            RequestInfo requestInfo = optOutRequest.getRequestInfo();
+
+            List<OptOut> optOuts = optOutRequest.getOptOuts();
+
+            optOuts.forEach((optOut -> {
+
+                List<ScheduleHearing> hearingList = hearingService.search(HearingSearchRequest.builder().requestInfo(requestInfo)
+                        .criteria(HearingSearchCriteria.builder()
+                                .tenantId(optOut.getTenantId())
+                                .caseId(optOut.getCaseId())
+                                .judgeId(optOut.getJudgeId())
+                                .status(Status.BLOCKED).build()).build());
+
+            }));
+        } catch (Exception e) {
+            log.error("KAFKA_PROCESS_ERROR:", e);
+        }
+    }
 }
