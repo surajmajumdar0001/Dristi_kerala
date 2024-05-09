@@ -35,8 +35,32 @@ public class Configuration {
     @Value("${drishti.judge.calendar.update}")
     private String updateJudgeCalendarTopic;
 
+    @Value("${drishti.causelist.insert}")
+    private String causeListInsertTopic;
+
+    @Value("${causelist.pdf.template.key}")
+    private String causeListPdfTemplateKey;
+
+    @Value("${async.submission.insert}")
+    private String asyncSubmissionSaveTopic;
+
+    @Value("${async.submission.update}")
+    private String asyncSubmissionUpdateTopic;
+
+    @Value("${async.reschedule.hearing}")
+    private String asyncSubmissionReScheduleHearing;
+
+    @Value("${min.async.submission.days}")
+    private Integer minAsyncSubmissionDays;
+
+    @Value("${min.async.response.days}")
+    private Integer minAsyncResponseDays;
     @Value("${drishti.scheduler.hearing.reschedule.update}")
     private String updateRescheduleRequestTopic;
+
+    //Tenant Id
+    @Value("${egov-state-level-tenant-id}")
+    private String egovStateTenantId;
 
     // User Config
     @Value("${egov.user.host}")
@@ -70,6 +94,9 @@ public class Configuration {
     @Value("${egov.idgen.reschedule}")
     private String rescheduleHearingIdFormat;
 
+    // id format
+    @Value("${idgen.async.submission.format}")
+    private String asyncSubmissionIdFormat;
 
     //Workflow Config
     @Value("${egov.workflow.host}")
@@ -97,4 +124,11 @@ public class Configuration {
     private String smsNotificationTopic;
 
 
+
+    //Pdf Services
+    @Value("${egov.pdf.service.host}")
+    private String pdfServiceHost;
+
+    @Value("${egov.pdf.service.create.endpoint}")
+    private String pdfServiceEndpoint;
 }
