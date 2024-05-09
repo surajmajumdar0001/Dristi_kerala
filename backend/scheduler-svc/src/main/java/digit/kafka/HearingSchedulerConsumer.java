@@ -32,4 +32,19 @@ public class HearingSchedulerConsumer {
         }
 
     }
+
+
+    @KafkaListener(topics = {"check-opt-out"})
+    public void listenOptOut(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+
+        try {
+            hearingScheduler.checkAndScheduleHearingForOptOut(record);
+
+        } catch (Exception e) {
+
+            log.error("error occurred while serializing", e);
+
+        }
+
+    }
 }

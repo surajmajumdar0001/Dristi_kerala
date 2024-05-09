@@ -15,18 +15,13 @@ import java.util.List;
 @Slf4j
 public class HearingQueryBuilder {
 
+    private static final String FROM_TABLES = " FROM hearing_booking hb ";
+    private final String BASE_APPLICATION_QUERY = "SELECT  hb.hearing_booking_id, hb.tenant_id, hb.court_id, hb.judge_id, hb.case_id, hb.hearing_date, hb.event_type, hb.title, hb.description, hb.status, hb.start_time, hb.end_time, hb.created_by,hb.last_modified_by,hb.created_time,hb.last_modified_time, hb.row_version ";
+    private final String ORDER_BY = " ORDER BY ";
+    private final String GROUP_BY = " GROUP BY ";
+    private final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
     @Autowired
     private QueryBuilderHelper queryBuilderHelper;
-
-    private final String BASE_APPLICATION_QUERY = "SELECT  hb.hearing_booking_id, hb.tenant_id, hb.court_id, hb.judge_id, hb.case_id, hb.hearing_date, hb.event_type, hb.title, hb.description, hb.status, hb.start_time, hb.end_time, hb.created_by,hb.last_modified_by,hb.created_time,hb.last_modified_time, hb.row_version ";
-
-    private static final String FROM_TABLES = " FROM hearing_booking hb ";
-
-    private final String ORDER_BY = " ORDER BY ";
-
-    private final String GROUP_BY = " GROUP BY ";
-
-    private final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
 
     public String getHearingQuery(HearingSearchCriteria hearingSearchCriteria, List<Object> preparedStmtList) {
 
@@ -109,6 +104,13 @@ public class HearingQueryBuilder {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" TO_TIMESTAMP(hb.end_time , 'YYYY-MM-DD HH24:MI:SS') <= ? ");
             preparedStmtList.add(hearingSearchCriteria.getEndDateTime());
+
+        }
+
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getStatus())) {
+            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.status = ? ");
+            preparedStmtList.add(hearingSearchCriteria.getStatus().toString());
 
         }
     }
