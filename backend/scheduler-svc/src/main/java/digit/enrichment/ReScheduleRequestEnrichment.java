@@ -12,6 +12,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,8 +59,14 @@ public class ReScheduleRequestEnrichment {
     public void enrichRequestOnUpdate(ReScheduleHearingRequest reScheduleHearingsRequest, List<ReScheduleHearing> existingReScheduleHearingsReq) {
         HashMap<String, Workflow> map = new HashMap<>();
 
+        HashMap<String, LocalDate> availableAfterMap = new HashMap<>();
 
-        reScheduleHearingsRequest.getReScheduleHearing().forEach((element) -> map.put(element.getRescheduledRequestId(), element.getWorkflow()));
+
+        reScheduleHearingsRequest.getReScheduleHearing().forEach((element) ->
+        {
+            map.put(element.getRescheduledRequestId(), element.getWorkflow());
+            availableAfterMap.put(element.getRescheduledRequestId(), element.getAvailableAfter());
+        });
         String auditingUser= reScheduleHearingsRequest.getRequestInfo().getUserInfo().getUuid();
         existingReScheduleHearingsReq.forEach((updateHearing) -> {
 
@@ -68,6 +75,7 @@ public class ReScheduleRequestEnrichment {
             updateHearing.getAuditDetails().setLastModifiedBy(auditingUser);
             updateHearing.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
             updateHearing.setRowVersion(updateHearing.getRowVersion()+1);
+            updateHearing.setAvailableAfter(availableAfterMap.get(updateHearing.getRescheduledRequestId()));
 
         });
 
