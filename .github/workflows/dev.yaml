@@ -1,6 +1,8 @@
 name: Dristi-kerala Image Build workflow
 on:
   pull_request:
+    types:
+      - closed
     branches:
       - develop
   workflow_dispatch:
