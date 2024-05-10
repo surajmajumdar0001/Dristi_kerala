@@ -2,6 +2,7 @@ package digit.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import digit.config.Configuration;
 import digit.kafka.Producer;
 import digit.web.models.*;
 import digit.web.models.enums.Status;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
@@ -20,6 +22,9 @@ public class HearingScheduler {
 
     @Autowired
     private Producer producer;
+
+    @Autowired
+    private Configuration configuration;
 
     @Autowired
     private ObjectMapper mapper;
@@ -69,6 +74,15 @@ public class HearingScheduler {
                                 .tenantId(tenantId)
                                 .build()).build());
 
+                // update here all the suggestedDay in reschedule hearing day
+
+                List<LocalDate> suggestedDays = availability.stream().map(
+                                (suggestedDate) -> LocalDate.parse(suggestedDate.getDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                        .toList();
+                hearingDetail.setSuggestedDates(suggestedDays);
+                hearingDetail.setRowVersion(hearingDetail.getRowVersion() + 1);
+
+
                 List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder()
                         .requestInfo(requestInfo)
                         .criteria(HearingSearchCriteria.builder()
@@ -101,8 +115,8 @@ public class HearingScheduler {
                 hearingService.schedule(ScheduleHearingRequest.builder()
                         .requestInfo(requestInfo).hearing(udpateHearingList).build());
 
-
             }
+            producer.push(configuration.getUpdateRescheduleRequestTopic(), hearingDetails);
         } catch (Exception e) {
             log.error("KAFKA_PROCESS_ERROR:", e);
             log.error("DK_SH_APP_ERR: error while blocking the calendar", e);
