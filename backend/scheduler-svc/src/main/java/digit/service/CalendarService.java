@@ -10,6 +10,7 @@ import digit.util.MdmsUtil;
 import digit.validator.JudgeCalendarValidator;
 import digit.web.models.*;
 import digit.web.models.enums.PeriodType;
+import digit.web.models.enums.Status;
 import net.minidev.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -231,7 +232,9 @@ public class CalendarService {
                 .judgeId(criteria.getJudgeId())
                 .tenantId(criteria.getTenantId())
                 .fromDate(fromDate)
-                .toDate(toDate).build();
+                .toDate(toDate)
+                .status(Status.SCHEDULED).build();
+
     }
 
 

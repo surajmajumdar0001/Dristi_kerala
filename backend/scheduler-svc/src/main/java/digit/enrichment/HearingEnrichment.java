@@ -35,7 +35,7 @@ public class HearingEnrichment {
             hearing.setAuditDetails(auditDetails);
             hearing.setHearingBookingId(idList.get(index++));
             hearing.setRowVersion(1);
-            hearing.setStatus(Status.SCHEDULED);
+            if (hearing.getStatus() == null) hearing.setStatus(Status.SCHEDULED);
         }
 
     }
@@ -43,7 +43,7 @@ public class HearingEnrichment {
 
     public void enrichUpdateScheduleHearing(RequestInfo requestInfo, List<ScheduleHearing> hearingList) {
 
-        hearingList.stream().forEach((hearing) -> {
+        hearingList.forEach((hearing) -> {
 
             Long currentTime = System.currentTimeMillis();
             hearing.getAuditDetails().setLastModifiedTime(currentTime);

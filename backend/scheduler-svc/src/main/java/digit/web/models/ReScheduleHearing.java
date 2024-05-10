@@ -66,5 +66,8 @@ public class ReScheduleHearing {
     @Valid
     private List<Document> documents = null;
 
+    @JsonProperty("suggestedDates")             // additional details
+    private List<LocalDate> suggestedDates;
+
 
 }

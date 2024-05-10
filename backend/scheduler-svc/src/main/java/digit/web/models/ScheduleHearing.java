@@ -75,4 +75,25 @@ public class ScheduleHearing {
 
     @JsonProperty("hearingTimeInMinutes")
     private Integer hearingTimeInMinutes = null;
+
+
+
+    public ScheduleHearing(ScheduleHearing another) {
+        this.hearingBookingId = another.hearingBookingId;
+        this.tenantId = another.tenantId;
+        this.courtId = another.courtId;
+        this.judgeId = another.judgeId;
+        this.caseId = another.caseId;
+        this.date = another.date;
+        this.eventType = another.eventType;
+        this.title = another.title;
+        this.description = another.description;
+        this.status = another.status;
+        this.startTime = another.startTime;
+        this.endTime = another.endTime;
+        this.auditDetails = another.auditDetails;
+        this.rowVersion = another.rowVersion;
+        this.errors = another.errors;
+        this.hearingTimeInMinutes = another.hearingTimeInMinutes;
+    }
 }

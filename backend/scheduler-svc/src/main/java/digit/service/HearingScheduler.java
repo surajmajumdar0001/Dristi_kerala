@@ -33,9 +33,13 @@ public class HearingScheduler {
 
     public void scheduleHearingForApprovalStatus(ReScheduleHearingRequest reScheduleHearingsRequest) {
 
-        List<ReScheduleHearing> hearingsNeedToBeSchedule = reScheduleHearingsRequest.getReScheduleHearing().stream().filter((element) -> Objects.equals(element.getWorkflow().getAction(), "APPROVE")).toList();
+        List<ReScheduleHearing> hearingsNeedToBeSchedule = reScheduleHearingsRequest.getReScheduleHearing()
+                .stream()
+                .filter((element) -> Objects.equals(element.getWorkflow().getAction(), "APPROVE"))
+                .toList();
 
-        ReScheduleHearingRequest request = ReScheduleHearingRequest.builder().reScheduleHearing(hearingsNeedToBeSchedule).requestInfo(reScheduleHearingsRequest.getRequestInfo()).build();
+        ReScheduleHearingRequest request = ReScheduleHearingRequest.builder().reScheduleHearing(hearingsNeedToBeSchedule)
+                .requestInfo(reScheduleHearingsRequest.getRequestInfo()).build();
 
         if (!hearingsNeedToBeSchedule.isEmpty()) producer.push("schedule-hearing-to-block-calendar", request);
     }
@@ -54,30 +58,54 @@ public class HearingScheduler {
 
             for (ReScheduleHearing hearingDetail : hearingDetails) {
 
-                List<AvailabilityDTO> availability = calendarService.getJudgeAvailability(JudgeAvailabilitySearchRequest.builder().requestInfo(hearingUpdateRequest.getRequestInfo()).criteria(JudgeAvailabilitySearchCriteria.builder().judgeId(hearingDetail.getJudgeId()).fromDate(hearingDetail.getAvailableAfter()).courtId("0001").numberOfSuggestedDays(5) //TODO: later we change this to no of attendees
-                        .tenantId(tenantId)// need to configure some where
-                        .build()).build());
+                List<AvailabilityDTO> availability = calendarService.getJudgeAvailability(JudgeAvailabilitySearchRequest
+                        .builder()
+                        .requestInfo(requestInfo)
+                        .criteria(JudgeAvailabilitySearchCriteria.builder()
+                                .judgeId(hearingDetail.getJudgeId())
+                                .fromDate(hearingDetail.getAvailableAfter())
+                                .courtId("0001")  //TODO: need to configure somewhere
+                                .numberOfSuggestedDays(5) //TODO: later we change this to no of attendees
+                                .tenantId(tenantId)
+                                .build()).build());
 
-                List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().requestInfo(requestInfo).criteria(HearingSearchCriteria.builder().hearingIds(Collections.singletonList(hearingDetail.getHearingBookingId())).build()
-
-                ).build());
+                List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder()
+                        .requestInfo(requestInfo)
+                        .criteria(HearingSearchCriteria.builder()
+                                .hearingIds(Collections.singletonList(hearingDetail.getHearingBookingId()))
+                                .build()).build());
                 ScheduleHearing hearing = hearings.get(0);
+                hearings.get(0).setStatus(Status.RE_SCHEDULED);
+
+
+                //reschedule hearing to unblock the calendar
+                hearingService.update(ScheduleHearingRequest.builder()
+                        .requestInfo(requestInfo).hearing(hearings).build());
+
 
                 List<ScheduleHearing> udpateHearingList = new ArrayList<>();
 
                 for (AvailabilityDTO availabilityDTO : availability) {
+                    //TODO: update logic to assign start time and end time
 
-                    hearing.setDate(LocalDate.parse(availabilityDTO.getDate()));
-                    hearing.setStartTime(LocalDateTime.of(hearing.getDate(), hearing.getStartTime().toLocalTime()));
-                    hearing.setEndTime(LocalDateTime.of(hearing.getDate(), hearing.getEndTime().toLocalTime()));
-                    hearing.setStatus(Status.BLOCKED);
-                    udpateHearingList.add(hearing);
+                    ScheduleHearing scheduleHearing = new ScheduleHearing(hearing);
+
+
+                    scheduleHearing.setDate(LocalDate.parse(availabilityDTO.getDate()));
+                    scheduleHearing.setStartTime(LocalDateTime.of(scheduleHearing.getDate(), hearing.getStartTime().toLocalTime()));
+                    scheduleHearing.setEndTime(LocalDateTime.of(scheduleHearing.getDate(), hearing.getEndTime().toLocalTime()));
+                    scheduleHearing.setStatus(Status.BLOCKED);
+                    udpateHearingList.add(scheduleHearing);
 
                 }
-                hearingService.update(ScheduleHearingRequest.builder().requestInfo(requestInfo).hearing(udpateHearingList).build());
+                hearingService.schedule(ScheduleHearingRequest.builder()
+                        .requestInfo(requestInfo).hearing(udpateHearingList).build());
+
+
             }
         } catch (Exception e) {
             log.error("KAFKA_PROCESS_ERROR:", e);
+            log.error("DK_SH_APP_ERR: error while blocking the calendar", e);
         }
     }
 
@@ -92,7 +120,8 @@ public class HearingScheduler {
 
             optOuts.forEach((optOut -> {
 
-                List<ScheduleHearing> hearingList = hearingService.search(HearingSearchRequest.builder().requestInfo(requestInfo)
+                List<ScheduleHearing> hearingList = hearingService.search(HearingSearchRequest
+                        .builder().requestInfo(requestInfo)
                         .criteria(HearingSearchCriteria.builder()
                                 .tenantId(optOut.getTenantId())
                                 .caseId(optOut.getCaseId())
