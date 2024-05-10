@@ -171,7 +171,6 @@ public class ReScheduleHearingService {
                     .tenantId(hearing.getTenantId())
                     .requesterId(requesterId)
                     .workflow(workflow)
-                    .
                     .actionComment("AUTO SCHEDULE BY JUDGE")
                     .build();
 
