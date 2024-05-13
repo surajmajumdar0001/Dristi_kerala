@@ -2,6 +2,8 @@ package digit.repository.querybuilder;
 
 import digit.helper.QueryBuilderHelper;
 import digit.web.models.HearingSearchCriteria;
+import digit.web.models.enums.EventType;
+import digit.web.models.enums.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,10 +42,17 @@ public class HearingQueryBuilder {
         query.append("FROM hearing_booking hb ");
 
         getWhereFields(hearingSearchCriteria, query, preparedStmtList);
+        // add status block
+        queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
+        query.append(" ( hb.status = ? ");
+        preparedStmtList.add(Status.BLOCKED.toString());
+        query.append(" OR hb.status = ? )");
+        preparedStmtList.add(Status.SCHEDULED.toString());
+
 
         query.append("GROUP BY hb.hearing_date) AS meeting_hours ");
-        query.append("WHERE meeting_hours.total_hours < ? ");
-        preparedStmtList.add(8);  //TODO:need to configure
+//        query.append("WHERE meeting_hours.total_hours < ? ");
+//        preparedStmtList.add(8);  //TODO:need to configure
 
         return query.toString();
     }
@@ -107,10 +116,15 @@ public class HearingQueryBuilder {
 
         }
 
-        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getStatus())) {
+        if (!CollectionUtils.isEmpty(hearingSearchCriteria.getStatus())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hb.status = ? ");
-            preparedStmtList.add(hearingSearchCriteria.getStatus().toString());
+            query.append(" ( ");
+            for (int i = 0; i < hearingSearchCriteria.getStatus().size() - 1; i++) {
+                query.append(" hb.status = ? ").append(" or ");
+                preparedStmtList.add(hearingSearchCriteria.getStatus().get(i).toString());
+            }
+            query.append("hb.status = ? )");
+            preparedStmtList.add(hearingSearchCriteria.getStatus().get(0).toString());
 
         }
     }

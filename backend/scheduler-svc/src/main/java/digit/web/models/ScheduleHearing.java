@@ -77,7 +77,7 @@ public class ScheduleHearing {
     private Integer hearingTimeInMinutes = null;
 
 
-
+//  copy constructor
     public ScheduleHearing(ScheduleHearing another) {
         this.hearingBookingId = another.hearingBookingId;
         this.tenantId = another.tenantId;
@@ -95,5 +95,9 @@ public class ScheduleHearing {
         this.rowVersion = another.rowVersion;
         this.errors = another.errors;
         this.hearingTimeInMinutes = another.hearingTimeInMinutes;
+    }
+
+    public boolean overlapsWith(ScheduleHearing other) {
+        return !((!startTime.isBefore(other.endTime)) || (!endTime.isAfter(other.startTime)));
     }
 }

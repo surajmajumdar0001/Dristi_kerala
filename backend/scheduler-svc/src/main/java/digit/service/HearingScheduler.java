@@ -4,6 +4,7 @@ package digit.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
 import digit.kafka.Producer;
+import digit.repository.ReScheduleRequestRepository;
 import digit.web.models.*;
 import digit.web.models.enums.Status;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,10 @@ public class HearingScheduler {
 
     @Autowired
     private Producer producer;
+
+
+    @Autowired
+    private ReScheduleRequestRepository repository;
 
     @Autowired
     private Configuration configuration;
@@ -134,13 +139,53 @@ public class HearingScheduler {
 
             optOuts.forEach((optOut -> {
 
+
+                Collections.sort(optOut.getOptoutDates());
+
+
+                // get the list and cancelled the hearings
                 List<ScheduleHearing> hearingList = hearingService.search(HearingSearchRequest
                         .builder().requestInfo(requestInfo)
                         .criteria(HearingSearchCriteria.builder()
                                 .tenantId(optOut.getTenantId())
                                 .caseId(optOut.getCaseId())
                                 .judgeId(optOut.getJudgeId())
-                                .status(Status.BLOCKED).build()).build());
+                                .fromDate(optOut.getOptoutDates().get(0))
+                                .toDate(optOut.getOptoutDates().get(optOut.getOptoutDates().size() - 1))
+                                .status(Collections.singletonList(Status.BLOCKED)).build()).build());
+
+                hearingList.forEach(hearing -> hearing.setStatus(Status.CANCELLED));
+
+                //release judge calendar
+                hearingService.update(ScheduleHearingRequest.builder()
+                        .requestInfo(RequestInfo.builder().build())
+                        .hearing(hearingList).build());
+
+
+                //TODO: get list of litigants
+                //TODO: get opt out of litigants
+
+
+                //if this is last one then update the status to review
+
+                //  updated available days in db
+                String rescheduleRequestId = optOut.getRescheduleRequestId();
+
+                List<ReScheduleHearing> reScheduleRequest = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder()
+                        .rescheduledRequestId(Collections.singletonList(rescheduleRequestId)).build());
+
+
+                List<LocalDate> suggestedDates = reScheduleRequest.get(0).getSuggestedDates();
+                Set<LocalDate> suggestedDatesSet = new HashSet<>(suggestedDates);
+
+                optOut.getOptoutDates().forEach(suggestedDatesSet::remove);
+
+
+                reScheduleRequest.get(0).setAvailableDates(new ArrayList<>(suggestedDatesSet));
+                reScheduleRequest.get(0).setStatus(Status.REVIEW);
+
+
+                producer.push(configuration.getUpdateRescheduleRequestTopic(),reScheduleRequest);
 
             }));
         } catch (Exception e) {

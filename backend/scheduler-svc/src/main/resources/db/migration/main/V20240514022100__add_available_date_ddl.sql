@@ -1,0 +1,2 @@
+ALTER TABLE hearing_booking_reschedule_request
+ADD available_days jsonb;

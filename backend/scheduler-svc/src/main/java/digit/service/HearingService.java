@@ -1,19 +1,30 @@
 package digit.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
+import digit.config.ServiceConstants;
 import digit.enrichment.HearingEnrichment;
+import digit.helper.DefaultMasterDataHelper;
 import digit.kafka.Producer;
 import digit.repository.HearingRepository;
+import digit.util.MdmsUtil;
 import digit.validator.HearingValidator;
 import digit.web.models.*;
-import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
+import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class HearingService {
 
 
@@ -27,6 +38,15 @@ public class HearingService {
     @Autowired
     private HearingRepository hearingRepository;
 
+    @Autowired
+    private ServiceConstants serviceConstants;
+
+    @Autowired
+    private DefaultMasterDataHelper helper;
+
+
+
+
 
     @Autowired
     public HearingService(HearingValidator hearingValidator, HearingEnrichment hearingEnrichment, Producer producer, Configuration config) {
@@ -39,11 +59,21 @@ public class HearingService {
 
     public List<ScheduleHearing> schedule(ScheduleHearingRequest schedulingRequests) {
 
+
+        List<MdmsSlot> defaultSlots = helper.getDataFromMDMS(MdmsSlot.class, serviceConstants.DEFAULT_SLOTTING_MASTER_NAME);
+
+        double totalHrs = defaultSlots.stream().reduce(0.0, (total, slot) -> total + slot.getSlotDuration() / 60.0, Double::sum);
+        // get hearings and default timing
+        List<MdmsHearing> defaultHearings = helper.getDataFromMDMS(MdmsHearing.class, serviceConstants.DEFAULT_HEARING_MASTER_NAME);
+        Map<String, MdmsHearing> hearingTypeMap = defaultHearings.stream().collect(Collectors.toMap(
+                MdmsHearing::getHearingType,
+                obj -> obj
+        ));
         //validate hearing request here
-        hearingValidator.validateHearing(schedulingRequests.getHearing());
+        hearingValidator.validateHearing(schedulingRequests, totalHrs, hearingTypeMap);
 
         // enhance the hearing request here
-        hearingEnrichment.enrichScheduleHearing(schedulingRequests.getRequestInfo(), schedulingRequests.getHearing());
+        hearingEnrichment.enrichScheduleHearing(schedulingRequests,defaultSlots,hearingTypeMap);
 
         //push to kafka
         producer.push(config.getScheduleHearingTopic(), schedulingRequests.getHearing());
@@ -52,7 +82,7 @@ public class HearingService {
     }
 
     // to update the status of existing hearing to reschedule
-    public  List<ScheduleHearing> update(ScheduleHearingRequest scheduleHearingRequest) {
+    public List<ScheduleHearing> update(ScheduleHearingRequest scheduleHearingRequest) {
 
         hearingValidator.validateHearingOnUpdate(scheduleHearingRequest);
 
@@ -75,6 +105,9 @@ public class HearingService {
 
         return hearingRepository.getAvailableDatesOfJudges(hearingSearchCriteria);
     }
+
+
+
 
 
 }
