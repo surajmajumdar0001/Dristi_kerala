@@ -7,6 +7,7 @@ import digit.kafka.Producer;
 import digit.repository.ReScheduleRequestRepository;
 import digit.validator.ReScheduleRequestValidator;
 import digit.web.models.*;
+import digit.web.models.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -94,7 +96,8 @@ public class ReScheduleHearingService {
         LocalDateTime startTime = bulkRescheduling.getStartTime();
         LocalDate fromDate = bulkRescheduling.getFromDate();
 
-        HearingSearchCriteria criteria = HearingSearchCriteria.builder().judgeId(judgeId).startDateTime(startTime).endDateTime(endTime).tenantId(tenantId).build();
+        HearingSearchCriteria criteria = HearingSearchCriteria.builder().judgeId(judgeId).startDateTime(startTime).endDateTime(endTime).tenantId(tenantId)
+                .status(Collections.singletonList(Status.SCHEDULED)).build();
 
         List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().requestInfo(request.getRequestInfo()).criteria(criteria).build());
 

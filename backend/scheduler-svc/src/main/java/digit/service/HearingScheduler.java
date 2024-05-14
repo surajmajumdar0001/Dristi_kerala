@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
 import digit.kafka.Producer;
 import digit.repository.ReScheduleRequestRepository;
+import digit.util.MdmsUtil;
 import digit.web.models.*;
 import digit.web.models.enums.Status;
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,9 +34,6 @@ public class HearingScheduler {
     private Configuration configuration;
 
     @Autowired
-    private Configuration configuration;
-
-    @Autowired
     private ObjectMapper mapper;
 
     @Autowired
@@ -42,6 +41,9 @@ public class HearingScheduler {
 
     @Autowired
     private HearingService hearingService;
+
+    @Autowired
+    private MdmsUtil mdmsUtil;
 
 
     public void scheduleHearingForApprovalStatus(ReScheduleHearingRequest reScheduleHearingsRequest) {
@@ -166,6 +168,21 @@ public class HearingScheduler {
 
 
                 //TODO: get list of litigants
+                // for now fetching mdms dummy case and checking all the litigants for the case
+
+                Map<String, Map<String, JSONArray>> mdmsCase = mdmsUtil.fetchMdmsData(RequestInfo.builder().build(), "kl", "schedule-hearing", Collections.singletonList("cases"));
+
+                LinkedHashMap map = (LinkedHashMap) mdmsCase.get("schedule-hearing").get("cases").get(0);
+
+                ArrayList representatives = (ArrayList) map.get("representatives");
+                List<String> ids = new ArrayList<>();
+                for (Object representative : representatives) {
+
+                    LinkedHashMap element = (LinkedHashMap) representative;
+                    String id = (String) element.get("advocateId");
+                    ids.add(id);
+                }
+
                 //TODO: get opt out of litigants
 
 
@@ -188,7 +205,7 @@ public class HearingScheduler {
                 reScheduleRequest.get(0).setStatus(Status.REVIEW);
 
 
-                producer.push(configuration.getUpdateRescheduleRequestTopic(),reScheduleRequest);
+                producer.push(configuration.getUpdateRescheduleRequestTopic(), reScheduleRequest);
 
             }));
         } catch (Exception e) {
