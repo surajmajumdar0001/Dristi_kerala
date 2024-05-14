@@ -26,7 +26,7 @@ public class AsyncSubmissionQueryBuilder {
 
         if(!CollectionUtils.isEmpty(searchCriteria.getSubmissionIds())){
             addClauseIfRequired(query, preparedStmtList);
-            query.append(" asb.async_submission_id IN ( ").append(createQuery(searchCriteria.getJudgeIds())).append(" ) ");
+            query.append(" asb.async_submission_id IN ( ").append(createQuery(searchCriteria.getSubmissionIds())).append(" ) ");
             addToPreparedStatement(preparedStmtList, searchCriteria.getSubmissionIds());
         }
         if (!ObjectUtils.isEmpty(searchCriteria.getCourtId())) {
@@ -41,7 +41,7 @@ public class AsyncSubmissionQueryBuilder {
         }
         if(!CollectionUtils.isEmpty(searchCriteria.getCaseIds())){
             addClauseIfRequired(query, preparedStmtList);
-            query.append(" asb.case_id IN ( ").append(createQuery(searchCriteria.getJudgeIds())).append(" ) ");
+            query.append(" asb.case_id IN ( ").append(createQuery(searchCriteria.getCaseIds())).append(" ) ");
             addToPreparedStatement(preparedStmtList, searchCriteria.getCaseIds());
         }
         if (!ObjectUtils.isEmpty(searchCriteria.getSubmissionDate())) {

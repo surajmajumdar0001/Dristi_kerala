@@ -35,7 +35,7 @@ public class CauseListQueryBuilder {
         }
         if(!CollectionUtils.isEmpty(searchCriteria.getCaseIds())){
             addClauseIfRequired(query, preparedStmtList);
-            query.append(" cl.case_id IN ( ").append(createQuery(searchCriteria.getJudgeIds())).append(" ) ");
+            query.append(" cl.case_id IN ( ").append(createQuery(searchCriteria.getCaseIds())).append(" ) ");
             addToPreparedStatement(preparedStmtList, searchCriteria.getCaseIds());
         }
         if (!ObjectUtils.isEmpty(searchCriteria.getSearchDate())) {
