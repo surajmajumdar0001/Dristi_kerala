@@ -4,6 +4,7 @@ package digit.service;
 import digit.config.Configuration;
 import digit.config.ServiceConstants;
 import digit.enrichment.JudgeCalendarEnrichment;
+import digit.helper.DefaultMasterDataHelper;
 import digit.kafka.Producer;
 import digit.repository.CalendarRepository;
 import digit.util.MdmsUtil;
@@ -42,6 +43,9 @@ public class CalendarService {
     @Autowired
     private HearingService hearingService;
 
+    @Autowired
+    private DefaultMasterDataHelper helper;
+
 
     @Autowired
     public CalendarService(JudgeCalendarValidator validator, JudgeCalendarEnrichment enrichment, Producer producer, Configuration config) {
@@ -55,6 +59,10 @@ public class CalendarService {
     public List<AvailabilityDTO> getJudgeAvailability(JudgeAvailabilitySearchRequest searchCriteriaRequest) {
 
         JudgeAvailabilitySearchCriteria criteria = searchCriteriaRequest.getCriteria();
+
+        List<MdmsSlot> defaultSlots = helper.getDataFromMDMS(MdmsSlot.class, serviceConstants.DEFAULT_SLOTTING_MASTER_NAME);
+
+        double totalHrs = defaultSlots.stream().reduce(0.0, (total, slot) -> total + slot.getSlotDuration() / 60.0, Double::sum);
 
         //validating required fields
         validator.validateSearchRequest(criteria);
@@ -73,7 +81,8 @@ public class CalendarService {
 
         int calendarLength = judgeCalendarRule.size();
 
-        HearingSearchCriteria hearingSearchCriteria = HearingSearchCriteria.builder().fromDate(criteria.getFromDate()).judgeId(criteria.getJudgeId()).toDate(criteria.getFromDate().plusDays(30)).build();
+        HearingSearchCriteria hearingSearchCriteria = HearingSearchCriteria.builder().fromDate(criteria.getFromDate())
+                .judgeId(criteria.getJudgeId()).toDate(criteria.getFromDate().plusDays(30 * 6)).build();
 
         List<AvailabilityDTO> availableDateForHearing = hearingService.getAvailableDateForHearing(hearingSearchCriteria);
         int hearingLength = availableDateForHearing.size();
@@ -84,8 +93,7 @@ public class CalendarService {
         for (int i = 0; i < loopLength; i++) {
 
             if (i < calendarLength) dateMap.put(judgeCalendarRule.get(i).getDate().toString(), -1.0);
-            if (i < hearingLength)
-                dateMap.put(availableDateForHearing.get(i).getDate(), availableDateForHearing.get(i).getOccupiedBandwidth());
+            if (i < hearingLength) dateMap.put(availableDateForHearing.get(i).getDate(), availableDateForHearing.get(i).getOccupiedBandwidth());
             if (i < court000334.size()) {
                 LinkedHashMap map = (LinkedHashMap) court000334.get(i);
                 if (map.containsKey("date")) {
@@ -105,7 +113,7 @@ public class CalendarService {
         Stream.iterate(criteria.getFromDate(), startDate -> startDate.isBefore(endDate), startDate -> startDate.plusDays(1))
                 .takeWhile(startDate -> resultList.size() != criteria.getNumberOfSuggestedDays()).forEach(startDate -> {
 
-                    if (dateMap.containsKey(startDate.toString()) && dateMap.get(startDate.toString()) != -1.0)
+                    if (dateMap.containsKey(startDate.toString()) && dateMap.get(startDate.toString()) != -1.0 && dateMap.get(startDate.toString()) < totalHrs)
                         resultList.add(AvailabilityDTO.builder()
                                 .date(startDate.toString())
                                 .occupiedBandwidth(dateMap.get(startDate.toString())).build());
@@ -233,7 +241,7 @@ public class CalendarService {
                 .tenantId(criteria.getTenantId())
                 .fromDate(fromDate)
                 .toDate(toDate)
-                .status(Status.SCHEDULED).build();
+                .status(Collections.singletonList(Status.SCHEDULED)).build();
 
     }
 

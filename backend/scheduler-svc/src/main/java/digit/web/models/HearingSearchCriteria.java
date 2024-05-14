@@ -51,7 +51,7 @@ public class HearingSearchCriteria {
     private LocalDateTime endDateTime;
 
     @JsonProperty("status")
-    private Status status;
+    private List<Status> status;
 
 
 }

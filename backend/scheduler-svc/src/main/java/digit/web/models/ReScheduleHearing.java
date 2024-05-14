@@ -69,5 +69,8 @@ public class ReScheduleHearing {
     @JsonProperty("suggestedDates")             // additional details
     private List<LocalDate> suggestedDates;
 
+    @JsonProperty("availableDates")             // additional details
+    private List<LocalDate> availableDates;
+
 
 }
