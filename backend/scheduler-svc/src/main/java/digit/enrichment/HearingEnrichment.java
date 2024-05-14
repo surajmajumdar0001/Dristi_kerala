@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,8 @@ public class HearingEnrichment {
     public void enrichScheduleHearing(ScheduleHearingRequest schedulingRequests, List<MdmsSlot> defaultSlots, Map<String, MdmsHearing> hearingTypeMap) {
 
         RequestInfo requestInfo = schedulingRequests.getRequestInfo();
+
+        HashMap<String, List<ScheduleHearing>> sameDayHearings = new HashMap<>();
 
         List<ScheduleHearing> hearingList = schedulingRequests.getHearing();
         log.info("starting update method for schedule hearing enrichment");
@@ -61,8 +64,17 @@ public class HearingEnrichment {
             hearing.setRowVersion(1);
             if (hearing.getStatus() == null) hearing.setStatus(Status.SCHEDULED);
 
-            List<ScheduleHearing> hearings = repository.getHearings(searchCriteria);
+            StringBuilder key = new StringBuilder();
+            key.append(hearing.getDate()).append("-").append(hearing.getJudgeId());
 
+            List<ScheduleHearing> hearings = new ArrayList<>();
+
+            if(sameDayHearings.containsKey(key.toString())){
+                hearings = sameDayHearings.get(key.toString());
+            } else {
+                hearings = repository.getHearings(searchCriteria);
+                sameDayHearings.put(key.toString(), hearings);
+            }
 
             //if status is != blocked then enrich start time and end time
             Integer hearingTime = hearingTypeMap.get(hearing.getEventType().toString()).getHearingTime();
@@ -70,9 +82,9 @@ public class HearingEnrichment {
             if (hearing.getStatus() != Status.BLOCKED)
                 updateHearingTime(hearing, defaultSlots, hearings, hearingTime);
 
-
-            hearings.add(hearing);
-
+            List<ScheduleHearing> hearings1 = sameDayHearings.get(key.toString());
+            hearings1.add(hearing);
+            sameDayHearings.put(key.toString(), hearings1);
         }
 
     }
@@ -100,17 +112,22 @@ public class HearingEnrichment {
     void updateHearingTime(ScheduleHearing hearing, List<MdmsSlot> slots, List<ScheduleHearing> scheduledHearings, int hearingDuration) {
         for (MdmsSlot slot : slots) {
             LocalTime currentStartTime = getLocalTime(slot.getSlotStartTime());
+            boolean flag = true;
             while (!currentStartTime.isAfter(getLocalTime(slot.getSlotEndTime()))) {
                 LocalTime currentEndTime = currentStartTime.plusMinutes(hearingDuration);
+                hearing.setStartTime(LocalDateTime.of(hearing.getDate(), currentStartTime));
+                hearing.setEndTime(LocalDateTime.of(hearing.getDate(), currentEndTime));
 
                 if (canScheduleHearings(hearing, scheduledHearings, slots)) {
                     hearing.setStartTime(LocalDateTime.of(hearing.getDate(), currentStartTime));
                     hearing.setEndTime(LocalDateTime.of(hearing.getDate(), currentEndTime));
                     // Hearing scheduled successfully
+                    flag = false;
                     break;
                 }
                 currentStartTime = currentStartTime.plusMinutes(15); // Move to the next time slot
             }
+            if(!flag) break;
         }
     }
 
@@ -121,6 +138,7 @@ public class HearingEnrichment {
             if (newHearing.overlapsWith(hearing)) {
                 return false;
             }
+
         }
         for (MdmsSlot slot : slots) {
 
