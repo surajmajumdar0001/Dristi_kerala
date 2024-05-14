@@ -32,6 +32,9 @@ public class HearingScheduler {
     private Configuration configuration;
 
     @Autowired
+    private Configuration configuration;
+
+    @Autowired
     private ObjectMapper mapper;
 
     @Autowired

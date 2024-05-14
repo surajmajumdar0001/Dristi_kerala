@@ -54,6 +54,7 @@ serviceMaps:
       fromTopic: update-reschedule-hearing
       isTransaction: true
       queryMaps:
+
         - query: UPDATE hearing_booking_reschedule_request SET hearing_booking_id =?,requester_id =?,reason =?,status =?,action_comment =?,created_by =?,last_modified_by =?,created_time =?, last_modified_time =? ,suggested_days =?,available_days =? ,row_version =? ,tenant_id =?,judge_id =? ,case_id =? ,documents =?  WHERE reschedule_request_id=?;
           basePath: $.*
           jsonMaps:
