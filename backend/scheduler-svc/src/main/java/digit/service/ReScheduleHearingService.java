@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -88,16 +89,18 @@ public class ReScheduleHearingService {
 
     public List<ReScheduleHearing> bulkReschedule(BulkReScheduleHearingRequest request) {
 
+        validator.validateBulkRescheduleRequest(request);
+
         BulkReschedulingOfHearings bulkRescheduling = request.getBulkRescheduling();
 
         String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
         String judgeId = bulkRescheduling.getJudgeId();
         LocalDateTime endTime = bulkRescheduling.getEndTime();
         LocalDateTime startTime = bulkRescheduling.getStartTime();
-        LocalDate fromDate = bulkRescheduling.getFromDate();
+        LocalDate fromDate = bulkRescheduling.getScheduleAfter();
 
         HearingSearchCriteria criteria = HearingSearchCriteria.builder().judgeId(judgeId).startDateTime(startTime).endDateTime(endTime).tenantId(tenantId)
-                .status(Collections.singletonList(Status.SCHEDULED)).build();
+                .status(Arrays.asList(Status.SCHEDULED,Status.BLOCKED)).build();
 
         List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().requestInfo(request.getRequestInfo()).criteria(criteria).build());
 
