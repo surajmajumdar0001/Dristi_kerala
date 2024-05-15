@@ -51,8 +51,6 @@ public class HearingQueryBuilder {
 
 
         query.append("GROUP BY hb.hearing_date) AS meeting_hours ");
-//        query.append("WHERE meeting_hours.total_hours < ? ");
-//        preparedStmtList.add(8);  //TODO:need to configure
 
         return query.toString();
     }
@@ -65,6 +63,13 @@ public class HearingQueryBuilder {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hb.hearing_booking_id IN ( ").append(queryBuilderHelper.createQuery(hearingSearchCriteria.getHearingIds())).append(" ) ");
             queryBuilderHelper.addToPreparedStatement(preparedStmtList, hearingSearchCriteria.getHearingIds());
+        }
+
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getTenantId())) {
+            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.tenant_id = ? ");
+            preparedStmtList.add(hearingSearchCriteria.getTenantId());
+
         }
 
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getJudgeId())) {
