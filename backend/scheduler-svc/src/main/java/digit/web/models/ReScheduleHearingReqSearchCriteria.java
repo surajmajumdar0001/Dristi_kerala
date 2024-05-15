@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -37,5 +38,8 @@ public class ReScheduleHearingReqSearchCriteria {
 
     @JsonProperty("status")
     private Status status;
+
+    @JsonProperty("beforeTwoDays")
+    private Long beforeTwoDays;
 
 }

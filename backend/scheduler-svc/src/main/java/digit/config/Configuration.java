@@ -124,6 +124,9 @@ public class Configuration {
     private String smsNotificationTopic;
 
 
+    //Due date of hearing
+    @Value("${opt-out-due-date}")
+    private Long optOutDueDate;
 
     //Pdf Services
     @Value("${egov.pdf.service.host}")
