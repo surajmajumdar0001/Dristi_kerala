@@ -71,9 +71,13 @@ public class CauseListService {
         // Wait for all tasks to complete
         waitForTasksCompletion(executorService);
 
-        CauseListResponse causeListResponse = CauseListResponse.builder()
-                .responseInfo(ResponseInfo.builder().build()).causeList(causeLists).build();
-        producer.push(config.getCauseListInsertTopic(), causeListResponse);
+        if (!CollectionUtils.isEmpty(causeLists)) {
+            CauseListResponse causeListResponse = CauseListResponse.builder()
+                    .responseInfo(ResponseInfo.builder().build()).causeList(causeLists).build();
+            producer.push(config.getCauseListInsertTopic(), causeListResponse);
+        } else {
+            log.info("No cause lists to be created");
+        }
         log.info("operation = updateCauseListForTomorrow, result = SUCCESS");
     }
 
@@ -108,6 +112,9 @@ public class CauseListService {
         } else {
             fillHearingTimesWithDataFromMdms(scheduleHearings);
             generateCauseListFromHearings(scheduleHearings, causeLists);
+            if (!CollectionUtils.isEmpty(causeLists)) {
+                log.info("Generated {} CauseLists for judgeId {}", causeLists.size(), judgeId);
+            }
             log.info("operation = generateCauseListForJudge, result = SUCCESS, judgeId = {}", judgeId);
         }
     }
