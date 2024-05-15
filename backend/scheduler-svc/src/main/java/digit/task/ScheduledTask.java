@@ -15,9 +15,12 @@ public class ScheduledTask {
 
     private CauseListService causeListService;
 
+    private RequestOptOutScheduleTask task;
+
     @Autowired
-    public ScheduledTask(CauseListService causeListService) {
+    public ScheduledTask(CauseListService causeListService, RequestOptOutScheduleTask task) {
         this.causeListService = causeListService;
+        this.task = task;
     }
 
     @Async
