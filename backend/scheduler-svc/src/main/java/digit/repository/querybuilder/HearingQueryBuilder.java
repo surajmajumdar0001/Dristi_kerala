@@ -126,7 +126,7 @@ public class HearingQueryBuilder {
             query.append(" ( ");
             for (int i = 0; i < hearingSearchCriteria.getStatus().size() - 1; i++) {
                 query.append(" hb.status = ? ").append(" or ");
-                preparedStmtList.add(hearingSearchCriteria.getStatus().get(i).toString());
+                preparedStmtList.add(hearingSearchCriteria.getStatus().get(i+1).toString());
             }
             query.append("hb.status = ? )");
             preparedStmtList.add(hearingSearchCriteria.getStatus().get(0).toString());
