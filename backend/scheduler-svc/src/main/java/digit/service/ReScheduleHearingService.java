@@ -175,6 +175,7 @@ public class ReScheduleHearingService {
                     .requesterId(requesterId)
                     .workflow(workflow)
                     .actionComment("AUTO SCHEDULE BY JUDGE")
+                    .reason("reschedule by judge")
                     .build();
 
             resultList.add(reScheduleHearingReq);

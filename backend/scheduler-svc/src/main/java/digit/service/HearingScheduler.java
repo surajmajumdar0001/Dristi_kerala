@@ -26,7 +26,6 @@ public class HearingScheduler {
     @Autowired
     private Producer producer;
 
-
     @Autowired
     private ReScheduleRequestRepository repository;
 
@@ -177,13 +176,18 @@ public class HearingScheduler {
                 ArrayList representatives = (ArrayList) map.get("representatives");
                 List<String> ids = new ArrayList<>();
                 for (Object representative : representatives) {
-
                     LinkedHashMap element = (LinkedHashMap) representative;
                     String id = (String) element.get("advocateId");
                     ids.add(id);
                 }
 
+
                 //TODO: get opt out of litigants
+
+//                List<OptOut> optOutForRescheduleRequest = optOutService.search(OptOutSearchRequest.builder().requestInfo(RequestInfo.builder().build()).criteria(
+//                        OptOutSearchCriteria.builder()
+//                                .rescheduleRequestId(optOut.getRescheduleRequestId()).build()
+//                ).build());
 
 
                 //if this is last one then update the status to review
