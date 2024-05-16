@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -73,8 +74,22 @@ public class ReScheduleRequestValidator {
 
     public List<ReScheduleHearing> validateExistingApplication(ReScheduleHearingRequest reScheduleHearingsRequest) {
         List<ReScheduleHearing> reScheduleHearing = reScheduleHearingsRequest.getReScheduleHearing();
+        List<String> ids = new ArrayList<>();
+        reScheduleHearingsRequest.getReScheduleHearing().forEach((element) -> {
 
-        List<String> ids = reScheduleHearing.stream().map(ReScheduleHearing::getRescheduledRequestId).toList();
+            if (element.getWorkflow().getAction().equals("APPROVE")) {
+                if (ObjectUtils.isEmpty(element.getAvailableAfter())) {
+                    throw new CustomException("DK_SH_APP_ERR", "Available after cannot be null");
+                }
+                if (element.getAvailableAfter().isBefore(LocalDate.now())) {
+                    throw new CustomException("DK_SH_APP_ERR", "available after cannot be past date");
+                }
+            }
+
+            ids.add(element.getRescheduledRequestId());
+
+        });
+
 
         List<ReScheduleHearing> existingReScheduleRequests = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().rescheduledRequestId(ids).build());
         if (existingReScheduleRequests.size() != ids.size()) {

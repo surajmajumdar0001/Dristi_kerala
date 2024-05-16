@@ -73,11 +73,13 @@ public class ScheduleHearing {
     @JsonIgnore
     private Error errors = null;
 
+    @JsonProperty("rescheduleRequestId")
+    private String rescheduleRequestId = null;
+
     @JsonProperty("hearingTimeInMinutes")
     private Integer hearingTimeInMinutes = null;
 
-
-//  copy constructor
+    //  copy constructor
     public ScheduleHearing(ScheduleHearing another) {
         this.hearingBookingId = another.hearingBookingId;
         this.tenantId = another.tenantId;
@@ -94,6 +96,7 @@ public class ScheduleHearing {
         this.auditDetails = another.auditDetails;
         this.rowVersion = another.rowVersion;
         this.errors = another.errors;
+        this.rescheduleRequestId = another.rescheduleRequestId;
         this.hearingTimeInMinutes = another.hearingTimeInMinutes;
     }
 

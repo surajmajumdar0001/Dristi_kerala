@@ -1,24 +1,18 @@
 package digit.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
 import digit.config.ServiceConstants;
 import digit.enrichment.HearingEnrichment;
 import digit.helper.DefaultMasterDataHelper;
 import digit.kafka.Producer;
 import digit.repository.HearingRepository;
-import digit.util.MdmsUtil;
 import digit.validator.HearingValidator;
 import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
-import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -107,7 +101,11 @@ public class HearingService {
     }
 
 
+    public void updateBulk(ScheduleHearingRequest request, List<MdmsSlot> defaultSlot, Map<String, MdmsHearing> hearingTypeMap) {
 
 
+        hearingEnrichment.enrichBulkReschedule(request,defaultSlot,hearingTypeMap);
 
+        producer.push(config.getScheduleHearingUpdateTopic(), request.getHearing());
+    }
 }
