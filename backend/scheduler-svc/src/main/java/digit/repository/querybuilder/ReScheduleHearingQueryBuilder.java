@@ -51,7 +51,8 @@ public class ReScheduleHearingQueryBuilder {
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 
-        if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
+        //bug
+        if (!ObjectUtils.isEmpty(searchCriteria.getCaseId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.case_id = ? ");
             preparedStmtList.add(searchCriteria.getJudgeId());
