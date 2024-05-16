@@ -17,7 +17,7 @@ public class RescheduleRequestOptOutQueryBuilder {
     private QueryBuilderHelper queryBuilderHelper;
 
 
-    private final String BASE_APPLICATION_QUERY = "SELECT  oo.id ,oo.individual_id ,oo.judge_id ,oo.case_id ,oo.reschedule_request_id ,oo.opt_out_dates , oo.created_by,oo.last_modified_by,oo.created_time,oo.last_modified_time, oo.row_version ";
+    private final String BASE_APPLICATION_QUERY = "SELECT  oo.individual_id ,oo.judge_id ,oo.case_id ,oo.reschedule_request_id ,oo.opt_out_dates , oo.created_by,oo.last_modified_by,oo.created_time,oo.last_modified_time, oo.row_version , oo.tenant_id ";
 
     private static final String FROM_TABLES = " FROM reschedule_request_opt_out_detail oo ";
 
@@ -31,11 +31,6 @@ public class RescheduleRequestOptOutQueryBuilder {
         StringBuilder query = new StringBuilder(BASE_APPLICATION_QUERY);
         query.append(FROM_TABLES);
 
-        if (!CollectionUtils.isEmpty(optOutSearchCriteria.getIds())) {
-            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" oo.id IN ( ").append(queryBuilderHelper.createQuery(optOutSearchCriteria.getIds())).append(" ) ");
-            queryBuilderHelper.addToPreparedStatement(preparedStmtList, optOutSearchCriteria.getIds());
-        }
 
         if (!ObjectUtils.isEmpty(optOutSearchCriteria.getJudgeId())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);

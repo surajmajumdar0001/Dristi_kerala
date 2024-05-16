@@ -90,12 +90,17 @@ public class ReScheduleRequestValidator {
 
         });
 
-
+        for(ReScheduleHearing reHearing : reScheduleHearing){
+            if(reHearing.getStatus().equals(Status.APPLIED) && reHearing.getAvailableAfter() == null){
+                throw new CustomException("DK_SH_APP_ERR", "Available after day is required.");
+            }
+        }
         List<ReScheduleHearing> existingReScheduleRequests = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().rescheduledRequestId(ids).build());
         if (existingReScheduleRequests.size() != ids.size()) {
             //TODO: proper error msg
             throw new CustomException("DK_SH_APP_ERR", "Reschedule request does not exist in the database");
         }
+
 
         return existingReScheduleRequests;
 

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Component
@@ -49,7 +51,8 @@ public class ReScheduleHearingQueryBuilder {
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 
-        if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
+        //bug
+        if (!ObjectUtils.isEmpty(searchCriteria.getCaseId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.case_id = ? ");
             preparedStmtList.add(searchCriteria.getJudgeId());
@@ -70,7 +73,11 @@ public class ReScheduleHearingQueryBuilder {
             query.append(" hbr.status = ? ");
             preparedStmtList.add(searchCriteria.getStatus().toString());
         }
-
+        if (!ObjectUtils.isEmpty(searchCriteria.getDueDate())) {
+            helper.addClauseIfRequired(query, preparedStmtList);
+            query.append(" hbr.last_modified_time < ?  ");
+            preparedStmtList.add(searchCriteria.getDueDate());
+        }
 
         return query.toString();
     }
