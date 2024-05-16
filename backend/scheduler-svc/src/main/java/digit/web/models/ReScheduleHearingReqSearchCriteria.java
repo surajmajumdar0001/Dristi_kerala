@@ -38,4 +38,6 @@ public class ReScheduleHearingReqSearchCriteria {
     @JsonProperty("status")
     private Status status;
 
+    @JsonProperty("beforeTwoDays")
+    private Long beforeTwoDays;
 }

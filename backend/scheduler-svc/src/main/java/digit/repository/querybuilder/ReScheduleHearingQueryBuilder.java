@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Component
@@ -19,7 +21,7 @@ public class ReScheduleHearingQueryBuilder {
     @Autowired
     private QueryBuilderHelper helper;
 
-    private final String BASE_APPLICATION_QUERY = "SELECT hbr.rescheduled_request_id, hbr.hearing_booking_id, hbr.tenant_id, hbr.judge_id, hbr.case_id,hbr.requester_id,hbr.reason,hbr.status,hbr.action_comment,hbr.documents, hbr.created_by,hbr.last_modified_by,hbr.created_time,hbr.last_modified_time, hbr.row_version  ";
+    private final String BASE_APPLICATION_QUERY = "SELECT hbr.reschedule_request_id, hbr.hearing_booking_id, hbr.tenant_id, hbr.judge_id, hbr.case_id,hbr.requester_id,hbr.reason,hbr.status,hbr.action_comment,hbr.documents, hbr.created_by,hbr.last_modified_by,hbr.created_time,hbr.last_modified_time, hbr.row_version, hbr.suggested_days , hbr.available_days  ";
 
     private static final String FROM_TABLES = " FROM hearing_booking_reschedule_request hbr ";
 
@@ -33,7 +35,7 @@ public class ReScheduleHearingQueryBuilder {
 
         if (!CollectionUtils.isEmpty(searchCriteria.getRescheduledRequestId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
-            query.append(" hbr.rescheduled_request_id IN ( ").append(helper.createQuery(searchCriteria.getRescheduledRequestId())).append(" ) ");
+            query.append(" hbr.reschedule_request_id IN ( ").append(helper.createQuery(searchCriteria.getRescheduledRequestId())).append(" ) ");
             helper.addToPreparedStatement(preparedStmtList, searchCriteria.getRescheduledRequestId());
         }
 
@@ -49,10 +51,10 @@ public class ReScheduleHearingQueryBuilder {
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 
-        if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
+        if (!ObjectUtils.isEmpty(searchCriteria.getCaseId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.case_id = ? ");
-            preparedStmtList.add(searchCriteria.getJudgeId());
+            preparedStmtList.add(searchCriteria.getCaseId());
         }
 
         if (!ObjectUtils.isEmpty(searchCriteria.getHearingBookingId())) {
@@ -68,9 +70,13 @@ public class ReScheduleHearingQueryBuilder {
         if (!ObjectUtils.isEmpty(searchCriteria.getStatus())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.status = ? ");
-            preparedStmtList.add(searchCriteria.getStatus());
+            preparedStmtList.add(searchCriteria.getStatus().toString());
         }
-
+        if (!ObjectUtils.isEmpty(searchCriteria.getBeforeTwoDays())) {
+            helper.addClauseIfRequired(query, preparedStmtList);
+            query.append(" hbr.last_modified_time < ?  ");
+            preparedStmtList.add(searchCriteria.getBeforeTwoDays());
+        }
 
         return query.toString();
     }
