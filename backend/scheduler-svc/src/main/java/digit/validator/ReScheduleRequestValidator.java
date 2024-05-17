@@ -10,6 +10,9 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -51,19 +54,17 @@ public class ReScheduleRequestValidator {
 
             //TODO: provide other required fields
 
-
-            List<ReScheduleHearing> reScheduleRequest = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder()
-                    .hearingBookingId(element.getHearingBookingId()).tenantId(element.getTenantId())
-                    .status(Status.APPLIED).build());
-
-            if (element.getWorkflow().getAction().equals("APPLY") && !reScheduleRequest.isEmpty()) {
+            // order by latest request(last modified time)
+            List<ReScheduleHearing> reScheduleRequest = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().hearingBookingId(element.getHearingBookingId()).tenantId(element.getTenantId()).build());
+            // we are checking only latest request
+            if (element.getWorkflow().getAction().equals("APPLY") && !reScheduleRequest.isEmpty() && !reScheduleRequest.get(0).getStatus().equals(Status.HEARING_SCHEDULE)) {
                 throw new CustomException("DK_SH_APP_ERR", "A reschedule request has already been initiated for Hearing :" + element.getHearingBookingId());
             }
         });
         List<String> ids = rescheduleRequests.stream().map(ReScheduleHearing::getHearingBookingId).toList();
 
-        List<ScheduleHearing> hearingsToReschedule = hearingService.search(HearingSearchRequest.builder().requestInfo(reScheduleHearingsRequest.getRequestInfo())
-                .criteria(HearingSearchCriteria.builder().hearingIds(ids).build()).build());
+
+        List<ScheduleHearing> hearingsToReschedule = hearingService.search(HearingSearchRequest.builder().requestInfo(reScheduleHearingsRequest.getRequestInfo()).criteria(HearingSearchCriteria.builder().hearingIds(ids).build()).build());
 
         if (hearingsToReschedule.size() != ids.size()) {
             throw new CustomException("DK_SH_APP_ERR", "Hearing does not exist in the database");
@@ -73,8 +74,22 @@ public class ReScheduleRequestValidator {
 
     public List<ReScheduleHearing> validateExistingApplication(ReScheduleHearingRequest reScheduleHearingsRequest) {
         List<ReScheduleHearing> reScheduleHearing = reScheduleHearingsRequest.getReScheduleHearing();
+        List<String> ids = new ArrayList<>();
+        reScheduleHearingsRequest.getReScheduleHearing().forEach((element) -> {
 
-        List<String> ids = reScheduleHearing.stream().map(ReScheduleHearing::getRescheduledRequestId).toList();
+            if (element.getWorkflow().getAction().equals("APPROVE")) {
+                if (ObjectUtils.isEmpty(element.getAvailableAfter())) {
+                    throw new CustomException("DK_SH_APP_ERR", "Available after cannot be null");
+                }
+                if (element.getAvailableAfter().isBefore(LocalDate.now())) {
+                    throw new CustomException("DK_SH_APP_ERR", "available after cannot be past date");
+                }
+            }
+
+            ids.add(element.getRescheduledRequestId());
+
+        });
+
         for(ReScheduleHearing reHearing : reScheduleHearing){
             if(reHearing.getStatus().equals(Status.APPLIED) && reHearing.getAvailableAfter() == null){
                 throw new CustomException("DK_SH_APP_ERR", "Available after day is required.");
@@ -88,6 +103,33 @@ public class ReScheduleRequestValidator {
 
 
         return existingReScheduleRequests;
+
+    }
+
+    public void validateBulkRescheduleRequest(BulkReScheduleHearingRequest request) {
+
+        BulkReschedulingOfHearings bulkRescheduling = request.getBulkRescheduling();
+
+
+        LocalDateTime currentDateTime = LocalDateTime.now();
+
+        if (ObjectUtils.isEmpty(bulkRescheduling.getJudgeId())) {
+            throw new CustomException("DK_SH_APP_ERR", "judge id must not be null");
+        }
+        LocalDateTime startTime = bulkRescheduling.getStartTime();
+        if (startTime.isBefore(currentDateTime)) {
+            throw new CustomException("DK_SH_APP_ERR", "Can not reschedule for past date hearings");
+        }
+
+        LocalDateTime endTime = bulkRescheduling.getEndTime();
+        if (endTime.isBefore(startTime)) {
+            throw new CustomException("DK_SH_APP_ERR", "end time is before start time");
+        }
+
+        LocalDate scheduleAfter = bulkRescheduling.getScheduleAfter();
+        if (scheduleAfter.isBefore(LocalDate.now())) {
+            throw new CustomException("DK_SH_APP_ERR", "can not reschedule for past dates");
+        }
 
     }
 }

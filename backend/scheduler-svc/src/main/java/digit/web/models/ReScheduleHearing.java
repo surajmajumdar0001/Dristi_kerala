@@ -73,4 +73,9 @@ public class ReScheduleHearing {
     private List<LocalDate> availableDates;
 
 
+    @JsonProperty("scheduleDate")
+    @JsonFormat(pattern = "yyyy-MM-dd")// additional details
+    private LocalDate scheduleDate;
+
+
 }

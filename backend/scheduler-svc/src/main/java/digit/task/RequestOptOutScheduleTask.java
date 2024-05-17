@@ -45,7 +45,7 @@ public class RequestOptOutScheduleTask {
         try {
             log.info("operation = updateAvailableDatesFromOptOuts, result=IN_PROGRESS");
             Long dueDate = LocalDate.now().minusDays(config.getOptOutDueDate()).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
-            List<ReScheduleHearing> reScheduleHearings = reScheduleRepository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().tenantId(config.getEgovStateTenantId()).status(Status.APPROVED).beforeTwoDays(dueDate).build());
+            List<ReScheduleHearing> reScheduleHearings = reScheduleRepository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().tenantId(config.getEgovStateTenantId()).status(Status.APPROVED).dueDate(dueDate).build());
 
             for (ReScheduleHearing reScheduleHearing : reScheduleHearings) {
                 List<OptOut> optOuts = requestOptOutRepository.getOptOut(OptOutSearchCriteria.builder().judgeId(reScheduleHearing.getJudgeId()).caseId(reScheduleHearing.getCaseId()).rescheduleRequestId(reScheduleHearing.getRescheduledRequestId()).tenantId(reScheduleHearing.getTenantId()).build());

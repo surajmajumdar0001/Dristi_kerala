@@ -72,10 +72,10 @@ public class ReScheduleHearingQueryBuilder {
             query.append(" hbr.status = ? ");
             preparedStmtList.add(searchCriteria.getStatus().toString());
         }
-        if (!ObjectUtils.isEmpty(searchCriteria.getBeforeTwoDays())) {
+        if (!ObjectUtils.isEmpty(searchCriteria.getDueDate())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.last_modified_time < ?  ");
-            preparedStmtList.add(searchCriteria.getBeforeTwoDays());
+            preparedStmtList.add(searchCriteria.getDueDate());
         }
 
         return query.toString();
