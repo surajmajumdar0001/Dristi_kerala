@@ -53,5 +53,8 @@ public class HearingSearchCriteria {
     @JsonProperty("status")
     private List<Status> status;
 
+    @JsonProperty("rescheduleId")
+    private String rescheduleId;
+
 
 }

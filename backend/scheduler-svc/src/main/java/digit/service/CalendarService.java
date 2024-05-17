@@ -241,6 +241,7 @@ public class CalendarService {
                 .tenantId(criteria.getTenantId())
                 .fromDate(fromDate)
                 .toDate(toDate)
+                .tenantId(criteria.getTenantId())
                 .status(Collections.singletonList(Status.SCHEDULED)).build();
 
     }

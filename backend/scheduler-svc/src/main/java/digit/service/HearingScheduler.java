@@ -3,13 +3,13 @@ package digit.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
+import digit.config.ServiceConstants;
+import digit.helper.DefaultMasterDataHelper;
 import digit.kafka.Producer;
 import digit.repository.ReScheduleRequestRepository;
-import digit.util.MdmsUtil;
 import digit.web.models.*;
 import digit.web.models.enums.Status;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONArray;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -42,20 +43,59 @@ public class HearingScheduler {
     private HearingService hearingService;
 
     @Autowired
-    private MdmsUtil mdmsUtil;
+    private DefaultMasterDataHelper helper;
+    @Autowired
+    private ServiceConstants serviceConstants;
 
 
     public void scheduleHearingForApprovalStatus(ReScheduleHearingRequest reScheduleHearingsRequest) {
 
-        List<ReScheduleHearing> hearingsNeedToBeSchedule = reScheduleHearingsRequest.getReScheduleHearing()
-                .stream()
-                .filter((element) -> Objects.equals(element.getWorkflow().getAction(), "APPROVE"))
-                .toList();
+        List<ReScheduleHearing> hearingsNeedToBeSchedule = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+        HashMap<String, LocalDate> dateMap = new HashMap<>();
+        List<ReScheduleHearing> blockedHearings = new ArrayList<>();
+        for (ReScheduleHearing element : reScheduleHearingsRequest.getReScheduleHearing()) {
+            if (Objects.equals(element.getWorkflow().getAction(), "SCHEDULE")) {
+                hearingsNeedToBeSchedule.add(element);
+                ids.add(element.getHearingBookingId());
+                dateMap.put(element.getHearingBookingId(), element.getScheduleDate());
+            }
+            if (Objects.equals(element.getWorkflow().getAction(), "APPROVE")) {
+                blockedHearings.add(element);
 
-        ReScheduleHearingRequest request = ReScheduleHearingRequest.builder().reScheduleHearing(hearingsNeedToBeSchedule)
+            }
+        }
+
+        ReScheduleHearingRequest request = ReScheduleHearingRequest.builder().reScheduleHearing(blockedHearings)
                 .requestInfo(reScheduleHearingsRequest.getRequestInfo()).build();
 
-        if (!hearingsNeedToBeSchedule.isEmpty()) producer.push("schedule-hearing-to-block-calendar", request);
+        if (!blockedHearings.isEmpty()) producer.push("schedule-hearing-to-block-calendar", request);
+
+        if (!hearingsNeedToBeSchedule.isEmpty()) {
+
+            List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().criteria(HearingSearchCriteria.builder()
+                            .hearingIds(ids).build())
+                    .build());
+            for (ScheduleHearing hearing : hearings) {
+                hearing.setStatus(Status.SCHEDULED);
+                hearing.setDate(dateMap.get(hearing.getHearingBookingId()));
+            }
+
+            List<MdmsSlot> defaultSlots = helper.getDataFromMDMS(MdmsSlot.class, serviceConstants.DEFAULT_SLOTTING_MASTER_NAME);
+
+            List<MdmsHearing> defaultHearings = helper.getDataFromMDMS(MdmsHearing.class, serviceConstants.DEFAULT_HEARING_MASTER_NAME);
+            Map<String, MdmsHearing> hearingTypeMap = defaultHearings.stream().collect(Collectors.toMap(
+                    MdmsHearing::getHearingType,
+                    obj -> obj
+            ));
+
+            ScheduleHearingRequest updateRequest = ScheduleHearingRequest.builder().hearing(hearings)
+                    .requestInfo(reScheduleHearingsRequest.getRequestInfo()).build();
+            hearingService.updateBulk(updateRequest, defaultSlots, hearingTypeMap);
+
+        }
+
+
     }
 
 
@@ -109,16 +149,15 @@ public class HearingScheduler {
                 List<ScheduleHearing> udpateHearingList = new ArrayList<>();
 
                 for (AvailabilityDTO availabilityDTO : availability) {
-                    //TODO: update logic to assign start time and end time
 
                     ScheduleHearing scheduleHearing = new ScheduleHearing(hearing);
-
 
                     scheduleHearing.setDate(LocalDate.parse(availabilityDTO.getDate()));
                     scheduleHearing.setStartTime(LocalDateTime.of(scheduleHearing.getDate(), hearing.getStartTime().toLocalTime()));
                     scheduleHearing.setEndTime(LocalDateTime.of(scheduleHearing.getDate(), hearing.getEndTime().toLocalTime()));
                     scheduleHearing.setStatus(Status.BLOCKED);
                     udpateHearingList.add(scheduleHearing);
+                    scheduleHearing.setRescheduleRequestId(hearingDetail.getRescheduledRequestId());
 
                 }
                 hearingService.schedule(ScheduleHearingRequest.builder()
@@ -144,42 +183,35 @@ public class HearingScheduler {
             optOuts.forEach((optOut -> {
 
 
-                Collections.sort(optOut.getOptoutDates());
-
-
                 // get the list and cancelled the hearings
                 List<ScheduleHearing> hearingList = hearingService.search(HearingSearchRequest
                         .builder().requestInfo(requestInfo)
                         .criteria(HearingSearchCriteria.builder()
-                                .tenantId(optOut.getTenantId())
-                                .caseId(optOut.getCaseId())
-                                .judgeId(optOut.getJudgeId())
-                                .fromDate(optOut.getOptoutDates().get(0))
-                                .toDate(optOut.getOptoutDates().get(optOut.getOptoutDates().size() - 1))
+                                .rescheduleId(optOut.getRescheduleRequestId())
                                 .status(Collections.singletonList(Status.BLOCKED)).build()).build());
 
                 hearingList.forEach(hearing -> hearing.setStatus(Status.CANCELLED));
 
                 //release judge calendar
                 hearingService.update(ScheduleHearingRequest.builder()
-                        .requestInfo(RequestInfo.builder().build())
+                        .requestInfo(requestInfo)
                         .hearing(hearingList).build());
 
 
                 //TODO: get list of litigants
                 // for now fetching mdms dummy case and checking all the litigants for the case
 
-                Map<String, Map<String, JSONArray>> mdmsCase = mdmsUtil.fetchMdmsData(RequestInfo.builder().build(), "kl", "schedule-hearing", Collections.singletonList("cases"));
-
-                LinkedHashMap map = (LinkedHashMap) mdmsCase.get("schedule-hearing").get("cases").get(0);
-
-                ArrayList representatives = (ArrayList) map.get("representatives");
-                List<String> ids = new ArrayList<>();
-                for (Object representative : representatives) {
-                    LinkedHashMap element = (LinkedHashMap) representative;
-                    String id = (String) element.get("advocateId");
-                    ids.add(id);
-                }
+//                Map<String, Map<String, JSONArray>> mdmsCase = mdmsUtil.fetchMdmsData(RequestInfo.builder().build(), "kl", "schedule-hearing", Collections.singletonList("cases"));
+//
+//                LinkedHashMap map = (LinkedHashMap) mdmsCase.get("schedule-hearing").get("cases").get(0);
+//
+//                ArrayList representatives = (ArrayList) map.get("representatives");
+//                List<String> ids = new ArrayList<>();
+//                for (Object representative : representatives) {
+//                    LinkedHashMap element = (LinkedHashMap) representative;
+//                    String id = (String) element.get("advocateId");
+//                    ids.add(id);
+//                }
 
 
                 //TODO: get opt out of litigants
