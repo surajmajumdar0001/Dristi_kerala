@@ -1,0 +1,1066 @@
+openapi: 3.0.0
+
+
+info:
+  title: API specs for Scheduler
+  description: Scheduler API paths and entity is defined in this file.
+  version: "0.1.0"
+tags:
+
+  - name: Judge Calendar
+    description: APIs required for judge calendar
+  - name: Schedule Hearing
+    description: APIs required for schedule  hearings
+  - name: Reschedule Hearing
+    description: APIs required for reschedule hearing
+  - name: Opt Out date
+    description: APIs required for opt out date of rescheduled hearing
+  - name: Cause List
+    description: APIs required for causeList
+  - name: Async Submission
+    description: APIs required for async submission
+
+paths:
+
+  /judge/v1/_update:
+    post:
+      tags:
+        - Judge Calendar
+      operationId: updateJudgeCalendar
+      requestBody:
+        description: Details for the new judge leave + RequestInfo meta data.
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/JudgeCalendarUpdateRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: judge calendar update failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /judge/v1/_calendar:
+    post:
+      tags:
+        - Judge Calendar
+      operationId: getJudgeCalendar
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/JudgeCalendarSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JudgeCalendarResponse'
+
+        "400":
+          description: failed to get judge calendar
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /judge/v1/_availability:
+    post:
+      tags:
+        - Judge Calendar
+      operationId: getAvailabilityOfJudge
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/JudgeAvailabilitySearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailabilityDTO'
+        "400":
+          description: failed to get judge availability
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+
+  /hearing/v1/_schedule:
+    post:
+      tags:
+        - Schedule Hearing
+      operationId: scheduleHearing
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ScheduleHearingRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/HearingResponse'
+        "400":
+          description: hearing(s) schedule failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /hearing/v1/_search:
+    post:
+      tags:
+        - Schedule Hearing
+      operationId: searchHearing
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/HearingSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/HearingResponse'
+        "400":
+          description: hearing(s) search failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+
+  /hearing/v1/_reschedule:
+    post:
+      tags:
+        - Reschedule Hearing
+      operationId: reScheduleHearing
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ReScheduleHearingRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReScheduleHearingResponse'
+        "400":
+          description: hearing(s) reschedule request failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+
+  /hearing/v1/reschedule/_update:
+    post:
+      tags:
+        - Reschedule Hearing
+      operationId: updateReScheduleHearing
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ReScheduleHearingRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReScheduleHearingResponse'
+        "400":
+          description: update hearing(s) reschedule request failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /hearing/v1/reschedule/_search:
+    post:
+      tags:
+        - Reschedule Hearing
+      operationId: searchRescheduleHearing
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ReScheduleHearingReqSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReScheduleHearingResponse'
+        "400":
+          description: failed to search reschedule hearing request
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /hearing/v1/bulk/_reschedule:
+    post:
+      tags:
+        - Reschedule Hearing
+      operationId: bulkRescheduleHearing
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/BulkReScheduleHearingRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReScheduleHearingResponse'
+        "400":
+          description: bulk reschedule failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /hearing/v1/_opt-out:
+    post:
+      tags:
+        - Opt Out date
+      operationId: optOutDates
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/OptOutRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OptOutResponse'
+        "400":
+          description: opt out date failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /hearing/v1/opt-out/_update:
+    post:
+      tags:
+        - Opt Out date
+      operationId: updateOptOut
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/OptOutRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OptOutResponse'
+        "400":
+          description: opt out date update failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /hearing/v1/opt-out/_search:
+    post:
+      tags:
+        - Opt Out date
+      operationId: searchOptOut
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/OptOutSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OptOutResponse'
+        "400":
+          description: opt out date search failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+
+  /causelist/v1/_view:
+    post:
+      tags:
+        - Cause List
+      operationId: viewCauseList
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/CauseListSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CauseListResponse'
+        "400":
+          description: view causelist failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /causelist/v1/_download:
+    post:
+      tags:
+        - Cause List
+      operationId: downloadCauseList
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/CauseListSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: download causlist failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /async-submission/v1/_updateDates:
+    post:
+      tags:
+        - Async Submission
+      operationId: updateSubmissionDates
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/AsyncSubmissionRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AsyncSubmissionResponse'
+        "400":
+          description: async submission update date failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /async-submission/v1/_saveDates:
+    post:
+      tags:
+        - Async Submission
+      operationId: saveSubmissionDates
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/AsyncSubmissionRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AsyncSubmissionResponse'
+        "400":
+          description: async submission update date failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /async-submission/v1/_getSubmissions:
+    post:
+      tags:
+        - Async Submission
+      operationId: getSubmissions
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/AsyncSubmissionSearchRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AsyncSubmissionResponse'
+        "400":
+          description: get async submission failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+  /async-submission/v1/_duedates:
+    post:
+      tags:
+        - Async Submission
+      operationId: getDueDates
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/AsyncSubmissionRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AsyncSubmissionResponse'
+        "400":
+          description: get async submissionn due date failed
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ErrorRes'
+components:
+  schemas:
+    JudgeCalendarRule:
+      type: object
+      properties:
+        id:
+          type: string
+        judgeId:
+          type: string
+        ruleType:
+          type: string
+          enum:
+            - NON_WORKING_DAY
+            - LEAVE
+            - OTHER
+        date:
+          type: string
+          format: date
+        notes:
+          type: string
+        tenantId:
+          type: string
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/AuditDetails'
+        rowVersion:
+          type: integer
+          format: int32
+    JudgeCalendarUpdateRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        JudgeCalendarRule:
+          type: array
+          items:
+            $ref: '#/components/schemas/JudgeCalendarRule'
+      description: Details for the judge calendar data to be updated.
+    CalendarSearchCriteria:
+      type: object
+      properties:
+        tenantId:
+          type: string
+        judgeId:
+          type: string
+        courtId:
+          type: string
+        fromDate:
+          type: string
+          format: date
+        toDate:
+          type: string
+          format: date
+        periodType:
+          type: string
+          enum:
+            - CURRENT_DATE
+            - CURRENT_WEEK
+            - CURRENT_MONTH
+            - CURRENT_YEAR
+    JudgeCalendarSearchRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        SearchCriteria:
+          $ref: '#/components/schemas/CalendarSearchCriteria'
+      description: Judge calendar search criteria and Request info
+    HearingCalendar:
+      type: object
+      properties:
+        judgeId:
+          type: string
+        date:
+          type: string
+          format: date
+        isHoliday:
+          type: boolean
+        isOnLeave:
+          type: boolean
+        description:
+          type: string
+        notes:
+          type: string
+        hearings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleHearing'
+    JudgeCalendarResponse:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        Calendar:
+          type: array
+          items:
+            $ref: '#/components/schemas/HearingCalendar'
+    ScheduleHearing:
+      type: object
+      properties:
+        hearingBookingId:
+          type: string
+        tenantId:
+          type: string
+        courtId:
+          type: string
+        judgeId:
+          type: string
+        caseId:
+          type: string
+        date:
+          type: string
+          format: date
+        eventType:
+          type: string
+          enum:
+            - ADMISSION_HEARING
+            - TRIAL_HEARING
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+            - SCHEDULED
+            - RE_SCHEDULED
+            - CANCELLED
+            - APPROVED
+            - APPLIED
+            - REJECTED
+            - BLOCKED
+            - AUTO_HEARING_SCHEDULE
+            - REVIEW
+            - HEARING_SCHEDULE
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/AuditDetails'
+        rowVersion:
+          type: integer
+          format: int32
+        rescheduleRequestId:
+          type: string
+        hearingTimeInMinutes:
+          type: integer
+          format: int32
+    JudgeAvailabilitySearchCriteria:
+      type: object
+      properties:
+        tenantId:
+          type: string
+        judgeId:
+          type: string
+        courtId:
+          type: string
+        numberOfSuggestedDays:
+          type: integer
+          format: int32
+        fromDate:
+          type: string
+          format: date
+        toDate:
+          type: string
+          format: date
+    JudgeAvailabilitySearchRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        SearchCriteria:
+          $ref: '#/components/schemas/JudgeAvailabilitySearchCriteria'
+      description: Judge availability search criteria and Request info
+    AvailabilityDTO:
+      type: object
+      properties:
+        date:
+          type: string
+        occupiedBandwidth:
+          type: number
+          format: double
+    ReScheduleHearing:
+      type: object
+      properties:
+        rescheduledRequestId:
+          type: string
+        hearingBookingId:
+          type: string
+        tenantId:
+          type: string
+        judgeId:
+          type: string
+        caseId:
+          type: string
+        requesterId:
+          type: string
+        reason:
+          type: string
+        availableAfter:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+            - SCHEDULED
+            - RE_SCHEDULED
+            - CANCELLED
+            - APPROVED
+            - APPLIED
+            - REJECTED
+            - BLOCKED
+            - AUTO_HEARING_SCHEDULE
+            - REVIEW
+            - HEARING_SCHEDULE
+        actionComment:
+          type: string
+        workflow:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/Workflow'
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/AuditDetails'
+        rowVersion:
+          type: integer
+          format: int32
+        documents:
+          type: array
+          items:
+            $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/Document'
+        suggestedDates:
+          type: array
+          items:
+            type: string
+            format: date
+        availableDates:
+          type: array
+          items:
+            type: string
+            format: date
+        scheduleDate:
+          type: string
+          format: date
+    ReScheduleHearingRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        RescheduledRequest:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReScheduleHearing'
+      description: Hearing Details and Request Info
+    ReScheduleHearingResponse:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ResponseInfo'
+        Hearings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReScheduleHearing'
+    ReScheduleHearingReqSearchCriteria:
+      type: object
+      properties:
+        rescheduledRequestId:
+          type: array
+          items:
+            type: string
+        hearingBookingId:
+          type: string
+        tenantId:
+          type: string
+        judgeId:
+          type: string
+        caseId:
+          type: string
+        requesterId:
+          type: string
+        status:
+          type: string
+          enum:
+            - SCHEDULED
+            - RE_SCHEDULED
+            - CANCELLED
+            - APPROVED
+            - APPLIED
+            - REJECTED
+            - BLOCKED
+            - AUTO_HEARING_SCHEDULE
+            - REVIEW
+            - HEARING_SCHEDULE
+        dueDate:
+          type: integer
+          format: int64
+    ReScheduleHearingReqSearchRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        SearchCriteria:
+          $ref: '#/components/schemas/ReScheduleHearingReqSearchCriteria'
+      description: Hearing Details and Request Info
+    OptOut:
+      type: object
+      properties:
+        tenantId:
+          type: string
+        individualId:
+          type: string
+        caseId:
+          type: string
+        rescheduleRequestId:
+          type: string
+        judgeId:
+          type: string
+        optOutDates:
+          type: array
+          items:
+            type: string
+            format: date
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/AuditDetails'
+        rowVersion:
+          type: integer
+          format: int32
+    OptOutRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        OptOut:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptOut'
+      description: Hearing Details and Request Info
+    OptOutResponse:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ResponseInfo'
+        OptOut:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptOut'
+    OptOutSearchCriteria:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+        judgeId:
+          type: string
+        caseId:
+          type: string
+        tenantId:
+          type: string
+        rescheduleRequestId:
+          type: string
+        individualId:
+          type: string
+    OptOutSearchRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        SearchCriteria:
+          $ref: '#/components/schemas/OptOutSearchCriteria'
+      description: Hearing Details and Request Info
+    BulkReScheduleHearingRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        BulkRescheduling:
+          $ref: '#/components/schemas/BulkReschedulingOfHearings'
+      description: Hearing Details and Request Info
+    BulkReschedulingOfHearings:
+      type: object
+      properties:
+        judgeId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        scheduleAfter:
+          type: string
+          format: date
+    HearingSearchCriteria:
+      type: object
+      properties:
+        hearingIds:
+          type: array
+          items:
+            type: string
+        judgeId:
+          type: string
+        courtId:
+          type: string
+        fromDate:
+          type: string
+          format: date
+        toDate:
+          type: string
+          format: date
+        hearingType:
+          type: string
+        caseId:
+          type: string
+        tenantId:
+          type: string
+        startDateTime:
+          type: string
+          format: date-time
+        endDateTime:
+          type: string
+          format: date-time
+        status:
+          type: array
+          items:
+            type: string
+            enum:
+              - SCHEDULED
+              - RE_SCHEDULED
+              - CANCELLED
+              - APPROVED
+              - APPLIED
+              - REJECTED
+              - BLOCKED
+              - AUTO_HEARING_SCHEDULE
+              - REVIEW
+              - HEARING_SCHEDULE
+        rescheduleId:
+          type: string
+    HearingSearchRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        SearchCriteria:
+          $ref: '#/components/schemas/HearingSearchCriteria'
+      description: Hearing Details and Request Info
+    HearingResponse:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ResponseInfo'
+        Hearings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleHearing'
+    ScheduleHearingRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        Hearing:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduleHearing'
+      description: Hearing Details and Request Info
+    CauseListSearchCriteria:
+      required:
+        - courtId
+      type: object
+      properties:
+        judgeIds:
+          type: array
+          items:
+            type: string
+        caseIds:
+          type: array
+          items:
+            type: string
+        courtId:
+          type: string
+        searchDate:
+          type: string
+          format: date
+    CauseListSearchRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        SearchCriteria:
+          $ref: '#/components/schemas/CauseListSearchCriteria'
+      description: CauseList Search criteria + RequestInfo meta data.
+    CauseList:
+      type: object
+      properties:
+        courtId:
+          type: string
+        caseId:
+          type: string
+        tenantId:
+          type: string
+        judgeId:
+          type: string
+        typeOfHearing:
+          type: string
+        litigantNames:
+          type: array
+          items:
+            type: string
+        tentativeSlot:
+          type: string
+        caseTitle:
+          type: string
+        caseDate:
+          type: string
+    CauseListResponse:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ResponseInfo'
+        CauseList:
+          type: array
+          items:
+            $ref: '#/components/schemas/CauseList'
+      description: CauseList Details for the Next day.
+    AsyncSubmission:
+      type: object
+      properties:
+        submissionId:
+          type: string
+        tenantId:
+          type: string
+        courtId:
+          type: string
+        judgeId:
+          type: string
+        caseId:
+          type: string
+        submissionType:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        submissionDate:
+          type: string
+        responseDate:
+          type: string
+        auditDetails:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/AuditDetails'
+        rowVersion:
+          type: integer
+          format: int32
+    AsyncSubmissionRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        AsyncSubmission:
+          $ref: '#/components/schemas/AsyncSubmission'
+      description: Give due dates for which files must be submitted and response must be given.
+    AsyncSubmissionResponse:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/ResponseInfo'
+        AsyncSubmissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/AsyncSubmission'
+    AsyncSubmissionSearchCriteria:
+      type: object
+      properties:
+        submissionIds:
+          type: array
+          items:
+            type: string
+        judgeIds:
+          type: array
+          items:
+            type: string
+        caseIds:
+          type: array
+          items:
+            type: string
+        courtId:
+          type: string
+        submissionDate:
+          type: string
+          format: date
+        responseDate:
+          type: string
+          format: date
+    AsyncSubmissionSearchRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-OSS/master/core-services/docs/common-contract_v1-1.yml#/components/schemas/RequestInfo'
+        SearchCriteria:
+          $ref: '#/components/schemas/AsyncSubmissionSearchCriteria'
+      description: Searches for submissions based on criteria given and returns them.
