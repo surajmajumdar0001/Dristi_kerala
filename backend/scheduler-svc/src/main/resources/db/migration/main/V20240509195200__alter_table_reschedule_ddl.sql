@@ -1,2 +1,0 @@
-ALTER TABLE hearing_booking_reschedule_request
-ADD suggested_days jsonb;
