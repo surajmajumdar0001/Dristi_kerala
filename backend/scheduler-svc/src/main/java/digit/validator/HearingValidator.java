@@ -29,6 +29,12 @@ public class HearingValidator {
             if (ObjectUtils.isEmpty(application.getEventType()))
                 throw new CustomException("DK_SH_APP_ERR", "Event type is mandatory for schedule a hearing");
 
+            if (ObjectUtils.isEmpty(application.getCourtId()))
+                throw new CustomException("DK_SH_SEARCH_ERR", "courtId is mandatory for schedule a hearing");
+
+            if (ObjectUtils.isEmpty(application.getJudgeId()))
+                throw new CustomException("DK_SH_APP_ERR", "Judge Id is mandatory for schedule a hearing");
+
             if (ObjectUtils.isEmpty(application.getDate())) {
                 throw new CustomException("DK_SH_APP_ERR", "date is mandatory for schedule a hearing");
             } else {

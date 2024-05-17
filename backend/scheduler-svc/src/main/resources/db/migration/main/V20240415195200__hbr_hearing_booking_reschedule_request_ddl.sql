@@ -12,9 +12,11 @@ CREATE TABLE hearing_booking_reschedule_request (
     last_modified_time          bigint,
     row_version                 bigint,
     tenant_id                   character varying(64),
-    court_id                    character varying(64),
+    case_id                    character varying(64),
     judge_id                    character varying(64),
     documents                   jsonb,
+    suggested_days              jsonb,
+    available_days              jsonb,
 
     CONSTRAINT pk_hearing_booking_reschedule_request_id PRIMARY KEY (reschedule_request_id)
 
