@@ -2,16 +2,12 @@
 title E-Sign and Issue
 Actor "Judge" as User #879BAA
 boundary CaseDetailsUI as UI #FFEDB5
+control "OrderSvc" as O
 control "Soln:\nSummonsSvc" as C #65C728
-control "Soln:\nDeliverySvc" as SD #65C728
 control "FileStoreSvc" as FS
 control "Soln:\nESignSvc" as E #65C728
 participant "Ext:\nESign" as ES #C8D1BA
 participant "Ext:\nAadhaarServer" as Aadhaar #C8D1BA
-participant "Case" as Case
-participant "MDMS" as MDMS
-participant "Advocate" as Advocate
-participant "Order" as Order
 participant Persister as Persister
 database Postgres
 User -> UI: Selected "E-Sign and Issue" option \nin Summons Screen
@@ -32,13 +28,13 @@ ES -> ES: Sign document \nbased on Aadhaar
 return Signed Document
 C -> FS++: Store Signed Document
 return Storage Location URL
-C -> SD++: Send for Summons Delivery
-return Summons Delivery \nInitiated Acknowledment
-C -> C: Calculate overall order status
-C -> Order++: Prepare overall order status payload
-return Order Object
-C -> Persister: Push Order payload
-Persister -> Postgres: Persist data \nin DB
-C -> UI: OrderId generated returned 
-UI -> User: Show the message \n"Summons Issued Successfully" 
+C -> O: Send Task Details
+O->Workflow: get Workflow status
+Workflow-->O: return Workflow status "Summons Served"
+O -> Kafka: Push Task payload to topic
+Persister -> Kafka: Read payload
+Persister -> Postgres: Update records in DB  
+C -> Notification: (async)Send notification to \n Complainant, Respondant, Advocates & Judge
+C -> UI: Summon details 
+UI -> User: Show the message \n"Summons Served Successfully" 
 @enduml

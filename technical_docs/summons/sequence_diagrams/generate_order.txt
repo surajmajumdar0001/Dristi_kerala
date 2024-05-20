@@ -1,0 +1,23 @@
+@startuml
+title Generate Order (Summons/Warrant)
+Actor "Judge" as Judge #879BAA
+boundary CaseDetailsUI as UI #FFEDB5
+boundary TaskDetailsUI as TaskUI #FFEDB5
+control "TaskSvc" as O
+control "Soln:\nSummonsSvc" as SummonsSvc #65C728
+Judge -> UI: Select "Generate Order" \noption in Case Details Screen
+UI -> O: Submit CaseID, JudgeID
+O -> TaskUI: Task Details for confirmation\n to proceed with payment 
+TaskUI -> Judge: Task Details for confirmation 
+Judge -> UI: Select "Confirm Order" \noption in Order Details Screen
+UI -> O: Task details along with CaseID, JudgeID
+  O -> SummonsSvc: Call Summons Service for payment amount \n with Task & Delivery Channel details 
+  SummonsSvc -> O: Send calculated payment amount 
+  O->Workflow: get Workflow status
+  Workflow-->O: return Workflow status "Pending Payment"
+  O -> Kafka: Push Task payload along with payment amount to topic
+  Persister -> Kafka: Read payload
+  Persister -> Postgres: Create records in DB  
+  O -> Notification: (async)Send notification to \n Complainant for payment
+TaskUI -> Judge: Task Created successfully 
+@enduml

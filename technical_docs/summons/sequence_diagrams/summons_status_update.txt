@@ -1,0 +1,44 @@
+@startuml
+title Daily Delivery Status Update (All undelivered Summons)
+control "Soln:\nSummonsSvc" as SummonsSvc #65C728
+control "OrderSvc" as OrderSvc
+control "FileStoreSvc" as FS
+participant "Ext:\nChannelDelivery" as CD #C8D1BA
+participant "MDMS" as MDMS
+participant "Advocate" as Advocate
+participant "Order" as Order
+participant "Soln:\nChannelDelivery" as SCD #65C728
+participant Persister as Persister
+database Postgres
+SummonsSvc -> MDMS ++: Retrieve MDMS data for Delivery Channels.
+return MDMS data for Delivery Channels
+SummonsSvc -> SCD++: Retrieve list of Summons Delivery in "Initiated" sttaus 
+return Undelivered Summons Delivery list
+loop for each Summons Delivery
+  SummonsSvc -> CD++: Get the delivery status
+  return status
+  alt delivery successful
+    SummonsSvc -> FS++: Store Delivery related files
+    return File update status
+    SummonsSvc -> SCD++: Prepare Summons Channel Delivery payload with Status(Delivered)
+    return Summons Channel Delivery Object
+    SummonsSvc -> Persister: Push Summons Channel Delivery payload
+    Persister -> Postgres: Persist data in DB
+  else delivery failed
+    SummonsSvc -> SCD++: Prepare Summons Channel Delivery payload with Status(Not Delivered & Reason)
+    return Summons Channel Delivery Object
+    SummonsSvc -> Persister: Push Summons Channel Delivery payload
+    Persister -> Postgres: Persist data in DB
+  else pending
+    alt elapsed days above limit
+      SummonsSvc -> SCD++: Prepare Summons Channel Delivery payload with Status(Not Delivered & Reason)
+      return Summons Channel Delivery Object
+      SummonsSvc -> Persister: Push Summons Channel Delivery payload
+      Persister -> Postgres: Persist data in DB
+    else
+    end
+  end
+  SummonsSvc -> SummonsSvc: Calculate overall order status
+  SummonsSvc -> OrderSvc++: Send order status payload
+end
+@enduml

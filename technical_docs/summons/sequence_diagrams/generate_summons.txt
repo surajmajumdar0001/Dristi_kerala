@@ -1,36 +1,41 @@
 @startuml
-title Generate Summons/Warrant/Notice
-Actor "Judge" as User #879BAA
-boundary CaseDetailsUI as UI #FFEDB5
-control "OrderSvc" as O
-control "Soln:\nSummonsSvc" as C #65C728
+title Generate Summons/Warrant and send to delivery channels
+control "TaskSvc" as O
+control "Soln:\nSummonsSvc" as SummonsSvc #65C728
 control "Soln:\nDocGenSvc" as DG #65C728
 control "IndividualSvc" as I
 control "FileStoreSvc" as FS
+participant "Ext:\nChannelDelivery" as CD #C8D1BA
+participant "Ext:\neTreasury" as eTreasury #C8D1BA
 participant "Case" as Case
 participant "MDMS" as MDMS
-participant "Advocate" as Advocate
-participant "Order" as Order 
-User -> UI: Select "Generate Summons/Warrant" \noption in Case Details Screen
-UI -> O ++: Submit CaseID, JudgeID
-  O -> C ++: Submit CaseID, JudgeID
-    C -> MDMS ++: Retrieve MDMS data for Scheduling.
-    return MDMS data for Scheduling
-    C -> Case ++: Fetch Case details based on CaseID
-    return Case Details
-    C -> I ++: Fetch Complainant details based on ComplainantID
-    return Complainant Details
-    C -> I ++: Fetch Respondant details based on RespondantID
-    return Respondant Details
-    C -> Advocate ++: Fetch advocate details based on AdvocateID
-    return Advocate Details
-    C -> FS++: Fetch Document template
-    return Document Template File
-    C -> DG++: Generate Summons based on template
-    return Summons Document
-    C -> Order++: Build Order payload
-    return Order Object
-  C -> O: Order Details along with \nSummons document 
-O -> UI: Order Details along with \nSummons document 
-UI -> User: Show the Summons details along \nwith the document attached 
+Kafka -> SummonsSvc++: Read order payload
+  SummonsSvc -> MDMS ++: Retrieve MDMS data for Summons Generation & Delivery Channels.
+  return MDMS data for Summons Generation & Delivery Channels
+  SummonsSvc -> Case ++: Fetch Case details based on CaseID
+  return Case Details
+  SummonsSvc -> I ++: Fetch Complainant details based on ComplainantID
+  return Complainant Details
+  SummonsSvc -> I ++: Fetch Respondant details based on RespondantID
+  return Respondant Details
+  SummonsSvc -> I ++: Fetch advocate details based on AdvocateID
+  return Advocate Details
+  SummonsSvc -> FS++: Fetch Document template
+  return Document Template File
+  SummonsSvc -> DG++: Generate Summons based on template
+  return Summons Document
+  loop for each channel
+    SummonsSvc ->> CD++: Send Summons Document Details along with file attachment for delivery (Async)
+    return Summons Delivery Accepted Acknowledgement
+    SummonsSvc -> SummonsSvc++: Prepare Summons Channel Delivery payload with Status (Initiated)
+    return Summons Channel Delivery Object
+    SummonsSvc -> Persister: Push Summons Channel Delivery payload
+    Persister -> Postgres: Persist data in DB
+  end
+  SummonsSvc -> SummonsSvc: Calculate overall order status \n Prepare overall order status payload
+  SummonsSvc -> O: Push Order Update payload
+  O -> Persister: Push Order payload
+  Persister -> Postgres: Update records in DB
+  O -> Notification: (async)Send notification to \n Complainant, Respondant, Advocates & Judge
+return success
 @enduml

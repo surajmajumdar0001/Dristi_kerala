@@ -1,0 +1,28 @@
+@startuml
+title Summons Payment (for Litigant)
+Actor "Litigant" as Litigant #879BAA
+boundary CaseDetailsUI as UI #FFEDB5
+boundary TaskDetailsUI as TaskUI #FFEDB5
+control "TaskSvc" as O
+control "Soln:\neTreasurySvc" as eTreasurySvc #65C728
+participant "Ext:\neTreasury" as eTreasury #C8D1BA
+Litigant -> TaskUI: Select "Make Payment" \noption in Landing Page
+TaskUI -> Litigant: Show Task Details for confirmation
+Litigant -> TaskUI: Select "Proceed with Payment" 
+TaskUI -> eTreasurySvc: Submit TaskId, Amount
+  eTreasurySvc -> eTreasury: Initiate Challan generation  
+  eTreasury -> eTreasurySvc: Send payment screen  
+eTreasurySvc -> TaskUI: Show payment screen
+TaskUI -> eTreasurySvc: Submit Payment with GRN Number 
+  eTreasurySvc -> eTreasury: Verify GRN Number  
+  eTreasury -> eTreasurySvc: Confirm payment  
+  eTreasury -> TaskUI: Payment completed
+  TaskUI -> O: Submit TaskId, Amount
+  O->Workflow: get Workflow status
+  Workflow-->O: return Workflow status "Issue Summons"
+  O -> Kafka: Push Task payload to topic
+  Persister -> Kafka: Read payload
+  Persister -> Postgres: Update records in DB  
+  O -> Notification: (async)Send notification to \n Complainant for payment
+  O -> TaskUI: Payment completed successfully
+TaskUI -> Litigant: Payment completed successfully
