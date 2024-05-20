@@ -1,7 +1,6 @@
 package digit.validator;
 
 import digit.config.Configuration;
-import digit.kafka.Producer;
 import digit.repository.HearingRepository;
 import digit.web.models.AsyncSubmission;
 import digit.web.models.HearingSearchCriteria;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -23,14 +23,12 @@ public class AsyncSubmissionValidator {
 
     private HearingRepository repository;
 
-    private Producer producer;
 
     private Configuration config;
 
     @Autowired
-    public AsyncSubmissionValidator(HearingRepository repository, Producer producer, Configuration config) {
+    public AsyncSubmissionValidator(HearingRepository repository, Configuration config) {
         this.repository = repository;
-        this.producer = producer;
         this.config = config;
     }
 
@@ -42,7 +40,7 @@ public class AsyncSubmissionValidator {
             Optional<ScheduleHearing> latestHearing = findLatestHearingByStartTime(scheduleHearingList);
             if (latestHearing.isPresent()) {
                 if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {
-                    producer.push(config.getAsyncSubmissionReScheduleHearing(), asyncSubmission);
+                    throw new CustomException("DK_ASH_APP_ERR", "async submission and response dates must be before hearing date");
                 }
             }
         } else {
@@ -56,8 +54,24 @@ public class AsyncSubmissionValidator {
 
     public static Optional<ScheduleHearing> findLatestHearingByStartTime(List<ScheduleHearing> hearings) {
         return hearings.stream()
-                .filter(hearing -> hearing.getStartTime() != null) // Filter out null start times
+                .filter(hearing -> hearing.getDate() != null && hearing.getDate().isAfter(LocalDate.now()))
                 .max(Comparator.comparing(ScheduleHearing::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo)));
     }
 
+    public void validateDates(AsyncSubmission asyncSubmission) {
+        HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
+                .caseId(asyncSubmission.getCaseId()).build();
+        List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
+        Optional<ScheduleHearing> latestHearing = findLatestHearingByStartTime(scheduleHearingList);
+        if (latestHearing.isPresent()) {
+            if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {
+                asyncSubmission.setResponseDate(String.valueOf(latestHearing.get().getDate().minusDays(1)));
+                if (ChronoUnit.DAYS.between(LocalDate.now(), latestHearing.get().getDate()) > 6) {
+                    asyncSubmission.setSubmissionDate(String.valueOf(latestHearing.get().getDate().minusDays(6)));
+                } else {
+                    asyncSubmission.setSubmissionDate(String.valueOf(String.valueOf(latestHearing.get().getDate().minusDays(2))));
+                }
+            }
+        }
+    }
 }
