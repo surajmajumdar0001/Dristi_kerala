@@ -69,7 +69,7 @@ public class AsyncSubmissionValidator {
                 if (ChronoUnit.DAYS.between(LocalDate.now(), latestHearing.get().getDate()) > 6) {
                     asyncSubmission.setSubmissionDate(String.valueOf(latestHearing.get().getDate().minusDays(6)));
                 } else {
-                    asyncSubmission.setSubmissionDate(String.valueOf(String.valueOf(latestHearing.get().getDate().minusDays(2))));
+                    asyncSubmission.setSubmissionDate(String.valueOf(String.valueOf(LocalDate.now().plusDays(1))));
                 }
             }
         }
