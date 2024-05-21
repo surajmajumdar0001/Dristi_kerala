@@ -1,7 +1,9 @@
 package digit.kafka;
 
 
+import digit.service.BlockedCalendarUpdate;
 import digit.service.HearingScheduler;
+import digit.service.OptOutHearingSchedule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -16,14 +18,16 @@ import java.util.HashMap;
 public class HearingSchedulerConsumer {
 
     @Autowired
-    private HearingScheduler hearingScheduler;
+    private BlockedCalendarUpdate blockedCalendarUpdate;
 
+    @Autowired
+    private OptOutHearingSchedule optOutHearingSchedule;
 
     @KafkaListener(topics = {"schedule-hearing-to-block-calendar"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
         try {
-            hearingScheduler.updateRequestForBlockCalendar(record);
+            blockedCalendarUpdate.updateRequestForBlockCalendar(record);
 
         } catch (Exception e) {
 
@@ -38,7 +42,7 @@ public class HearingSchedulerConsumer {
     public void listenOptOut(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
         try {
-            hearingScheduler.checkAndScheduleHearingForOptOut(record);
+            optOutHearingSchedule.checkAndScheduleHearingForOptOut(record);
 
         } catch (Exception e) {
 

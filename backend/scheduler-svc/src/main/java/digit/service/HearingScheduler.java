@@ -31,19 +31,11 @@ public class HearingScheduler {
     private ReScheduleRequestRepository repository;
 
     @Autowired
-    private Configuration configuration;
-
-    @Autowired
-    private ObjectMapper mapper;
-
-    @Autowired
-    private CalendarService calendarService;
-
-    @Autowired
     private HearingService hearingService;
 
     @Autowired
     private DefaultMasterDataHelper helper;
+
     @Autowired
     private ServiceConstants serviceConstants;
 
@@ -99,153 +91,7 @@ public class HearingScheduler {
     }
 
 
-    // blocked judged calendar by creating temp hearings
-    public void updateRequestForBlockCalendar(HashMap<String, Object> record) {
-
-        try {
-
-            ReScheduleHearingRequest hearingUpdateRequest = mapper.convertValue(record, ReScheduleHearingRequest.class);
-            RequestInfo requestInfo = hearingUpdateRequest.getRequestInfo();
-
-            List<ReScheduleHearing> hearingDetails = hearingUpdateRequest.getReScheduleHearing();
-            String tenantId = hearingDetails.get(0).getTenantId();
-
-            for (ReScheduleHearing hearingDetail : hearingDetails) {
-
-                List<AvailabilityDTO> availability = calendarService.getJudgeAvailability(JudgeAvailabilitySearchRequest
-                        .builder()
-                        .requestInfo(requestInfo)
-                        .criteria(JudgeAvailabilitySearchCriteria.builder()
-                                .judgeId(hearingDetail.getJudgeId())
-                                .fromDate(hearingDetail.getAvailableAfter())
-                                .courtId("0001")  //TODO: need to configure somewhere
-                                .numberOfSuggestedDays(5) //TODO: later we change this to no of attendees
-                                .tenantId(tenantId)
-                                .build()).build());
-
-                // update here all the suggestedDay in reschedule hearing day
-
-                List<LocalDate> suggestedDays = availability.stream().map(
-                                (suggestedDate) -> LocalDate.parse(suggestedDate.getDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-                        .toList();
-                hearingDetail.setSuggestedDates(suggestedDays);
-                hearingDetail.setRowVersion(hearingDetail.getRowVersion() + 1);
 
 
-                List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder()
-                        .requestInfo(requestInfo)
-                        .criteria(HearingSearchCriteria.builder()
-                                .hearingIds(Collections.singletonList(hearingDetail.getHearingBookingId()))
-                                .build()).build());
-                ScheduleHearing hearing = hearings.get(0);
-                hearings.get(0).setStatus(Status.RE_SCHEDULED);
 
-
-                //reschedule hearing to unblock the calendar
-                hearingService.update(ScheduleHearingRequest.builder()
-                        .requestInfo(requestInfo).hearing(hearings).build());
-
-
-                List<ScheduleHearing> udpateHearingList = new ArrayList<>();
-
-                for (AvailabilityDTO availabilityDTO : availability) {
-
-                    ScheduleHearing scheduleHearing = new ScheduleHearing(hearing);
-
-                    scheduleHearing.setDate(LocalDate.parse(availabilityDTO.getDate()));
-                    scheduleHearing.setStartTime(LocalDateTime.of(scheduleHearing.getDate(), hearing.getStartTime().toLocalTime()));
-                    scheduleHearing.setEndTime(LocalDateTime.of(scheduleHearing.getDate(), hearing.getEndTime().toLocalTime()));
-                    scheduleHearing.setStatus(Status.BLOCKED);
-                    udpateHearingList.add(scheduleHearing);
-                    scheduleHearing.setRescheduleRequestId(hearingDetail.getRescheduledRequestId());
-
-                }
-                hearingService.schedule(ScheduleHearingRequest.builder()
-                        .requestInfo(requestInfo).hearing(udpateHearingList).build());
-
-            }
-            producer.push(configuration.getUpdateRescheduleRequestTopic(), hearingDetails);
-        } catch (Exception e) {
-            log.error("KAFKA_PROCESS_ERROR:", e);
-            log.error("DK_SH_APP_ERR: error while blocking the calendar", e);
-        }
-    }
-
-    public void checkAndScheduleHearingForOptOut(HashMap<String, Object> record) {
-
-
-        try {
-            OptOutRequest optOutRequest = mapper.convertValue(record, OptOutRequest.class);
-            RequestInfo requestInfo = optOutRequest.getRequestInfo();
-
-            List<OptOut> optOuts = optOutRequest.getOptOuts();
-
-            optOuts.forEach((optOut -> {
-
-
-                // get the list and cancelled the hearings
-                List<ScheduleHearing> hearingList = hearingService.search(HearingSearchRequest
-                        .builder().requestInfo(requestInfo)
-                        .criteria(HearingSearchCriteria.builder()
-                                .rescheduleId(optOut.getRescheduleRequestId())
-                                .status(Collections.singletonList(Status.BLOCKED)).build()).build());
-
-                hearingList.forEach(hearing -> hearing.setStatus(Status.CANCELLED));
-
-                //release judge calendar
-                hearingService.update(ScheduleHearingRequest.builder()
-                        .requestInfo(requestInfo)
-                        .hearing(hearingList).build());
-
-
-                //TODO: get list of litigants
-                // for now fetching mdms dummy case and checking all the litigants for the case
-
-//                Map<String, Map<String, JSONArray>> mdmsCase = mdmsUtil.fetchMdmsData(RequestInfo.builder().build(), "kl", "schedule-hearing", Collections.singletonList("cases"));
-//
-//                LinkedHashMap map = (LinkedHashMap) mdmsCase.get("schedule-hearing").get("cases").get(0);
-//
-//                ArrayList representatives = (ArrayList) map.get("representatives");
-//                List<String> ids = new ArrayList<>();
-//                for (Object representative : representatives) {
-//                    LinkedHashMap element = (LinkedHashMap) representative;
-//                    String id = (String) element.get("advocateId");
-//                    ids.add(id);
-//                }
-
-
-                //TODO: get opt out of litigants
-
-//                List<OptOut> optOutForRescheduleRequest = optOutService.search(OptOutSearchRequest.builder().requestInfo(RequestInfo.builder().build()).criteria(
-//                        OptOutSearchCriteria.builder()
-//                                .rescheduleRequestId(optOut.getRescheduleRequestId()).build()
-//                ).build());
-
-
-                //if this is last one then update the status to review
-
-                //  updated available days in db
-                String rescheduleRequestId = optOut.getRescheduleRequestId();
-
-                List<ReScheduleHearing> reScheduleRequest = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder()
-                        .rescheduledRequestId(Collections.singletonList(rescheduleRequestId)).build());
-
-
-                List<LocalDate> suggestedDates = reScheduleRequest.get(0).getSuggestedDates();
-                Set<LocalDate> suggestedDatesSet = new HashSet<>(suggestedDates);
-
-                optOut.getOptoutDates().forEach(suggestedDatesSet::remove);
-
-
-                reScheduleRequest.get(0).setAvailableDates(new ArrayList<>(suggestedDatesSet));
-                reScheduleRequest.get(0).setStatus(Status.REVIEW);
-
-
-                producer.push(configuration.getUpdateRescheduleRequestTopic(), reScheduleRequest);
-
-            }));
-        } catch (Exception e) {
-            log.error("KAFKA_PROCESS_ERROR:", e);
-        }
-    }
 }
