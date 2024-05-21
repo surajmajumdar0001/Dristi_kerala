@@ -135,10 +135,4 @@ public class Configuration {
     @Value("${egov.pdf.service.create.endpoint}")
     private String pdfServiceEndpoint;
 
-    //CaseCriteria
-    @Value("${config.case.url}")
-    private String caseUrl;
-
-    @Value("${config.case.url.endpoint}")
-    private String caseEndpoint;
 }

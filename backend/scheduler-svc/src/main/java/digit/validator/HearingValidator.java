@@ -5,8 +5,6 @@ import digit.config.Configuration;
 import digit.repository.HearingRepository;
 import digit.repository.ServiceRequestRepository;
 import digit.web.models.*;
-import digit.web.models.cases.CaseCriteria;
-import digit.web.models.cases.CaseSearchCriteria;
 import org.apache.commons.lang3.ObjectUtils;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +52,6 @@ public class HearingValidator {
 
                 }
             }
-            StringBuilder url = new StringBuilder(config.getCaseUrl() + config.getCaseEndpoint());
-
-            CaseSearchCriteria caseSearchCriteria = CaseSearchCriteria.builder().RequestInfo(schedulingRequests.getRequestInfo()).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(application.getCaseId()).build())).build();
-
-            Object response = requestRepository.postMethod(url, caseSearchCriteria);
-
-
         });
 
         verifyHearingDates(schedulingRequests.getHearing(), totalHrs, hearingTypeMap);
