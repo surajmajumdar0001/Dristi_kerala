@@ -44,7 +44,7 @@ public class AsyncSubmissionValidator {
                 }
             }
         } else {
-            throw new CustomException("DK_AS_APP_ERR", "async submission date must be before response date");
+            throw new CustomException("DK_ASR_APP_ERR", "async submission date must be before response date");
         }
     }
 
