@@ -65,7 +65,6 @@ public class RescheduleRequestOptOutQueryBuilder {
         }
 
         if (!ObjectUtils.isEmpty(limit) && !ObjectUtils.isEmpty(offset)) {
-            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(LIMIT_OFFSET);
             preparedStmtList.add(limit);
             preparedStmtList.add(offset);
