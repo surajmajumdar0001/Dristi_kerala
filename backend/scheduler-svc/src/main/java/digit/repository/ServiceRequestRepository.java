@@ -29,7 +29,20 @@ public class ServiceRequestRepository {
         this.mapper = mapper;
         this.restTemplate = restTemplate;
     }
-
+    public Object postMethod(StringBuilder uri, Object request) {
+        Object response = null;
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        try {
+            log.debug("Sending POST request to URL: {}", uri.toString());
+            log.debug("Request body: {}", request);
+            response = restTemplate.postForObject(uri.toString(), request, Object.class);
+            log.debug("Response: {}", response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Service call exception in POST method", e);
+        }
+        return response;
+    }
 
     public Object fetchResult(StringBuilder uri, Object request) {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
