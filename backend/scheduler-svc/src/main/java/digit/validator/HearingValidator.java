@@ -82,7 +82,7 @@ public class HearingValidator {
             }
 
 
-            if ((judgeBandwidth - occupiedBandwidthOfJudgeForDay) > requiredSlot) {
+            if ((judgeBandwidth - occupiedBandwidthOfJudgeForDay) >= requiredSlot) {
                 // temporary booked the slot
                 map.put(key.toString(), occupiedBandwidthOfJudgeForDay + requiredSlot);
 
@@ -96,7 +96,5 @@ public class HearingValidator {
 
     }
 
-    public void validateHearingOnUpdate(ScheduleHearingRequest scheduleHearingRequest) {
-    }
 }
 

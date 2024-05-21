@@ -55,16 +55,11 @@ public class WorkflowService {
     }
 
     public State callWorkFlow(ProcessInstanceRequest workflowReq) {
-        try {
             ProcessInstanceResponse response = null;
             StringBuilder url = new StringBuilder(config.getWfHost().concat(config.getWfTransitionPath()));
             Object optional = repository.fetchResult(url, workflowReq);
             response = mapper.convertValue(optional, ProcessInstanceResponse.class);
             return response.getProcessInstances().get(0).getState();
-        } catch (Exception e) {
-            log.info("operation=callWorkFlow, result=FAILURE,  message", e);
-            throw new CustomException("DK_SH_APP_ERR", e.getMessage());
-        }
     }
 
     private ProcessInstance getProcessInstanceForHearingReScheduler(ReScheduleHearing application, RequestInfo requestInfo) {

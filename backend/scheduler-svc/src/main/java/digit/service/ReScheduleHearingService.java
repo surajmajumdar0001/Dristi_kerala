@@ -10,57 +10,73 @@ import digit.repository.ReScheduleRequestRepository;
 import digit.validator.ReScheduleRequestValidator;
 import digit.web.models.*;
 import digit.web.models.enums.Status;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+/**
+ * Contains methods related to raised reschedule request, update request,search , bulk rescheduling
+ */
 @Service
+@Slf4j
 public class ReScheduleHearingService {
 
-
     private final Configuration config;
-    private ReScheduleRequestRepository repository;
-    private ReScheduleRequestValidator validator;
-    private ReScheduleRequestEnrichment enrichment;
-    private Producer producer;
-    @Autowired
-    private WorkflowService workflowService;
+
+    private final ReScheduleRequestRepository repository;
+
+    private final ReScheduleRequestValidator validator;
+
+    private final ReScheduleRequestEnrichment enrichment;
+
+    private final Producer producer;
+
+    private final WorkflowService workflowService;
+
+    private final HearingService hearingService;
+
+    private final CalendarService calendarService;
+
+    private final HearingScheduler hearingScheduler;
+
+    private final ServiceConstants serviceConstants;
+
+    private final DefaultMasterDataHelper helper;
 
     @Autowired
-    private HearingService hearingService;
-
-    @Autowired
-    private CalendarService calendarService;
-
-    @Autowired
-    private HearingScheduler hearingScheduler;
-
-    @Autowired
-    private ServiceConstants serviceConstants;
-
-    @Autowired
-    private DefaultMasterDataHelper helper;
-
-
-    @Autowired
-    public ReScheduleHearingService(ReScheduleRequestRepository repository, ReScheduleRequestValidator validator, ReScheduleRequestEnrichment enrichment, Producer producer, Configuration config) {
+    public ReScheduleHearingService(Configuration config, ReScheduleRequestRepository repository, ReScheduleRequestValidator validator, ReScheduleRequestEnrichment enrichment, Producer producer, WorkflowService workflowService, HearingService hearingService, CalendarService calendarService, HearingScheduler hearingScheduler, ServiceConstants serviceConstants, DefaultMasterDataHelper helper) {
+        this.config = config;
         this.repository = repository;
         this.validator = validator;
         this.enrichment = enrichment;
         this.producer = producer;
-        this.config = config;
+        this.workflowService = workflowService;
+        this.hearingService = hearingService;
+        this.calendarService = calendarService;
+        this.hearingScheduler = hearingScheduler;
+        this.serviceConstants = serviceConstants;
+        this.helper = helper;
     }
 
+    /**
+     *
+     * @param reScheduleHearingsRequest
+     * @return
+     */
+
     public List<ReScheduleHearing> create(ReScheduleHearingRequest reScheduleHearingsRequest) {
+        log.info("operation = create, result = IN_PROGRESS,  RescheduledRequest = {}", reScheduleHearingsRequest.getReScheduleHearing());
+
         List<ReScheduleHearing> reScheduleHearing = reScheduleHearingsRequest.getReScheduleHearing();
 
         validator.validateRescheduleRequest(reScheduleHearingsRequest);
@@ -71,11 +87,19 @@ public class ReScheduleHearingService {
 
         producer.push(config.getRescheduleRequestCreateTopic(), reScheduleHearing);
 
+        log.info("operation = create, result=SUCCESS, ReScheduleHearing={}", reScheduleHearing);
+
         return reScheduleHearing;
 
     }
 
+    /**
+     *
+     * @param reScheduleHearingsRequest
+     * @return
+     */
     public List<ReScheduleHearing> update(ReScheduleHearingRequest reScheduleHearingsRequest) {
+        log.info("operation = update, result = IN_PROGRESS,  RescheduledRequest = {}", reScheduleHearingsRequest.getReScheduleHearing());
 
         List<ReScheduleHearing> existingReScheduleHearingsReq = validator.validateExistingApplication(reScheduleHearingsRequest);
 
@@ -88,16 +112,28 @@ public class ReScheduleHearingService {
         hearingScheduler.scheduleHearingForApprovalStatus(reScheduleHearingsRequest);
 
         producer.push(config.getUpdateRescheduleRequestTopic(), reScheduleHearingsRequest.getReScheduleHearing());
+        log.info("operation = create, result = SUCCESS, ReScheduleHearing={}", existingReScheduleHearingsReq);
 
         return reScheduleHearingsRequest.getReScheduleHearing();
 
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     */
     public List<ReScheduleHearing> search(ReScheduleHearingReqSearchRequest request) {
         return repository.getReScheduleRequest(request.getCriteria());
     }
 
+    /**
+     *
+     * @param request
+     * @return
+     */
     public List<ReScheduleHearing> bulkReschedule(BulkReScheduleHearingRequest request) {
+        log.info("operation = bulkReschedule, result = IN_PROGRESS,  BulkRescheduling = {}", request.getBulkRescheduling());
 
         validator.validateBulkRescheduleRequest(request);
 
@@ -137,7 +173,7 @@ public class ReScheduleHearingService {
                                 .judgeId(judgeId)
                                 .fromDate(fromDate)
                                 .courtId("0001")
-                                .numberOfSuggestedDays(hearings.size()+10)
+                                .numberOfSuggestedDays(hearings.size() + 10)
                                 .tenantId(tenantId)// need to configure some where
                                 .build()).build()
         );
@@ -163,13 +199,21 @@ public class ReScheduleHearingService {
         // try to make it async
         // updated hearing in hearing table
         hearingService.updateBulk(ScheduleHearingRequest.builder()
-                .hearing(hearings).requestInfo(request.getRequestInfo()).build(),defaultSlots,hearingTypeMap);
+                .hearing(hearings).requestInfo(request.getRequestInfo()).build(), defaultSlots, hearingTypeMap);
 
+        log.info("operation = bulkReschedule, result = SUCCESS, ReScheduleHearing={}", reScheduleHearings);
 
         return reScheduleHearings;
     }
 
+    /**
+     *
+     * @param hearings
+     * @param requesterId
+     * @return
+     */
     private List<ReScheduleHearing> createReschedulingRequest(List<ScheduleHearing> hearings, String requesterId) {
+        log.info("operation=createReschedulingRequest, result=IN_PROGRESS, hearings={}", hearings);
         List<ReScheduleHearing> resultList = new ArrayList<>();
 
         Workflow workflow = Workflow.builder().action("AUTO_SCHEDULE").assignees(new ArrayList<>()).comment("bulk reschedule by :" + requesterId).build();
@@ -189,6 +233,7 @@ public class ReScheduleHearingService {
             resultList.add(reScheduleHearingReq);
 
         }
+        log.info("operation= createReschedulingRequest, result=SUCCESS, ReScheduleHearing={}", resultList);
         return resultList;
     }
 }
