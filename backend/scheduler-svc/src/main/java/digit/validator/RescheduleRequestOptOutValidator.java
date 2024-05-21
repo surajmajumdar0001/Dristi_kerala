@@ -47,7 +47,7 @@ public class RescheduleRequestOptOutValidator {
 
         List<ReScheduleHearing> search = reScheduleHearingService.search(ReScheduleHearingReqSearchRequest.builder()
                 .requestInfo(request.getRequestInfo())
-                .criteria(ReScheduleHearingReqSearchCriteria.builder().rescheduledRequestId(ids).build()).build());
+                .criteria(ReScheduleHearingReqSearchCriteria.builder().rescheduledRequestId(ids).build()).build(), null,  null);
 
         if (ids.size() != search.size()) {
             throw new CustomException("DK_SH_APP_ERR", "Reschedule request does not exist in database");

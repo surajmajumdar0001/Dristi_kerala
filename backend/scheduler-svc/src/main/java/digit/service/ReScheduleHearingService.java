@@ -93,8 +93,8 @@ public class ReScheduleHearingService {
 
     }
 
-    public List<ReScheduleHearing> search(ReScheduleHearingReqSearchRequest request) {
-        return repository.getReScheduleRequest(request.getCriteria());
+    public List<ReScheduleHearing> search(ReScheduleHearingReqSearchRequest request, Integer limit, Integer offset) {
+        return repository.getReScheduleRequest(request.getCriteria(), limit, offset);
     }
 
     public List<ReScheduleHearing> bulkReschedule(BulkReScheduleHearingRequest request) {
@@ -120,7 +120,7 @@ public class ReScheduleHearingService {
         HearingSearchCriteria criteria = HearingSearchCriteria.builder().judgeId(judgeId).startDateTime(startTime).endDateTime(endTime).tenantId(tenantId)
                 .status(Arrays.asList(Status.SCHEDULED, Status.BLOCKED)).build();
 
-        List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().requestInfo(request.getRequestInfo()).criteria(criteria).build());
+        List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().requestInfo(request.getRequestInfo()).criteria(criteria).build(), null, null);
 
         if (CollectionUtils.isEmpty(hearings)) {
             return new ArrayList<>();

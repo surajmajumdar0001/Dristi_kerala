@@ -61,7 +61,7 @@ public class RescheduleRequestOptOutService {
         return request.getOptOuts();
     }
 
-    public List<OptOut> search(OptOutSearchRequest request) {
-        return rescheduleRequestOptOutRepository.getOptOut(request.getCriteria());
+    public List<OptOut> search(OptOutSearchRequest request, Integer limit, Integer offset) {
+        return rescheduleRequestOptOutRepository.getOptOut(request.getCriteria(), limit,  offset);
     }
 }

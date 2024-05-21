@@ -38,7 +38,7 @@ public class AsyncSubmissionValidator {
         if (validateSubmissionAndResponseDates(asyncSubmission)) {
             HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
                     .caseId(asyncSubmission.getCaseId()).build();
-            List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
+            List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria, null, null);
             Optional<ScheduleHearing> latestHearing = findLatestHearingByStartTime(scheduleHearingList);
             if (latestHearing.isPresent()) {
                 if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {

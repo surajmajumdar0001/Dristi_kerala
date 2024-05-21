@@ -172,7 +172,7 @@ public class CalendarService {
 
         HearingSearchCriteria hearingSearchCriteria = getHearingSearchCriteriaFromJudgeSearch(criteria);
         // sort on the basis of start time
-        List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().criteria(hearingSearchCriteria).build());
+        List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().criteria(hearingSearchCriteria).build(), null, null);
 
         hearings.forEach((hearing) -> {
 

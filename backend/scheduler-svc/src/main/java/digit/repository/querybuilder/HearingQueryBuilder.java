@@ -25,12 +25,12 @@ public class HearingQueryBuilder {
     @Autowired
     private QueryBuilderHelper queryBuilderHelper;
 
-    public String getHearingQuery(HearingSearchCriteria hearingSearchCriteria, List<Object> preparedStmtList) {
+    public String getHearingQuery(HearingSearchCriteria hearingSearchCriteria, List<Object> preparedStmtList, Integer limit, Integer offset) {
 
         StringBuilder query = new StringBuilder(BASE_APPLICATION_QUERY);
         query.append(FROM_TABLES);
 
-        getWhereFields(hearingSearchCriteria, query, preparedStmtList);
+        getWhereFields(hearingSearchCriteria, query, preparedStmtList, limit, offset);
 
         return query.toString();
     }
@@ -41,7 +41,7 @@ public class HearingQueryBuilder {
         query.append("SELECT hb.hearing_date, SUM(EXTRACT(EPOCH FROM (TO_TIMESTAMP(hb.end_time, 'YYYY-MM-DD HH24:MI:SS') - TO_TIMESTAMP(hb.start_time, 'YYYY-MM-DD HH24:MI:SS'))) / 3600) AS total_hours ");
         query.append("FROM hearing_booking hb ");
 
-        getWhereFields(hearingSearchCriteria, query, preparedStmtList);
+        getWhereFields(hearingSearchCriteria, query, preparedStmtList, null, null);
         // add status block
         queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
         query.append(" ( hb.status = ? ");
@@ -56,7 +56,7 @@ public class HearingQueryBuilder {
     }
 
 
-    private void getWhereFields(HearingSearchCriteria hearingSearchCriteria, StringBuilder query, List<Object> preparedStmtList) {
+    private void getWhereFields(HearingSearchCriteria hearingSearchCriteria, StringBuilder query, List<Object> preparedStmtList, Integer limit, Integer offset) {
 
 
         if (!CollectionUtils.isEmpty(hearingSearchCriteria.getHearingIds())) {
@@ -137,6 +137,13 @@ public class HearingQueryBuilder {
             query.append("hb.status = ? )");
             preparedStmtList.add(hearingSearchCriteria.getStatus().get(0).toString());
 
+        }
+
+        if (!ObjectUtils.isEmpty(limit) && !ObjectUtils.isEmpty(offset)) {
+            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
+            query.append(LIMIT_OFFSET);
+            preparedStmtList.add(limit);
+            preparedStmtList.add(offset);
         }
     }
 
