@@ -1,14 +1,19 @@
 package digit.validator;
 
 
+import digit.config.Configuration;
 import digit.repository.HearingRepository;
+import digit.repository.ServiceRequestRepository;
 import digit.web.models.*;
+import digit.web.models.cases.CaseCriteria;
+import digit.web.models.cases.CaseSearchCriteria;
 import org.apache.commons.lang3.ObjectUtils;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +24,11 @@ public class HearingValidator {
     @Autowired
     private HearingRepository repository;
 
+    @Autowired
+    Configuration config;
+
+    @Autowired
+    ServiceRequestRepository requestRepository;
 
     public void validateHearing(ScheduleHearingRequest schedulingRequests, double totalHrs, Map<String, MdmsHearing> hearingTypeMap) {
 
@@ -44,6 +54,12 @@ public class HearingValidator {
 
                 }
             }
+            StringBuilder url = new StringBuilder(config.getCaseUrl() + config.getCaseEndpoint());
+
+            CaseSearchCriteria caseSearchCriteria = CaseSearchCriteria.builder().RequestInfo(schedulingRequests.getRequestInfo()).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(application.getCaseId()).build())).build();
+
+            Object response = requestRepository.postMethod(url, caseSearchCriteria);
+
 
         });
 
