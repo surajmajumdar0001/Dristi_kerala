@@ -79,7 +79,6 @@ public class ReScheduleHearingQueryBuilder {
             preparedStmtList.add(searchCriteria.getDueDate());
         }
         if(!ObjectUtils.isEmpty(limit) && !ObjectUtils.isEmpty(offset)){
-            helper.addClauseIfRequired(query, preparedStmtList);
             query.append(LIMIT_OFFSET);
             preparedStmtList.add(limit);
             preparedStmtList.add(offset);
