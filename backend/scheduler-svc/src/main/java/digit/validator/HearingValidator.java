@@ -55,9 +55,7 @@ public class HearingValidator {
                 }
             }
             StringBuilder url = new StringBuilder(config.getCaseUrl() + config.getCaseEndpoint());
-
             CaseSearchCriteria caseSearchCriteria = CaseSearchCriteria.builder().RequestInfo(schedulingRequests.getRequestInfo()).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(application.getCaseId()).build())).build();
-
             Object response = requestRepository.postMethod(url, caseSearchCriteria);
 
             if(ObjectUtils.isEmpty(response)){
