@@ -12,6 +12,7 @@ import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -78,6 +79,9 @@ public class AsyncSubmissionService {
     public AsyncSubmissionResponse updateAsyncSubmissions(AsyncSubmissionRequest request) {
         log.info("operation = updateAsyncSubmissions, result = IN_PROGRESS");
         AsyncSubmission asyncSubmission = request.getAsyncSubmission();
+        if (StringUtils.isEmpty(asyncSubmission.getSubmissionId())) {
+            throw new CustomException("DK_AS_APP_ERR", "async submission id should not be null");
+        }
         AsyncSubmissionSearchCriteria searchCriteria = AsyncSubmissionSearchCriteria.builder()
                 .submissionIds(Collections.singletonList(asyncSubmission.getSubmissionId())).build();
         List<AsyncSubmission> asyncSubmissions = repository.getAsyncSubmissions(searchCriteria);
