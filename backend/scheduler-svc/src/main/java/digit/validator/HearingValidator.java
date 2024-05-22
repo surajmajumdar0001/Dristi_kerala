@@ -60,6 +60,9 @@ public class HearingValidator {
 
             Object response = requestRepository.postMethod(url, caseSearchCriteria);
 
+            if(ObjectUtils.isEmpty(response)){
+                throw new CustomException("DK_SH_APP_ERR", "No case exists for given case id.");
+            }
 
         });
 
