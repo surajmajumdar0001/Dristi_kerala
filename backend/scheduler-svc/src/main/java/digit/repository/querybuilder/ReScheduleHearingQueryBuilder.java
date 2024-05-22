@@ -25,7 +25,7 @@ public class ReScheduleHearingQueryBuilder {
 
     private static final String FROM_TABLES = " FROM hearing_booking_reschedule_request hbr ";
 
-    private final String ORDER_BY = " ORDER BY ";
+    private final String ORDER_BY = " ORDER BY hbr.last_modified_time DESC";
 
     private final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
 
@@ -78,6 +78,8 @@ public class ReScheduleHearingQueryBuilder {
             query.append(" hbr.last_modified_time < ?  ");
             preparedStmtList.add(searchCriteria.getDueDate());
         }
+
+        query.append(ORDER_BY);
 
         return query.toString();
     }

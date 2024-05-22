@@ -19,49 +19,68 @@ import java.util.List;
 @Slf4j
 public class RescheduleRequestOptOutService {
 
-    @Autowired
-    private RescheduleRequestOptOutRepository rescheduleRequestOptOutRepository;
+    private final RescheduleRequestOptOutRepository optOutRepositoryt;
+
+    private final RescheduleRequestOptOutValidator optOutValidator;
+
+    private final RescheduleRequestOptOutEnrichment optOutEnrichment;
+
+    private final Producer producer;
+
+    private final Configuration config;
 
     @Autowired
-    private RescheduleRequestOptOutValidator rescheduleRequestOptOutValidator;
-    @Autowired
-    private RescheduleRequestOptOutEnrichment rescheduleRequestOptOutEnrichment;
+    public RescheduleRequestOptOutService(RescheduleRequestOptOutRepository optOutRepositoryt, RescheduleRequestOptOutValidator optOutValidator, RescheduleRequestOptOutEnrichment optOutEnrichment, Producer producer, Configuration config) {
+        this.optOutRepositoryt = optOutRepositoryt;
+        this.optOutValidator = optOutValidator;
+        this.optOutEnrichment = optOutEnrichment;
+        this.producer = producer;
+        this.config = config;
+    }
 
-    @Autowired
-    private Producer producer;
-
-    @Autowired
-    private Configuration config;
-
-    @Autowired
-    private WorkflowService workflowService;
-
-
+    /**
+     * @param request
+     * @return
+     */
     public List<OptOut> create(OptOutRequest request) {
+        log.info("operation = create, result = IN_PROGRESS, OptOut = {}", request.getOptOuts());
 
-        rescheduleRequestOptOutValidator.validateRequest(request);
+        optOutValidator.validateRequest(request);
 
-        rescheduleRequestOptOutEnrichment.enrichCreateRequest(request);
+        optOutEnrichment.enrichCreateRequest(request);
 
         producer.push(config.getOptOutTopic(), request.getOptOuts());
 
         producer.push("check-opt-out", request);
 
+        log.info("operation = create, result = SUCCESS, OptOut = {}", request.getOptOuts());
+
         return request.getOptOuts();
     }
 
+    /**
+     * @param request
+     * @return
+     */
     public List<OptOut> update(OptOutRequest request) {
+        log.info("operation = update, result = IN_PROGRESS, OptOut = {}", request.getOptOuts());
 
-        rescheduleRequestOptOutValidator.validateUpdateRequest(request);
+        optOutValidator.validateUpdateRequest(request);
 
-        rescheduleRequestOptOutEnrichment.enrichUpdateRequest(request);
+        optOutEnrichment.enrichUpdateRequest(request);
 
         producer.push(config.getOptOutUpdateTopic(), request.getOptOuts());
 
+        log.info("operation = update, result = SUCCESS, OptOut = {}", request.getOptOuts());
+
         return request.getOptOuts();
     }
 
+    /**
+     * @param request
+     * @return
+     */
     public List<OptOut> search(OptOutSearchRequest request) {
-        return rescheduleRequestOptOutRepository.getOptOut(request.getCriteria());
+        return optOutRepositoryt.getOptOut(request.getCriteria());
     }
 }

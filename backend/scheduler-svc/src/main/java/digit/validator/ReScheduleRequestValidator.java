@@ -57,7 +57,7 @@ public class ReScheduleRequestValidator {
             // order by latest request(last modified time)
             List<ReScheduleHearing> reScheduleRequest = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().hearingBookingId(element.getHearingBookingId()).tenantId(element.getTenantId()).build());
             // we are checking only latest request
-            if (element.getWorkflow().getAction().equals("APPLY") && !reScheduleRequest.isEmpty() && !reScheduleRequest.get(0).getStatus().equals(Status.HEARING_SCHEDULE)) {
+            if (element.getWorkflow().getAction().equals("APPLY") && !reScheduleRequest.isEmpty() && !(reScheduleRequest.get(0).getStatus().equals(Status.HEARING_SCHEDULE) || reScheduleRequest.get(0).getStatus().equals(Status.CANCELLED) || reScheduleRequest.get(0).getStatus().equals(Status.REJECTED))) {
                 throw new CustomException("DK_SH_APP_ERR", "A reschedule request has already been initiated for Hearing :" + element.getHearingBookingId());
             }
         });
@@ -90,11 +90,6 @@ public class ReScheduleRequestValidator {
 
         });
 
-        for(ReScheduleHearing reHearing : reScheduleHearing){
-            if(reHearing.getStatus().equals(Status.APPLIED) && reHearing.getAvailableAfter() == null){
-                throw new CustomException("DK_SH_APP_ERR", "Available after day is required.");
-            }
-        }
         List<ReScheduleHearing> existingReScheduleRequests = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().rescheduledRequestId(ids).build());
         if (existingReScheduleRequests.size() != ids.size()) {
             //TODO: proper error msg
