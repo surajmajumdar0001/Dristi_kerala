@@ -78,13 +78,13 @@ public class ReScheduleHearingQueryBuilder {
             query.append(" hbr.last_modified_time < ?  ");
             preparedStmtList.add(searchCriteria.getDueDate());
         }
-        if(!ObjectUtils.isEmpty(limit) && !ObjectUtils.isEmpty(offset)){
+        query.append(ORDER_BY);
+        if (!ObjectUtils.isEmpty(limit) && !ObjectUtils.isEmpty(offset)) {
             query.append(LIMIT_OFFSET);
             preparedStmtList.add(limit);
             preparedStmtList.add(offset);
         }
 
-        query.append(ORDER_BY);
 
         return query.toString();
     }
