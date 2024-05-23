@@ -50,11 +50,12 @@ public class JudgeCalendarApiController {
     }
 
     @RequestMapping(value = "/judge/v1/_availability", method = RequestMethod.POST)
-    public ResponseEntity<List<AvailabilityDTO>> getAvailabilityOfJudge(@Parameter(in = ParameterIn.DEFAULT, description = "Judge availability search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest request) {
+    public ResponseEntity<JudgeAvailabilityResponse> getAvailabilityOfJudge(@Parameter(in = ParameterIn.DEFAULT, description = "Judge availability search criteria and Request info", required = true, schema = @Schema()) @Valid @RequestBody JudgeAvailabilitySearchRequest request) {
         log.info("api=/judge/v1/_availability, result = IN_PROGRESS");
         List<AvailabilityDTO> judgeAvailability = calendarService.getJudgeAvailability(request);
+        JudgeAvailabilityResponse response = JudgeAvailabilityResponse.builder().responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true)).availableDates(judgeAvailability).build();
         log.info("api=/judge/v1/_availability, result = SUCCESS");
-        return ResponseEntity.accepted().body(judgeAvailability);
+        return ResponseEntity.accepted().body(response);
     }
 
 
