@@ -237,9 +237,9 @@ public class CauseListService {
     public ByteArrayResource downloadCauseListForTomorrow(CauseListSearchRequest searchRequest) {
         log.info("operation = downloadCauseListForTomorrow, with searchRequest : {}", searchRequest.toString());
         List<CauseList> causeLists = getCauseListForTomorrow(searchRequest.getCauseListSearchCriteria());
-        CauseListResponse causeListResponse = CauseListResponse.builder()
-                .responseInfo(ResponseInfo.builder().build()).causeList(causeLists).build();
-        return pdfServiceUtil.generatePdfFromPdfService(causeListResponse , searchRequest.getRequestInfo().getUserInfo().getTenantId(),
-                config.getCauseListPdfTemplateKey(), searchRequest.getRequestInfo());
+        CauseListRequest causeListRequest = CauseListRequest.builder()
+                .requestInfo(searchRequest.getRequestInfo()).causeList(causeLists).build();
+        return pdfServiceUtil.generatePdfFromPdfService(causeListRequest , searchRequest.getRequestInfo().getUserInfo().getTenantId(),
+                config.getCauseListPdfTemplateKey());
     }
 }

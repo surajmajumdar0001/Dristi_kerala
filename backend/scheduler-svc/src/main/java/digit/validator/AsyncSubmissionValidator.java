@@ -32,13 +32,23 @@ public class AsyncSubmissionValidator {
         this.config = config;
     }
 
-    public void validateHearing(AsyncSubmission asyncSubmission) {
+    public void validateSubmissionDates(AsyncSubmission asyncSubmission) {
+        // Check if tenant Id is null or does not match the defined tenant ID
+        if (asyncSubmission.getTenantId() == null || !config.getEgovStateTenantId().equalsIgnoreCase(asyncSubmission.getTenantId())) {
+            throw new CustomException("DK_ASH_APP_ERR", "Tenant id is either null or invalid");
+        }
+        // Validate submission and response dates
         if (validateSubmissionAndResponseDates(asyncSubmission)) {
+            // Build search criteria using case Id and retrieve list of scheduled hearings
             HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
                     .caseId(asyncSubmission.getCaseId()).build();
             List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
-            Optional<ScheduleHearing> latestHearing = findLatestHearingByStartTime(scheduleHearingList);
+
+            // Find the latest hearing by start time
+            Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);
+            // Proceed only if a latest hearing is found
             if (latestHearing.isPresent()) {
+                // Check if the response date is after the latest hearing date
                 if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {
                     throw new CustomException("DK_ASH_APP_ERR", "async submission and response dates must be before hearing date");
                 }
@@ -49,28 +59,50 @@ public class AsyncSubmissionValidator {
     }
 
     private Boolean validateSubmissionAndResponseDates(AsyncSubmission asyncSubmission) {
-        return LocalDate.parse(asyncSubmission.getSubmissionDate()).isBefore(LocalDate.parse(asyncSubmission.getResponseDate()));
+        LocalDate submissionDate = LocalDate.parse(asyncSubmission.getSubmissionDate());
+        LocalDate responseDate = LocalDate.parse(asyncSubmission.getResponseDate());
+        LocalDate currentDate = LocalDate.now();
+
+        // Check if both dates are after the current date and submission date is before response date
+        return submissionDate.isAfter(currentDate) && responseDate.isAfter(currentDate) && submissionDate.isBefore(responseDate);
     }
 
-    public static Optional<ScheduleHearing> findLatestHearingByStartTime(List<ScheduleHearing> hearings) {
+    public static Optional<ScheduleHearing> findLatestHearingByHearingDate(List<ScheduleHearing> hearings) {
         return hearings.stream()
+                // Filter out hearings that have a null date or a date before today
                 .filter(hearing -> hearing.getDate() != null && hearing.getDate().isAfter(LocalDate.now()))
+                // Find the hearing with the latest start time, considering nulls as the last in order
                 .max(Comparator.comparing(ScheduleHearing::getStartTime, Comparator.nullsLast(LocalDateTime::compareTo)));
     }
 
+
     public void validateDates(AsyncSubmission asyncSubmission) {
+        // Build search criteria using case Id and retrieve list of scheduled hearings
         HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
                 .caseId(asyncSubmission.getCaseId()).build();
         List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
-        Optional<ScheduleHearing> latestHearing = findLatestHearingByStartTime(scheduleHearingList);
+
+        // Find the latest hearing by start time
+        Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);
+
+        // Proceed only if a latest hearing is found
         if (latestHearing.isPresent()) {
-            if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {
-                asyncSubmission.setResponseDate(String.valueOf(latestHearing.get().getDate().minusDays(1)));
-                if (ChronoUnit.DAYS.between(LocalDate.now(), latestHearing.get().getDate()) > 6) {
-                    asyncSubmission.setSubmissionDate(String.valueOf(latestHearing.get().getDate().minusDays(6)));
-                } else {
-                    asyncSubmission.setSubmissionDate(String.valueOf(String.valueOf(LocalDate.now().plusDays(1))));
-                }
+            ScheduleHearing hearing = latestHearing.get();
+            LocalDate hearingDate = hearing.getDate();
+            LocalDate responseDate = LocalDate.parse(asyncSubmission.getResponseDate());
+            LocalDate currentDate = LocalDate.now();
+
+            // Adjust response date if it is after the latest hearing date
+            if (responseDate.isAfter(hearingDate)) {
+                asyncSubmission.setResponseDate(hearingDate.minusDays(1).toString());
+            }
+
+            // Calculate no of days till latest hearing and set submission dates
+            long daysUntilHearing = ChronoUnit.DAYS.between(currentDate, hearingDate);
+            if (daysUntilHearing > 6) {
+                asyncSubmission.setSubmissionDate(hearingDate.minusDays(6).toString());
+            } else {
+                asyncSubmission.setSubmissionDate(currentDate.plusDays(1).toString());
             }
         }
     }

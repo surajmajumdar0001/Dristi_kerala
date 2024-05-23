@@ -65,8 +65,8 @@ public class AsyncSubmissionService {
     public AsyncSubmissionResponse saveAsyncSubmissions(AsyncSubmissionRequest request) {
         log.info("operation = saveAsyncSubmissions, result = IN_PROGRESS");
         AsyncSubmission asyncSubmission = request.getAsyncSubmission();
+        validator.validateSubmissionDates(asyncSubmission);
         enrichment.enrichAsyncSubmissions(request.getRequestInfo(), asyncSubmission);
-        validator.validateHearing(asyncSubmission);
         AsyncSubmissionResponse asyncSubmissionResponse = AsyncSubmissionResponse.builder()
                 .responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .asyncSubmissions(Collections.singletonList(asyncSubmission))
@@ -88,8 +88,8 @@ public class AsyncSubmissionService {
         if (CollectionUtils.isEmpty(asyncSubmissions) && asyncSubmissions.size() != 1) {
             throw new CustomException("DK_AS_APP_ERR", "async submission id provided must be valid");
         }
+        validator.validateSubmissionDates(asyncSubmission);
         enrichment.enrichUpdateAsyncSubmission(request.getRequestInfo(), asyncSubmission);
-        validator.validateHearing(asyncSubmission);
         AsyncSubmissionResponse asyncSubmissionResponse = AsyncSubmissionResponse.builder()
                 .responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .asyncSubmissions(Collections.singletonList(asyncSubmission))
