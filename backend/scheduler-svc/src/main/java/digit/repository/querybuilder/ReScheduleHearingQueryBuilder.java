@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Component
@@ -19,11 +21,11 @@ public class ReScheduleHearingQueryBuilder {
     @Autowired
     private QueryBuilderHelper helper;
 
-    private final String BASE_APPLICATION_QUERY = "SELECT hbr.reschedule_request_id, hbr.hearing_booking_id, hbr.tenant_id, hbr.judge_id, hbr.case_id,hbr.requester_id,hbr.reason,hbr.status,hbr.action_comment,hbr.documents, hbr.created_by,hbr.last_modified_by,hbr.created_time,hbr.last_modified_time, hbr.row_version  ";
+    private final String BASE_APPLICATION_QUERY = "SELECT hbr.reschedule_request_id, hbr.hearing_booking_id, hbr.tenant_id, hbr.judge_id, hbr.case_id,hbr.requester_id,hbr.reason,hbr.status,hbr.action_comment,hbr.documents, hbr.created_by,hbr.last_modified_by,hbr.created_time,hbr.last_modified_time, hbr.row_version, hbr.suggested_days , hbr.available_days  ";
 
     private static final String FROM_TABLES = " FROM hearing_booking_reschedule_request hbr ";
 
-    private final String ORDER_BY = " ORDER BY ";
+    private final String ORDER_BY = " ORDER BY hbr.last_modified_time DESC";
 
     private final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
 
@@ -49,7 +51,8 @@ public class ReScheduleHearingQueryBuilder {
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 
-        if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
+        //bug
+        if (!ObjectUtils.isEmpty(searchCriteria.getCaseId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.case_id = ? ");
             preparedStmtList.add(searchCriteria.getJudgeId());
@@ -68,9 +71,15 @@ public class ReScheduleHearingQueryBuilder {
         if (!ObjectUtils.isEmpty(searchCriteria.getStatus())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.status = ? ");
-            preparedStmtList.add(searchCriteria.getStatus());
+            preparedStmtList.add(searchCriteria.getStatus().toString());
+        }
+        if (!ObjectUtils.isEmpty(searchCriteria.getDueDate())) {
+            helper.addClauseIfRequired(query, preparedStmtList);
+            query.append(" hbr.last_modified_time < ?  ");
+            preparedStmtList.add(searchCriteria.getDueDate());
         }
 
+        query.append(ORDER_BY);
 
         return query.toString();
     }

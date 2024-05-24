@@ -33,7 +33,5 @@ public class RescheduleRequestOptOutRepository {
         String query = optOutQueryBuilder.getOptOutQuery(optOutSearchCriteria, preparedStmtList);
         log.debug("Final query: " + query);
         return jdbcTemplate.query(query, preparedStmtList.toArray(), rescheduleRequestOptOutRowMapper);
-
-
     }
 }

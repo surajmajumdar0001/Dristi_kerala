@@ -27,10 +27,12 @@ public class QueryBuilderHelper {
         return builder.toString();
     }
 
+
     public void addToPreparedStatement(List<Object> preparedStmtList, List<String> ids) {
         ids.forEach(id -> {
             preparedStmtList.add(id);
         });
     }
+
 
 }

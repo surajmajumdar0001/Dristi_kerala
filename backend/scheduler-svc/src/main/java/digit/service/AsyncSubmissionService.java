@@ -6,13 +6,13 @@ import digit.kafka.Producer;
 import digit.repository.AsyncSubmissionRepository;
 import digit.util.ResponseInfoFactory;
 import digit.validator.AsyncSubmissionValidator;
-import digit.web.models.AsyncSubmission;
-import digit.web.models.AsyncSubmissionRequest;
-import digit.web.models.AsyncSubmissionResponse;
-import digit.web.models.AsyncSubmissionSearchRequest;
+import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -52,6 +52,7 @@ public class AsyncSubmissionService {
         AsyncSubmission asyncSubmission = submissionRequest.getAsyncSubmission();
         asyncSubmission.setSubmissionDate(LocalDate.now().plusDays(config.getMinAsyncSubmissionDays()).toString());
         asyncSubmission.setResponseDate(LocalDate.now().plusDays(config.getMinAsyncResponseDays()).toString());
+        validator.validateDates(asyncSubmission);
         log.info("operation = getDueDates, result = SUCCESS");
         return asyncSubmission;
     }
@@ -64,8 +65,8 @@ public class AsyncSubmissionService {
     public AsyncSubmissionResponse saveAsyncSubmissions(AsyncSubmissionRequest request) {
         log.info("operation = saveAsyncSubmissions, result = IN_PROGRESS");
         AsyncSubmission asyncSubmission = request.getAsyncSubmission();
+        validator.validateSubmissionDates(asyncSubmission);
         enrichment.enrichAsyncSubmissions(request.getRequestInfo(), asyncSubmission);
-        validator.validateHearing(asyncSubmission);
         AsyncSubmissionResponse asyncSubmissionResponse = AsyncSubmissionResponse.builder()
                 .responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .asyncSubmissions(Collections.singletonList(asyncSubmission))
@@ -78,8 +79,17 @@ public class AsyncSubmissionService {
     public AsyncSubmissionResponse updateAsyncSubmissions(AsyncSubmissionRequest request) {
         log.info("operation = updateAsyncSubmissions, result = IN_PROGRESS");
         AsyncSubmission asyncSubmission = request.getAsyncSubmission();
+        if (StringUtils.isEmpty(asyncSubmission.getSubmissionId())) {
+            throw new CustomException("DK_AS_APP_ERR", "async submission id should not be null");
+        }
+        AsyncSubmissionSearchCriteria searchCriteria = AsyncSubmissionSearchCriteria.builder()
+                .submissionIds(Collections.singletonList(asyncSubmission.getSubmissionId())).build();
+        List<AsyncSubmission> asyncSubmissions = repository.getAsyncSubmissions(searchCriteria);
+        if (CollectionUtils.isEmpty(asyncSubmissions) && asyncSubmissions.size() != 1) {
+            throw new CustomException("DK_AS_APP_ERR", "async submission id provided must be valid");
+        }
+        validator.validateSubmissionDates(asyncSubmission);
         enrichment.enrichUpdateAsyncSubmission(request.getRequestInfo(), asyncSubmission);
-        validator.validateHearing(asyncSubmission);
         AsyncSubmissionResponse asyncSubmissionResponse = AsyncSubmissionResponse.builder()
                 .responseInfo(ResponseInfoFactory.createResponseInfo(request.getRequestInfo(), true))
                 .asyncSubmissions(Collections.singletonList(asyncSubmission))

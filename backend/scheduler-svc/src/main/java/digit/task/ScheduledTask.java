@@ -18,6 +18,7 @@ public class ScheduledTask {
     @Autowired
     public ScheduledTask(CauseListService causeListService) {
         this.causeListService = causeListService;
+
     }
 
     @Async

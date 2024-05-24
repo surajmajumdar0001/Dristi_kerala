@@ -2,6 +2,7 @@ package digit.web.models;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import digit.web.models.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -48,6 +49,12 @@ public class HearingSearchCriteria {
 
     @JsonProperty("endDateTime")
     private LocalDateTime endDateTime;
+
+    @JsonProperty("status")
+    private List<Status> status;
+
+    @JsonProperty("rescheduleId")
+    private String rescheduleId;
 
 
 }

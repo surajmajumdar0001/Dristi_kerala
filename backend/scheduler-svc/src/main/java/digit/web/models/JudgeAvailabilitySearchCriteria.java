@@ -26,7 +26,7 @@ public class JudgeAvailabilitySearchCriteria implements SearchCriteria {
 
     //TODO : need to configure
     @JsonProperty("numberOfSuggestedDays")
-    private Integer numberOfSuggestedDays;
+    private Integer numberOfSuggestedDays = 5;
 
     @JsonProperty("fromDate")
     private LocalDate fromDate;

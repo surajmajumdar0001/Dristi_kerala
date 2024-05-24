@@ -12,6 +12,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,16 +59,28 @@ public class ReScheduleRequestEnrichment {
     public void enrichRequestOnUpdate(ReScheduleHearingRequest reScheduleHearingsRequest, List<ReScheduleHearing> existingReScheduleHearingsReq) {
         HashMap<String, Workflow> map = new HashMap<>();
 
+        HashMap<String, LocalDate> availableAfterMap = new HashMap<>();
 
-        reScheduleHearingsRequest.getReScheduleHearing().forEach((element) -> map.put(element.getRescheduledRequestId(), element.getWorkflow()));
-        String auditingUser= reScheduleHearingsRequest.getRequestInfo().getUserInfo().getUuid();
+        HashMap<String, LocalDate> scheduleDateMap = new HashMap<>();
+
+
+        reScheduleHearingsRequest.getReScheduleHearing().forEach((element) ->
+        {
+            map.put(element.getRescheduledRequestId(), element.getWorkflow());
+            availableAfterMap.put(element.getRescheduledRequestId(), element.getAvailableAfter());
+
+            scheduleDateMap.put(element.getRescheduledRequestId(), element.getScheduleDate());
+        });
+        String auditingUser = reScheduleHearingsRequest.getRequestInfo().getUserInfo().getUuid();
         existingReScheduleHearingsReq.forEach((updateHearing) -> {
 
-            Workflow workflowNeedToUpdate= map.get(updateHearing.getRescheduledRequestId());
+            Workflow workflowNeedToUpdate = map.get(updateHearing.getRescheduledRequestId());
             updateHearing.setWorkflow(workflowNeedToUpdate);
             updateHearing.getAuditDetails().setLastModifiedBy(auditingUser);
             updateHearing.getAuditDetails().setLastModifiedTime(System.currentTimeMillis());
-            updateHearing.setRowVersion(updateHearing.getRowVersion()+1);
+            updateHearing.setRowVersion(updateHearing.getRowVersion() + 1);
+            updateHearing.setAvailableAfter(availableAfterMap.get(updateHearing.getRescheduledRequestId()));
+            updateHearing.setScheduleDate(scheduleDateMap.get(updateHearing.getRescheduledRequestId()));
 
         });
 

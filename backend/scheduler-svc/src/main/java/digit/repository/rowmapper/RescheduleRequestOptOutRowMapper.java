@@ -25,12 +25,11 @@ public class RescheduleRequestOptOutRowMapper implements RowMapper<OptOut> {
     public OptOut mapRow(ResultSet rs, int rowNum) throws SQLException {
         try {
             return OptOut.builder()
-                    .id(rs.getString("id"))
                     .judgeId(rs.getString("judge_id"))
                     .caseId(rs.getString("case_id"))
                     .rescheduleRequestId(rs.getString("reschedule_request_id"))
                     .individualId(rs.getString("individual_id"))
-                    .optoutDates(rs.getString("opt_out_dates") == null ? null : objectMapper.readValue(rs.getString(""), new TypeReference<List<LocalDate>>() {
+                    .optoutDates(rs.getString("opt_out_dates") == null ? null : objectMapper.readValue(rs.getString("opt_out_dates"), new TypeReference<List<LocalDate>>() {
                     }))
                     .rowVersion(rs.getInt("row_version"))
                     .auditDetails(AuditDetails.builder()

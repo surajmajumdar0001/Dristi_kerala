@@ -2,18 +2,16 @@ package digit.validator;
 
 
 import digit.repository.HearingRepository;
-import digit.web.models.HearingSearchCriteria;
-import digit.web.models.ScheduleHearing;
-import digit.web.models.ScheduleHearingRequest;
+import digit.web.models.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.egov.tracer.model.CustomException;
-import org.egov.tracer.model.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class HearingValidator {
@@ -21,43 +19,54 @@ public class HearingValidator {
     @Autowired
     private HearingRepository repository;
 
-    public void validateHearing(List<ScheduleHearing> schedulingRequests) {
 
-        schedulingRequests.forEach(application -> {
+    public void validateHearing(ScheduleHearingRequest schedulingRequests, double totalHrs, Map<String, MdmsHearing> hearingTypeMap) {
+
+        schedulingRequests.getHearing().forEach(application -> {
             if (ObjectUtils.isEmpty(application.getTenantId()))
                 throw new CustomException("DK_SH_APP_ERR", "tenantId is mandatory for schedule a hearing");
 
-            if (ObjectUtils.isEmpty(application.getDate())){
+            if (ObjectUtils.isEmpty(application.getEventType()))
+                throw new CustomException("DK_SH_APP_ERR", "Event type is mandatory for schedule a hearing");
+
+            if (ObjectUtils.isEmpty(application.getDate())) {
                 throw new CustomException("DK_SH_APP_ERR", "date is mandatory for schedule a hearing");
-            }else{
+            } else {
                 LocalDate date = application.getDate();
-                if (date.isBefore(LocalDate.now())){
-                    throw new CustomException("DK_SH_APP_ERR", "cannot schedule a hearing for past date: " +date);
+                if (date.isBefore(LocalDate.now())) {
+                    throw new CustomException("DK_SH_APP_ERR", "cannot schedule a hearing for past date: " + date);
 
                 }
             }
 
         });
 
-        verifyHearingDates(schedulingRequests);
+        verifyHearingDates(schedulingRequests.getHearing(), totalHrs, hearingTypeMap);
     }
 
-    private void verifyHearingDates(List<ScheduleHearing> hearingRequest) {
+    private void verifyHearingDates(List<ScheduleHearing> hearingRequest, Double judgeBandwidth, Map<String, MdmsHearing> hearingTypeMap) {
         HashMap<String, Double> map = new HashMap<>(); // to avoid extra call to db
 
-        //TODO: need to configure
-        Double judgeBandwidth = 8.0;
-
         for (ScheduleHearing hearing : hearingRequest) {
+
+            Double requiredSlot = null;
+
+            String eventType = hearing.getEventType().toString();
 
             HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
                     .toDate(hearing.getDate())
                     .fromDate(hearing.getDate())
                     .judgeId(hearing.getJudgeId()).build();
 
-            Double requiredSlot = (hearing.getEndTime().getHour() - hearing.getStartTime().getHour()) +
-                    (hearing.getEndTime().getMinute() - hearing.getStartTime().getMinute()) / 60.0 +
-                    (hearing.getEndTime().getSecond() - hearing.getStartTime().getSecond()) / 3600.0;
+            if (hearingTypeMap.containsKey(eventType)) {
+                MdmsHearing hearingType = hearingTypeMap.get(eventType);
+                requiredSlot = hearingType.getHearingTime() / 60.00;
+
+
+            } else {
+                throw new CustomException("DK_SH_APP_ERR", "this hearing type does not exist in master data");
+            }
+
 
             StringBuilder key = new StringBuilder();
             key.append(hearing.getJudgeId()).append("-").append(hearing.getDate());
@@ -66,25 +75,19 @@ public class HearingValidator {
             if (map.containsKey(key.toString())) {
                 occupiedBandwidthOfJudgeForDay = map.get(key.toString());
             } else {
-                List<ScheduleHearing> judgeHearing = repository.getHearings(searchCriteria);
-                occupiedBandwidthOfJudgeForDay = judgeHearing.stream().reduce(0.0, (total, element) ->
-                                total + (element.getEndTime().getHour() - element.getStartTime().getHour()) +
-                                        (element.getEndTime().getMinute() - element.getStartTime().getMinute()) / 60.0 +
-                                        (element.getEndTime().getSecond() - element.getStartTime().getSecond()) / 3600.0,
-                        Double::sum);
+                List<AvailabilityDTO> judgeHearing = repository.getAvailableDatesOfJudges(searchCriteria);
+                if (!judgeHearing.isEmpty())
+                    occupiedBandwidthOfJudgeForDay = judgeHearing.get(0).getOccupiedBandwidth();
+                else occupiedBandwidthOfJudgeForDay = 0.0;
             }
 
 
-            if ((judgeBandwidth - occupiedBandwidthOfJudgeForDay) > requiredSlot) {
+            if ((judgeBandwidth - occupiedBandwidthOfJudgeForDay) >= requiredSlot) {
                 // temporary booked the slot
                 map.put(key.toString(), occupiedBandwidthOfJudgeForDay + requiredSlot);
 
             } else {
-                Error error = new Error();
-                error.setCode("500");
-                error.setMessage("No slots are available");
-                error.setDescription("Judge: " + hearing.getJudgeId() + " is occupied for day " + hearing.getDate());
-                hearing.setErrors(error);
+                throw new CustomException("DK_SH_APP_ERR", "cannot schedule hearing for given date");
             }
 
 
@@ -93,7 +96,5 @@ public class HearingValidator {
 
     }
 
-    public void validateHearingOnUpdate(ScheduleHearingRequest scheduleHearingRequest) {
-    }
 }
 

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -71,9 +72,13 @@ public class CauseListService {
         // Wait for all tasks to complete
         waitForTasksCompletion(executorService);
 
-        CauseListResponse causeListResponse = CauseListResponse.builder()
-                .responseInfo(ResponseInfo.builder().build()).causeList(causeLists).build();
-        producer.push(config.getCauseListInsertTopic(), causeListResponse);
+        if (!CollectionUtils.isEmpty(causeLists)) {
+            CauseListResponse causeListResponse = CauseListResponse.builder()
+                    .responseInfo(ResponseInfo.builder().build()).causeList(causeLists).build();
+            producer.push(config.getCauseListInsertTopic(), causeListResponse);
+        } else {
+            log.info("No cause lists to be created");
+        }
         log.info("operation = updateCauseListForTomorrow, result = SUCCESS");
     }
 
@@ -106,23 +111,26 @@ public class CauseListService {
         if (CollectionUtils.isEmpty(scheduleHearings)) {
             log.info("No hearings scheduled tomorrow for judgeId = {}", judgeId);
         } else {
+            log.info("No. of hearings scheduled tomorrow for judgeId = {} is {}", judgeId, scheduleHearings.size());
             fillHearingTimesWithDataFromMdms(scheduleHearings);
             generateCauseListFromHearings(scheduleHearings, causeLists);
+            if (!CollectionUtils.isEmpty(causeLists)) {
+                log.info("Generated {} CauseLists for judgeId {}", causeLists.size(), judgeId);
+            }
             log.info("operation = generateCauseListForJudge, result = SUCCESS, judgeId = {}", judgeId);
         }
     }
 
     private void fillHearingTimesWithDataFromMdms(List<ScheduleHearing> scheduleHearings) {
         log.info("operation = fillHearingTimesWithDataFromMdms, result = IN_PROGRESS, judgeId = {}", scheduleHearings.get(0).getJudgeId());
-        RequestInfo requestInfo = new RequestInfo();
-        //TODO finalise on tenant id and create a system user for calls without proper request info
-
         List<MdmsHearing> mdmsHearings = getHearingDataFromMdms();
         for (ScheduleHearing scheduleHearing : scheduleHearings) {
             Optional<MdmsHearing> optionalHearing = mdmsHearings.stream().filter(a -> a.getHearingName()
                     .equalsIgnoreCase(scheduleHearing.getEventType().getValue())).findFirst();
             if (optionalHearing.isPresent() && (optionalHearing.get().getHearingTime() != null)) {
                 scheduleHearing.setHearingTimeInMinutes(optionalHearing.get().getHearingTime());
+                log.info("Minutes to be allotted {} for Schedule Hearing {}", scheduleHearing.getHearingTimeInMinutes(),
+                        scheduleHearing.getHearingBookingId());
             }
         }
         log.info("operation = fillHearingTimesWithDataFromMdms, result = SUCCESS, judgeId = {}", scheduleHearings.get(0).getJudgeId());
@@ -181,6 +189,7 @@ public class CauseListService {
     }
 
     private static CauseList getCauseListFromHearingAndSlot(ScheduleHearing hearing, MdmsSlot mdmsSlot) {
+        log.info("Added hearing {} to slot {}", hearing.getHearingBookingId(), mdmsSlot.getSlotName());
         return CauseList.builder()
                 .judgeId(hearing.getJudgeId())
                 .courtId(hearing.getCourtId())
@@ -214,19 +223,23 @@ public class CauseListService {
 
     public List<CauseList> viewCauseListForTomorrow(CauseListSearchRequest searchRequest) {
         log.info("operation = viewCauseListForTomorrow, with searchRequest : {}", searchRequest.toString());
-        return getCauseListForTomorrow(searchRequest);
+        return getCauseListForTomorrow(searchRequest.getCauseListSearchCriteria());
     }
 
-    private List<CauseList> getCauseListForTomorrow(CauseListSearchRequest searchRequest) {
-        return causeListRepository.getCauseLists(searchRequest.getCauseListSearchCriteria());
+    private List<CauseList> getCauseListForTomorrow(CauseListSearchCriteria searchCriteria) {
+        if (searchCriteria != null && searchCriteria.getSearchDate() != null
+                && searchCriteria.getSearchDate().isAfter(LocalDate.now().plusDays(1))) {
+            throw new CustomException("DK_CL_APP_ERR", "CauseList Search date cannot be after than tomorrow");
+        }
+        return causeListRepository.getCauseLists(searchCriteria);
     }
 
     public ByteArrayResource downloadCauseListForTomorrow(CauseListSearchRequest searchRequest) {
         log.info("operation = downloadCauseListForTomorrow, with searchRequest : {}", searchRequest.toString());
-        List<CauseList> causeLists = getCauseListForTomorrow(searchRequest);
-        CauseListResponse causeListResponse = CauseListResponse.builder()
-                .responseInfo(ResponseInfo.builder().build()).causeList(causeLists).build();
-        return pdfServiceUtil.generatePdfFromPdfService(causeListResponse , searchRequest.getRequestInfo().getUserInfo().getTenantId(),
-                config.getCauseListPdfTemplateKey(), searchRequest.getRequestInfo());
+        List<CauseList> causeLists = getCauseListForTomorrow(searchRequest.getCauseListSearchCriteria());
+        CauseListRequest causeListRequest = CauseListRequest.builder()
+                .requestInfo(searchRequest.getRequestInfo()).causeList(causeLists).build();
+        return pdfServiceUtil.generatePdfFromPdfService(causeListRequest , searchRequest.getRequestInfo().getUserInfo().getTenantId(),
+                config.getCauseListPdfTemplateKey());
     }
 }
