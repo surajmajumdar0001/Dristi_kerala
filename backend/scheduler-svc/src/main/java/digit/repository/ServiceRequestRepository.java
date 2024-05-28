@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.tracer.model.ServiceCallException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -35,21 +33,30 @@ public class ServiceRequestRepository {
     public Object postMethod(StringBuilder uri, Object requestObject) {
         Object response = null;
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+
         try {
             log.debug("Sending POST request to URL: {}", uri.toString());
             log.debug("Request body: {}", requestObject);
+
             HttpHeaders headers = new HttpHeaders();
             headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            HttpEntity<Object> request= new HttpEntity<Object>(requestObject, headers);
-            response = restTemplate.postForObject(uri.toString(), request, Object.class);
+            HttpEntity<Object> requestEntity = new HttpEntity<>(requestObject, headers);
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                    uri.toString(), HttpMethod.POST, requestEntity, String.class);
+
+            response = responseEntity.getBody();
+
             log.debug("Response: {}", response);
         } catch (Exception e) {
             log.error("Service call exception in POST method", e);
         }
-        return response;
+
+        return response; // Return the response string
     }
+
 
     public Object fetchResult(StringBuilder uri, Object request) {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
