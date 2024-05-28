@@ -1,6 +1,9 @@
 package digit.validator;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
 import digit.repository.HearingRepository;
 import digit.repository.ServiceRequestRepository;
@@ -30,6 +33,9 @@ public class HearingValidator {
     @Autowired
     ServiceRequestRepository requestRepository;
 
+    @Autowired
+    private ObjectMapper mapper;
+
     public void validateHearing(ScheduleHearingRequest schedulingRequests, double totalHrs, Map<String, MdmsHearing> hearingTypeMap) {
 
         schedulingRequests.getHearing().forEach(application -> {
@@ -51,10 +57,6 @@ public class HearingValidator {
             StringBuilder url = new StringBuilder(config.getCaseUrl() + config.getCaseEndpoint());
             CaseSearchCriteria caseSearchCriteria = CaseSearchCriteria.builder().RequestInfo(schedulingRequests.getRequestInfo()).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(application.getCaseId()).build())).build();
             Object response = requestRepository.postMethod(url, caseSearchCriteria);
-
-            if(ObjectUtils.isEmpty(response)){
-                throw new CustomException("DK_SH_APP_ERR", "No case exists for given case id.");
-            }
 
         });
 
