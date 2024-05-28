@@ -1,19 +1,26 @@
 package digit.validator;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import digit.config.Configuration;
 import digit.repository.ReScheduleRequestRepository;
+import digit.repository.ServiceRequestRepository;
 import digit.service.HearingService;
 import digit.web.models.*;
+import digit.web.models.cases.CaseCriteria;
+import digit.web.models.cases.CaseSearchCriteria;
 import digit.web.models.enums.Status;
 import org.apache.commons.lang3.ObjectUtils;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.ObjectInputFilter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class ReScheduleRequestValidator {
@@ -23,6 +30,15 @@ public class ReScheduleRequestValidator {
 
     @Autowired
     private ReScheduleRequestRepository repository;
+
+    @Autowired
+    private Configuration config;
+
+    @Autowired
+    private ServiceRequestRepository requestRepository;
+
+    @Autowired
+    private ObjectMapper mapper;
 
     public void validateRescheduleRequest(ReScheduleHearingRequest reScheduleHearingsRequest) {
 
@@ -50,6 +66,28 @@ public class ReScheduleRequestValidator {
 
             if (ObjectUtils.isEmpty(element.getCaseId())) {
                 throw new CustomException("DK_SH_APP_ERR", "Case ID is necessary to process the hearing reschedule");
+            }
+
+            //Case Integration
+            StringBuilder url = new StringBuilder(config.getCaseUrl() + config.getCaseEndpoint());
+            CaseSearchCriteria caseSearchCriteria = CaseSearchCriteria.builder().RequestInfo(reScheduleHearingsRequest.getRequestInfo()).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(element.getCaseId()).build())).build();
+            Object response = requestRepository.postMethod(url, caseSearchCriteria);
+            Set<String> representativeIds = new HashSet<>();
+            try {
+                JsonNode jsonNode = mapper.readTree(response.toString());
+                JsonNode representativesNode = jsonNode.get("cases").get(0).get("representatives");
+                if(representativesNode != null && representativesNode.isArray()){
+                    for(JsonNode representative : representativesNode){
+                        String representativeId = String.valueOf(representative.get("id").asText());
+                        representativeIds.add(representativeId);
+                    }
+                }
+            } catch (JsonProcessingException e) {
+                throw new CustomException("DK_SH_APP_ERR", "Invalid json response.");
+            }
+
+            if(!representativeIds.contains(element.getRequesterId())){
+                throw new CustomException("DK_SH_APP_ERR", "Invalid requesterId.");
             }
 
             //TODO: provide other required fields
