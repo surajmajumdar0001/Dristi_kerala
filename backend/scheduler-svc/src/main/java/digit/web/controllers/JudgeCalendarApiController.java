@@ -1,14 +1,12 @@
 package digit.web.controllers;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.service.CalendarService;
 import digit.util.ResponseInfoFactory;
 import digit.web.models.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +24,12 @@ import java.util.List;
 @Slf4j
 public class JudgeCalendarApiController {
 
-    private final ObjectMapper objectMapper;
-
-    private final HttpServletRequest request;
 
     private final CalendarService calendarService;
 
     @Autowired
-    public JudgeCalendarApiController(ObjectMapper objectMapper, HttpServletRequest request, CalendarService calendarService) {
-        this.objectMapper = objectMapper;
-        this.request = request;
+    public JudgeCalendarApiController(CalendarService calendarService) {
+
         this.calendarService = calendarService;
     }
 
