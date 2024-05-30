@@ -31,10 +31,10 @@ public class HearingRepository {
     @Autowired
     private AvailabilityRowMapper availabilityRowMapper;
 
-    public List<ScheduleHearing> getHearings(HearingSearchCriteria hearingSearchCriteria) {
+    public List<ScheduleHearing> getHearings(HearingSearchCriteria hearingSearchCriteria, Integer limit, Integer offset) {
 
         List<Object> preparedStmtList = new ArrayList<>();
-        String query = queryBuilder.getHearingQuery(hearingSearchCriteria, preparedStmtList);
+        String query = queryBuilder.getHearingQuery(hearingSearchCriteria, preparedStmtList, limit, offset);
         log.debug("Final query: " + query);
         return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 

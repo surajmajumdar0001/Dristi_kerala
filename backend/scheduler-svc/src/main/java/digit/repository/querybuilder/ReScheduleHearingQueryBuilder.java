@@ -29,7 +29,7 @@ public class ReScheduleHearingQueryBuilder {
 
     private final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
 
-    public String getReScheduleRequestQuery(ReScheduleHearingReqSearchCriteria searchCriteria, List<Object> preparedStmtList) {
+    public String getReScheduleRequestQuery(ReScheduleHearingReqSearchCriteria searchCriteria, List<Object> preparedStmtList, Integer limit, Integer offset) {
         StringBuilder query = new StringBuilder(BASE_APPLICATION_QUERY);
         query.append(FROM_TABLES);
 
@@ -77,6 +77,12 @@ public class ReScheduleHearingQueryBuilder {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.last_modified_time < ?  ");
             preparedStmtList.add(searchCriteria.getDueDate());
+        }
+        if(!ObjectUtils.isEmpty(limit) && !ObjectUtils.isEmpty(offset)){
+            helper.addClauseIfRequired(query, preparedStmtList);
+            query.append(LIMIT_OFFSET);
+            preparedStmtList.add(limit);
+            preparedStmtList.add(offset);
         }
 
         query.append(ORDER_BY);

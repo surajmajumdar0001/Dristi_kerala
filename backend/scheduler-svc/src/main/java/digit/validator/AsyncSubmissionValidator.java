@@ -43,7 +43,7 @@ public class AsyncSubmissionValidator {
         // Build search criteria using case id and retrieve list of scheduled hearings
         HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
                 .caseId(asyncSubmission.getCaseId()).build();
-        List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
+        List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria,null,null);
 
         // Find the latest hearing by start time
         Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);
@@ -84,7 +84,7 @@ public class AsyncSubmissionValidator {
         // Build search criteria using case Id and retrieve list of scheduled hearings
         HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
                 .caseId(asyncSubmission.getCaseId()).build();
-        List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
+        List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria,null,null);
 
         // Find the latest hearing by start time
         Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);

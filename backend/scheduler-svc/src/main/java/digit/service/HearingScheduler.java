@@ -78,10 +78,9 @@ public class HearingScheduler {
             if (!blockedHearings.isEmpty()) producer.push("schedule-hearing-to-block-calendar", request);
 
             if (!hearingsNeedToBeSchedule.isEmpty()) {
-
                 List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().criteria(HearingSearchCriteria.builder()
                                 .hearingIds(ids).build())
-                        .build());
+                        .build(), null, null);
                 for (ScheduleHearing hearing : hearings) {
                     hearing.setStatus(Status.SCHEDULED);
                     hearing.setDate(dateMap.get(hearing.getHearingBookingId()));
@@ -99,7 +98,6 @@ public class HearingScheduler {
                         .requestInfo(reScheduleHearingsRequest.getRequestInfo()).build();
                 hearingService.updateBulk(updateRequest, defaultSlots, hearingTypeMap);
             }
-
 
 
         } catch (Exception e) {
@@ -147,7 +145,7 @@ public class HearingScheduler {
                         .requestInfo(requestInfo)
                         .criteria(HearingSearchCriteria.builder()
                                 .hearingIds(Collections.singletonList(hearingDetail.getHearingBookingId()))
-                                .build()).build());
+                                .build()).build(), null, null);
                 ScheduleHearing hearing = hearings.get(0);
                 hearings.get(0).setStatus(Status.RE_SCHEDULED);
 
@@ -204,7 +202,7 @@ public class HearingScheduler {
                         .builder().requestInfo(requestInfo)
                         .criteria(HearingSearchCriteria.builder()
                                 .rescheduleId(optOut.getRescheduleRequestId())
-                                .status(Collections.singletonList(Status.BLOCKED)).build()).build());
+                                .status(Collections.singletonList(Status.BLOCKED)).build()).build(), null, null);
 
                 hearingList.forEach(hearing -> hearing.setStatus(Status.CANCELLED));
 
@@ -244,7 +242,7 @@ public class HearingScheduler {
                 String rescheduleRequestId = optOut.getRescheduleRequestId();
 
                 List<ReScheduleHearing> reScheduleRequest = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder()
-                        .rescheduledRequestId(Collections.singletonList(rescheduleRequestId)).build());
+                        .rescheduledRequestId(Collections.singletonList(rescheduleRequestId)).build(), null, null);
 
 
                 List<LocalDate> suggestedDates = reScheduleRequest.get(0).getSuggestedDates();
