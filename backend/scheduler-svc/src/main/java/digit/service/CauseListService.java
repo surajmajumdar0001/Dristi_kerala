@@ -107,7 +107,7 @@ public class CauseListService {
                 .fromDate(LocalDate.now().plusDays(1))
                 .toDate(LocalDate.now().plusDays(1))
                 .build();
-        List<ScheduleHearing> scheduleHearings = hearingRepository.getHearings(searchCriteria);
+        List<ScheduleHearing> scheduleHearings = hearingRepository.getHearings(searchCriteria, null, null);
         if (CollectionUtils.isEmpty(scheduleHearings)) {
             log.info("No hearings scheduled tomorrow for judgeId = {}", judgeId);
         } else {

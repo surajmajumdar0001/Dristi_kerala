@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class RescheduleRequestOptOutService {
 
-    private final RescheduleRequestOptOutRepository optOutRepositoryt;
+    private final RescheduleRequestOptOutRepository optOutRepository;
 
     private final RescheduleRequestOptOutValidator optOutValidator;
 
@@ -30,8 +30,8 @@ public class RescheduleRequestOptOutService {
     private final Configuration config;
 
     @Autowired
-    public RescheduleRequestOptOutService(RescheduleRequestOptOutRepository optOutRepositoryt, RescheduleRequestOptOutValidator optOutValidator, RescheduleRequestOptOutEnrichment optOutEnrichment, Producer producer, Configuration config) {
-        this.optOutRepositoryt = optOutRepositoryt;
+    public RescheduleRequestOptOutService(RescheduleRequestOptOutRepository optOutRepository, RescheduleRequestOptOutValidator optOutValidator, RescheduleRequestOptOutEnrichment optOutEnrichment, Producer producer, Configuration config) {
+        this.optOutRepository = optOutRepository;
         this.optOutValidator = optOutValidator;
         this.optOutEnrichment = optOutEnrichment;
         this.producer = producer;
@@ -80,7 +80,8 @@ public class RescheduleRequestOptOutService {
      * @param request
      * @return
      */
-    public List<OptOut> search(OptOutSearchRequest request) {
-        return optOutRepositoryt.getOptOut(request.getCriteria());
+
+    public List<OptOut> search(OptOutSearchRequest request, Integer limit, Integer offset) {
+        return optOutRepository.getOptOut(request.getCriteria(), limit, offset);
     }
 }

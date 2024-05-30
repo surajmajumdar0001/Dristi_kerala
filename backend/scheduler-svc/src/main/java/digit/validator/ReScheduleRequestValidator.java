@@ -55,7 +55,7 @@ public class ReScheduleRequestValidator {
             //TODO: provide other required fields
 
             // order by latest request(last modified time)
-            List<ReScheduleHearing> reScheduleRequest = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().hearingBookingId(element.getHearingBookingId()).tenantId(element.getTenantId()).build());
+            List<ReScheduleHearing> reScheduleRequest = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().hearingBookingId(element.getHearingBookingId()).tenantId(element.getTenantId()).build(),null,null);
             // we are checking only latest request
             if (element.getWorkflow().getAction().equals("APPLY") && !reScheduleRequest.isEmpty() && !(reScheduleRequest.get(0).getStatus().equals(Status.HEARING_SCHEDULE) || reScheduleRequest.get(0).getStatus().equals(Status.CANCELLED) || reScheduleRequest.get(0).getStatus().equals(Status.REJECTED))) {
                 throw new CustomException("DK_SH_APP_ERR", "A reschedule request has already been initiated for Hearing :" + element.getHearingBookingId());
@@ -64,7 +64,7 @@ public class ReScheduleRequestValidator {
         List<String> ids = rescheduleRequests.stream().map(ReScheduleHearing::getHearingBookingId).toList();
 
 
-        List<ScheduleHearing> hearingsToReschedule = hearingService.search(HearingSearchRequest.builder().requestInfo(reScheduleHearingsRequest.getRequestInfo()).criteria(HearingSearchCriteria.builder().hearingIds(ids).build()).build());
+        List<ScheduleHearing> hearingsToReschedule = hearingService.search(HearingSearchRequest.builder().requestInfo(reScheduleHearingsRequest.getRequestInfo()).criteria(HearingSearchCriteria.builder().hearingIds(ids).build()).build(),null,null);
 
         if (hearingsToReschedule.size() != ids.size()) {
             throw new CustomException("DK_SH_APP_ERR", "Hearing does not exist in the database");
@@ -90,7 +90,7 @@ public class ReScheduleRequestValidator {
 
         });
 
-        List<ReScheduleHearing> existingReScheduleRequests = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().rescheduledRequestId(ids).build());
+        List<ReScheduleHearing> existingReScheduleRequests = repository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().rescheduledRequestId(ids).build(),null,null);
         if (existingReScheduleRequests.size() != ids.size()) {
             //TODO: proper error msg
             throw new CustomException("DK_SH_APP_ERR", "Reschedule request does not exist in the database");

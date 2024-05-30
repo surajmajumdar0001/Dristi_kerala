@@ -109,9 +109,9 @@ public class HearingService {
      * @return list of schedule hearing object
      */
 
-    public List<ScheduleHearing> search(HearingSearchRequest request) {
+    public List<ScheduleHearing> search(HearingSearchRequest request, Integer limit,Integer offset) {
 
-        return hearingRepository.getHearings(request.getCriteria());
+        return hearingRepository.getHearings(request.getCriteria(), limit, offset);
 
     }
 
