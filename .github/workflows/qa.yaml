@@ -1,16 +1,13 @@
 name: Dristi-kerala Image Build workflow for QA
 on:
   pull_request:
+    types:
+      - closed
     branches:
       - main
   workflow_dispatch:
 
 jobs:
-  image-build:
-    name: image-build
-    uses: ./.github/workflows/Image-build.yaml
-    secrets: inherit
-
   Workflow_Trigger:
     runs-on: ubuntu-latest
     needs: image-build
