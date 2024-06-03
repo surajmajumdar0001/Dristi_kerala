@@ -1,8 +1,8 @@
 package digit.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import digit.repository.ServiceRequestRepository;
 import digit.config.Configuration;
+import digit.repository.ServiceRequestRepository;
 import org.egov.common.contract.idgen.IdGenerationRequest;
 import org.egov.common.contract.idgen.IdGenerationResponse;
 import org.egov.common.contract.idgen.IdRequest;
@@ -17,7 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static digit.config.ServiceConstants.*;
+import static digit.config.ServiceConstants.IDGEN_ERROR;
+import static digit.config.ServiceConstants.NO_IDS_FOUND_ERROR;
 
 @Component
 public class IdgenUtil {
