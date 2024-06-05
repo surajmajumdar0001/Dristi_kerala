@@ -16,7 +16,7 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderDetails {
+public class CaseDetails {
 
     @JsonProperty("orderId")
     @Valid

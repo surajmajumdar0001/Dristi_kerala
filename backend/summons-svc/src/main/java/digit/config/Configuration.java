@@ -68,4 +68,20 @@ public class Configuration {
 
     @Value("${egov.orders.service.create.endpoint}")
     private String ordersServiceEndpoint;
+
+    // ICops
+
+    @Value("${egov.icops.host}")
+    private String iCopsHost;
+
+    @Value("${egov.icops.request.endpoint}")
+    private String iCopsRequestEndPoint;
+
+    // ESummons
+
+    @Value("${egov.esummons.host}")
+    private String eSummonsHost;
+
+    @Value("${egov.esummons.request.endpoint}")
+    private String ESummonsRequestEndPoint;
 }
