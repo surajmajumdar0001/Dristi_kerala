@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 /**
  * SummonsRequest
  */
@@ -27,6 +29,4 @@ public class GenerateSummonsRequest {
     @JsonProperty("summonDetails")
     @Valid
     private SummonsDetails summonDetails = null;
-
-
 }

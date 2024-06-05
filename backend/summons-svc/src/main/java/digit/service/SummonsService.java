@@ -68,7 +68,7 @@ public class SummonsService {
     public List<Summons> sendSummonsViaChannels(SendSummonsRequest request) {
         SummonsDetails summonsDetails = request.getSummonDetails();
         List<Summons> summonsList = new ArrayList<>();
-        for (DeliveryChannel deliveryChannel : summonsDetails.getChannelsToDeliver()) {
+        for (DeliveryChannel deliveryChannel : request.getChannelsToDeliver()) {
             Summons summons = generateSummons(summonsDetails, deliveryChannel);
             summonsEnrichment.enrichSummons(summons, request.getRequestInfo());
             externalChannelUtil.sendSummonsByDeliveryChannel(summonsDetails, summons, deliveryChannel);
@@ -82,9 +82,9 @@ public class SummonsService {
 
     private Summons generateSummons(SummonsDetails summonsDetails, DeliveryChannel deliveryChannel) {
         return Summons.builder()
-                .orderId(summonsDetails.getOrderDetails().getOrderId())
+                .orderId(summonsDetails.getCaseDetails().getOrderId())
                 .channelName(deliveryChannel.getChannelName().name())
-                .orderType(summonsDetails.getOrderDetails().getIssueType())
+                .orderType(summonsDetails.getCaseDetails().getIssueType())
                 .tenantId(config.getEgovStateTenantId())
                 .requestDate(LocalDateTime.now())
                 .build();

@@ -1,6 +1,7 @@
 package digit.web.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +17,11 @@ import org.springframework.validation.annotation.Validated;
 public class SummonsDocument {
 
     @JsonProperty("fileStoreId")
+    @NotNull
     private String fileStoreId;
 
     @JsonProperty("docType")
+    @NotNull
     private String docType;
 
     @JsonProperty("docName")
