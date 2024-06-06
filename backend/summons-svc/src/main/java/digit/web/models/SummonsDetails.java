@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
+
 /**
  * Summon
  */
@@ -18,9 +20,12 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class SummonsDetails {
 
-    @JsonProperty("caseDetails")
-    private CaseDetails caseDetails = null;
+    @JsonProperty("summonId")
+    private String summonId = null;
 
-    @JsonProperty("respondentDetails")
-    private RespondentDetails respondentDetails = null;
+    @JsonProperty("issueDate")
+    private LocalDate issueDate;
+
+    @JsonProperty("tenantId")
+    private String tenantId;
 }

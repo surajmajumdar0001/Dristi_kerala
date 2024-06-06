@@ -1,14 +1,13 @@
 package digit.web.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @Validated
@@ -22,9 +21,8 @@ public class DeliveryChannel {
     @JsonProperty("channelName")
     private ChannelName channelName;
 
-    @JsonProperty("orderId")
-    @Valid
-    private String orderId;
+    @JsonProperty("paymentFees")
+    private String paymentFees;
 
     @JsonProperty("paymentTransactionId")
     private String paymentTransactionId;
@@ -32,6 +30,12 @@ public class DeliveryChannel {
     @JsonProperty("paymentStatus")
     private String paymentStatus;
 
-    @JsonProperty("deliveryInstructions")
-    private Map<String, String> deliveryInstructions;
+    @JsonProperty("deliveryStatus")
+    private String deliveryStatus;
+
+    @JsonProperty("deliveryStatusChangedDate")
+    private String deliveryStatusChangedDate;
+
+    @JsonProperty("channelDetails")
+    private Map<String, String> channelDetails;
 }

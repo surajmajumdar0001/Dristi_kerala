@@ -2,9 +2,7 @@ package digit.util;
 
 import digit.channel.ChannelFactory;
 import digit.channel.ExternalChannel;
-import digit.web.models.DeliveryChannel;
-import digit.web.models.Summons;
-import digit.web.models.SummonsDetails;
+import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +16,8 @@ public class ExternalChannelUtil {
         this.channelFactory = channelFactory;
     }
 
-    public void sendSummonsByDeliveryChannel(SummonsDetails summonsDetails, Summons summons, DeliveryChannel deliveryChannel) {
-        ExternalChannel externalDeliveryChannel = channelFactory.getDeliveryChannel(deliveryChannel.getChannelName());
-        externalDeliveryChannel.sendSummons(summonsDetails, summons, deliveryChannel);
+    public ChannelMessage sendSummonsByDeliveryChannel(SendSummonsRequest request, SummonsDelivery summonsDelivery) {
+        ExternalChannel externalDeliveryChannel = channelFactory.getDeliveryChannel(summonsDelivery.getChannelName());
+        return externalDeliveryChannel.sendSummons(request);
     }
 }

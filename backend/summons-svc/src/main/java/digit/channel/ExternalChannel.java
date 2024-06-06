@@ -1,9 +1,9 @@
 package digit.channel;
 
-import digit.web.models.DeliveryChannel;
-import digit.web.models.Summons;
-import digit.web.models.SummonsDetails;
+import digit.web.models.ChannelMessage;
+import digit.web.models.SendSummonsRequest;
 
 public interface ExternalChannel {
-    void sendSummons(SummonsDetails summonsDetails, Summons summons, DeliveryChannel deliveryChannel);
+
+    ChannelMessage sendSummons(SendSummonsRequest request);
 }

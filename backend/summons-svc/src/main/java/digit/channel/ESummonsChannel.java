@@ -1,13 +1,14 @@
 package digit.channel;
 
 import digit.config.Configuration;
-import digit.web.models.DeliveryChannel;
-import digit.web.models.Summons;
-import digit.web.models.SummonsDetails;
+import digit.web.models.ChannelMessage;
+import digit.web.models.SendSummonsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,13 +24,18 @@ public class ESummonsChannel implements ExternalChannel{
     private Configuration config;
 
     @Override
-    public void sendSummons(SummonsDetails summonsDetails, Summons summons, DeliveryChannel deliveryChannel) {
+    public ChannelMessage sendSummons(SendSummonsRequest request) {
         StringBuilder uri = new StringBuilder();
         uri.append(config.getESummonsHost()).append(config.getESummonsRequestEndPoint());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        return;
+        HttpEntity<SendSummonsRequest> requestEntity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<ChannelMessage> responseEntity = restTemplate.postForEntity(uri.toString(),
+                requestEntity, ChannelMessage.class);
+
+        return responseEntity.getBody();
     }
 }

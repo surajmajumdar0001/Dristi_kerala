@@ -1,7 +1,7 @@
 package digit.util;
 
 import digit.config.Configuration;
-import digit.web.models.OrderStatusUpdateRequest;
+import digit.web.models.SummonsTaskUpdateRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.tracer.model.CustomException;
 import org.springframework.http.HttpEntity;
@@ -13,18 +13,18 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @Slf4j
-public class OrdersServiceUtil {
+public class TaskSummonsUtil {
 
     private final RestTemplate restTemplate;
 
     private final Configuration config;
 
-    public OrdersServiceUtil(RestTemplate restTemplate, Configuration config) {
+    public TaskSummonsUtil(RestTemplate restTemplate, Configuration config) {
         this.restTemplate = restTemplate;
         this.config = config;
     }
 
-    public void updateOrdersStatus(OrderStatusUpdateRequest orderStatusUpdateRequest) {
+    public void updateSummonsTaskStatus(SummonsTaskUpdateRequest summonsTaskUpdateRequest) {
         try {
             StringBuilder uri = new StringBuilder();
             uri.append(config.getOrdersServiceHost())
@@ -32,7 +32,7 @@ public class OrdersServiceUtil {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<OrderStatusUpdateRequest> requestEntity = new HttpEntity<>(orderStatusUpdateRequest, headers);
+            HttpEntity<SummonsTaskUpdateRequest> requestEntity = new HttpEntity<>(summonsTaskUpdateRequest, headers);
 
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(uri.toString(),
                     requestEntity, String.class);

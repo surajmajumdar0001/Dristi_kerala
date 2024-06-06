@@ -17,7 +17,7 @@ import java.util.HashMap;
 @Component
 @Slf4j
 @EnableAsync
-public class SummonsConsumer {
+public class SummonsDeliveryConsumer {
 
     @Autowired
     private SummonsService summonsService;
@@ -31,7 +31,7 @@ public class SummonsConsumer {
         try {
             SummonsRequest request = objectMapper.convertValue(record, SummonsRequest.class);
             log.info(request.toString());
-            summonsService.processStatusAndSendMessageToOrders(request);
+            summonsService.processStatusAndUpdateSummonsTask(request);
         } catch (final Exception e) {
             log.error("Error while listening to value: " + record + ": ", e);
         }

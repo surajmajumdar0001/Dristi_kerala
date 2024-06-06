@@ -1,35 +1,28 @@
 package digit.enrichment;
 
 import digit.config.Configuration;
-import digit.util.IdgenUtil;
-import digit.web.models.Summons;
+import digit.web.models.SummonsDelivery;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.models.AuditDetails;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
 @Component
 @Slf4j
-public class SummonsEnrichment {
-
-    private final IdgenUtil idgenUtil;
+public class SummonsDeliveryEnrichment {
 
     private final Configuration config;
 
-    public SummonsEnrichment(IdgenUtil idgenUtil, Configuration config) {
-        this.idgenUtil = idgenUtil;
+    public SummonsDeliveryEnrichment(Configuration config) {
         this.config = config;
     }
 
-    public void enrichSummons(Summons summons, RequestInfo requestInfo) {
-        List<String> idList = idgenUtil.getIdList(requestInfo,
-                config.getEgovStateTenantId(), config.getSummonsIdFormat(), null, 1);
+    public void enrichSummonsDelivery(SummonsDelivery summonsDelivery, RequestInfo requestInfo) {
         AuditDetails auditDetails = getAuditDetails(requestInfo);
-        summons.setAuditDetails(auditDetails);
-        summons.setSummonsId(idList.get(0));
-        summons.setRowVersion(1);
+        summonsDelivery.setAuditDetails(auditDetails);
+        summonsDelivery.setDeliveryStatus("DELIVERY_NOT_STARTED");
+        summonsDelivery.setRowVersion(1);
     }
 
     private AuditDetails getAuditDetails(RequestInfo requestInfo) {
