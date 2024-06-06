@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.egov.common.contract.request.RequestInfo;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
@@ -15,14 +14,14 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class OrderStatusUpdateRequest {
+public class SummonsTaskStatus {
 
-    @JsonProperty("requestInfo")
+
+    @JsonProperty("summonsId")
     @Valid
-    private RequestInfo requestInfo = null;
+    private String summonsId;
 
-    @JsonProperty("orderStatus")
+    @JsonProperty("statusTobeUpdated")
     @Valid
-    private OrderStatus orderStatus = null;
-
+    private String statusTobeUpdated;
 }

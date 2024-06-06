@@ -21,7 +21,7 @@ public class SummonsRequest {
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("summon")
+    @JsonProperty("summonsDelivery")
     @Valid
-    private Summons summon = null;
+    private SummonsDelivery summonsDelivery = null;
 }

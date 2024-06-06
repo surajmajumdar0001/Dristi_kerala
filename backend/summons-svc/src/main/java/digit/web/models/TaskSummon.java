@@ -1,5 +1,6 @@
 package digit.web.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +15,18 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class TaskSummon {
 
+    @JsonProperty("summonDetails")
+    private SummonsDetails summonDetails = null;
 
+    @JsonProperty("caseDetails")
+    private CaseDetails caseDetails = null;
+
+    @JsonProperty("respondentDetails")
+    private RespondentDetails respondentDetails = null;
+
+    @JsonProperty("deliveryChannel")
+    private DeliveryChannel deliveryChannel = null;
+
+    @JsonProperty("summonsDocument")
+    private SummonsDocument summonsDocument;
 }

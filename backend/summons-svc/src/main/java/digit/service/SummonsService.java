@@ -1,21 +1,18 @@
 package digit.service;
 
 import digit.config.Configuration;
-import digit.enrichment.SummonsEnrichment;
+import digit.enrichment.SummonsDeliveryEnrichment;
 import digit.kafka.Producer;
 import digit.repository.SummonsRepository;
 import digit.util.*;
 import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
-import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -33,27 +30,25 @@ public class SummonsService {
 
     private final Producer producer;
 
-    private final SummonsEnrichment summonsEnrichment;
+    private final SummonsDeliveryEnrichment summonsDeliveryEnrichment;
 
     private final ExternalChannelUtil externalChannelUtil;
 
-    private final SummonsStatusLogicUtil logicUtil;
-
-    private final OrdersServiceUtil ordersServiceUtil;
+    private final TaskSummonsUtil taskSummonsUtil;
 
     @Autowired
     public SummonsService(PdfServiceUtil pdfServiceUtil, Configuration config, Producer producer,
                           FileStorageUtil fileStorageUtil, SummonsRepository summonsRepository,
-                          SummonsEnrichment summonsEnrichment, ExternalChannelUtil externalChannelUtil, SummonsStatusLogicUtil logicUtil, OrdersServiceUtil ordersServiceUtil) {
+                          SummonsDeliveryEnrichment summonsDeliveryEnrichment, ExternalChannelUtil externalChannelUtil,
+                          TaskSummonsUtil taskSummonsUtil) {
         this.pdfServiceUtil = pdfServiceUtil;
         this.config = config;
         this.producer = producer;
         this.fileStorageUtil = fileStorageUtil;
         this.summonsRepository = summonsRepository;
-        this.summonsEnrichment = summonsEnrichment;
+        this.summonsDeliveryEnrichment = summonsDeliveryEnrichment;
         this.externalChannelUtil = externalChannelUtil;
-        this.logicUtil = logicUtil;
-        this.ordersServiceUtil = ordersServiceUtil;
+        this.taskSummonsUtil = taskSummonsUtil;
     }
 
 
@@ -65,63 +60,58 @@ public class SummonsService {
                 .builder().fileStoreId(fileStoreId).docType("pdf").docName("summons").build();
     }
 
-    public List<Summons> sendSummonsViaChannels(SendSummonsRequest request) {
-        SummonsDetails summonsDetails = request.getSummonDetails();
-        List<Summons> summonsList = new ArrayList<>();
-        for (DeliveryChannel deliveryChannel : request.getChannelsToDeliver()) {
-            Summons summons = generateSummons(summonsDetails, deliveryChannel);
-            summonsEnrichment.enrichSummons(summons, request.getRequestInfo());
-            externalChannelUtil.sendSummonsByDeliveryChannel(summonsDetails, summons, deliveryChannel);
-            SummonsRequest summonsRequest = SummonsRequest.builder()
-                    .summon(summons).requestInfo(request.getRequestInfo()).build();
-            producer.push("insert-summons", summonsRequest);
-            summonsList.add(summons);
-        }
-        return summonsList;
+    public SummonsDelivery sendSummonsViaChannels(SendSummonsRequest request) {
+        TaskSummon summonsTask = request.getTaskSummon();
+        SummonsDelivery summonsDelivery = generateSummonsDelivery(request.getTaskSummon());
+        summonsDeliveryEnrichment.enrichSummonsDelivery(summonsDelivery, request.getRequestInfo());
+        ChannelMessage channelMessage = externalChannelUtil.sendSummonsByDeliveryChannel(request, summonsDelivery);
+        summonsDelivery.setIsAcceptedByChannel(Boolean.TRUE);
+        summonsDelivery.setDeliveryStatus(channelMessage.getStatus());
+        summonsDelivery.setChannelAcknowledgementId(channelMessage.getChannelAcknowledgementId());
+        SummonsRequest summonsRequest = SummonsRequest.builder()
+                .summonsDelivery(summonsDelivery).requestInfo(request.getRequestInfo()).build();
+        producer.push("insert-summons-delivery", summonsRequest);
+        return summonsDelivery;
     }
 
-    private Summons generateSummons(SummonsDetails summonsDetails, DeliveryChannel deliveryChannel) {
-        return Summons.builder()
-                .orderId(summonsDetails.getCaseDetails().getOrderId())
-                .channelName(deliveryChannel.getChannelName().name())
-                .orderType(summonsDetails.getCaseDetails().getIssueType())
-                .tenantId(config.getEgovStateTenantId())
-                .requestDate(LocalDateTime.now())
+    private SummonsDelivery generateSummonsDelivery(TaskSummon taskSummon) {
+        return SummonsDelivery.builder()
+                .summonsId(taskSummon.getSummonDetails().getSummonId())
+                .caseId(taskSummon.getCaseDetails().getCaseId())
+                .docType(taskSummon.getCaseDetails().getDocType())
+                .paymentFees(taskSummon.getDeliveryChannel().getPaymentFees())
+                .paymentStatus(taskSummon.getDeliveryChannel().getPaymentStatus())
+                .channelName(taskSummon.getDeliveryChannel().getChannelName())
+                .channelDetails(taskSummon.getDeliveryChannel().getChannelDetails())
+                .deliveryRequestDate(LocalDate.now())
                 .build();
     }
 
-    public Summons updateSummonsDeliveryStatus(UpdateSummonsRequest request) {
+    public SummonsDelivery updateSummonsDeliveryStatus(UpdateSummonsRequest request) {
         ChannelMessage channelMessage = request.getChannelMessage();
-        SummonsSearchCriteria searchCriteria = SummonsSearchCriteria
+        SummonsDeliverySearchCriteria searchCriteria = SummonsDeliverySearchCriteria
                 .builder().summonsId(channelMessage.getSummonsId()).build();
-        Optional<Summons> optionalSummons = summonsRepository.getSummons(searchCriteria).stream().findFirst();
+        Optional<SummonsDelivery> optionalSummons = summonsRepository.getSummons(searchCriteria).stream().findFirst();
         if (optionalSummons.isEmpty()) {
             throw new CustomException("SUMMONS_UPDATE_STATUS_ERROR", "Update Summons api was provided with an invalid summons api");
         }
-        Summons summons = optionalSummons.get();
-        summons.setStatusOfDelivery(channelMessage.getStatus());
-        summons.setAdditionalFields(channelMessage.getAdditionalFields());
+        SummonsDelivery summonsDelivery = optionalSummons.get();
+        summonsDelivery.setDeliveryStatus(channelMessage.getStatus());
+        summonsDelivery.setAdditionalFields(channelMessage.getAdditionalFields());
         SummonsRequest newRequest = SummonsRequest.builder()
-                .requestInfo(request.getRequestInfo()).summon(summons).build();
-        SummonsSearchCriteria newSearchCriteria = SummonsSearchCriteria
-                .builder().orderId(summons.getOrderId()).build();
-        List<Summons> summonsList = summonsRepository.getSummons(newSearchCriteria);
-        String statusBeforeUpdate = logicUtil.evaluateSummonsStatus(summonsList);
-        summonsList.removeIf(a -> a.getSummonsId().equals(summons.getSummonsId()));
-        summonsList.add(summons);
-        String statusAfterUpdate = logicUtil.evaluateSummonsStatus(summonsList);
-        if (statusBeforeUpdate.equalsIgnoreCase("SUMMONS_IN_PROGRESS") &&
-                (statusAfterUpdate.equalsIgnoreCase("SUMMONS_DELIVERED") || statusAfterUpdate.equalsIgnoreCase("SUMMONS_NOT_DELIVERED"))) {
-            sendNotificationToUpdateOrders(summons, request.getRequestInfo(), statusAfterUpdate);
-        }
-        producer.push("update-summons", newRequest);
-        return summons;
+                .requestInfo(request.getRequestInfo()).summonsDelivery(summonsDelivery).build();
+        producer.push("update-summons-delivery", newRequest);
+        return summonsDelivery;
     }
 
-    private void sendNotificationToUpdateOrders(Summons summons, RequestInfo requestInfo, String statusAfterUpdate) {
-        OrderStatus orderStatus = OrderStatus.builder().orderId(summons.getOrderId()).statusTobeUpdated(statusAfterUpdate).build();
-        OrderStatusUpdateRequest updateRequest = OrderStatusUpdateRequest.builder()
-                .orderStatus(orderStatus).requestInfo(requestInfo).build();
-        ordersServiceUtil.updateOrdersStatus(updateRequest);
+    public void processStatusAndUpdateSummonsTask(SummonsRequest request) {
+        SummonsDelivery summonsDelivery = request.getSummonsDelivery();
+        SummonsTaskStatus taskStatus = SummonsTaskStatus.builder()
+                .summonsId(summonsDelivery.getSummonsId())
+                .statusTobeUpdated(summonsDelivery.getDeliveryStatus())
+                .build();
+        SummonsTaskUpdateRequest updateRequest = SummonsTaskUpdateRequest.builder()
+                .summonsTaskStatus(taskStatus).requestInfo(request.getRequestInfo()).build();
+        taskSummonsUtil.updateSummonsTaskStatus(updateRequest);
     }
 }

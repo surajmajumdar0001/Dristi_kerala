@@ -26,6 +26,6 @@ public class SummonsResponse {
     @Valid
     private ResponseInfo responseInfo = null;
 
-    @JsonProperty("summons")
-    private List<Summons> summons = null;
+    @JsonProperty("summonsDelivery")
+    private SummonsDelivery summonsDelivery = null;
 }

@@ -26,7 +26,7 @@ public class GenerateSummonsRequest {
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("summonDetails")
+    @JsonProperty("taskSummon")
     @Valid
-    private SummonsDetails summonDetails = null;
+    private TaskSummon taskSummon;
 }
