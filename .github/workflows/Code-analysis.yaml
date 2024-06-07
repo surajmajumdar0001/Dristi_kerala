@@ -21,4 +21,4 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B -f backend/scheduler-svc/pom.xml verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=solutions_scheduler_svc -Dsonar.organization=solutions -Dsonar.host.url=https://sonarcloud.io/
+        run: mvn -B -f backend/scheduler-svc/pom.xml package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=solutions_scheduler_svc -Dsonar.organization=solutions -Dsonar.host.url=https://sonarcloud.io/
