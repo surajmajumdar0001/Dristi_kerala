@@ -2,7 +2,7 @@ name: Sonarcloud Scan
 on:
   push:
     branches:
-      - develop
+      - sonarcloud
   workflow_dispatch:
 jobs:
   docker_image-build:
