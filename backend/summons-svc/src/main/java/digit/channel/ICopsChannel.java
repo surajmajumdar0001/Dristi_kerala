@@ -32,9 +32,7 @@ public class ICopsChannel implements ExternalChannel {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         HttpEntity<SendSummonsRequest> requestEntity = new HttpEntity<>(request, headers);
-
         ResponseEntity<ChannelMessage> responseEntity = restTemplate.postForEntity(uri.toString(),
                 requestEntity, ChannelMessage.class);
 

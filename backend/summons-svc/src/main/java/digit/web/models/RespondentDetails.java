@@ -13,13 +13,10 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-05-29T13:38:04.562296+05:30[Asia/Calcutta]")
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class RespondentDetails {
 
     @JsonProperty("name")
-    @Pattern(regexp = "^[a-zA-Z]{1,100}$", message = "Name must be up to 100 alphabets with no numbers")
     private String name;
 
     @JsonProperty("age")
@@ -34,7 +31,6 @@ public class RespondentDetails {
     private String email;
 
     @JsonProperty("phone")
-    @Pattern(regexp = "^\\+?[0-9\\-() ]+$", message = "Phone must be a valid phone number")
     private String phone;
 
     @JsonProperty("address")
