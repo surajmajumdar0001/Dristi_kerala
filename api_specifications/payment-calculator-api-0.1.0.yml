@@ -1,0 +1,380 @@
+openapi: 3.0.0
+info:
+  title: Payment calculator service
+  description: please update this description
+  version: 0.1.0
+tags:
+  - name: Payment Calculator
+    description: APIs to calculate payment for channel and court
+  - name: Postal Hub
+    description: APIs to manage postal hub
+paths:
+  /v1/_getbill:
+    post:
+      tags:
+        - Payment Calculator
+      operationId: v1GetbillPost
+      summary: get a bill for application id
+      description: |
+        API to get bill for application.
+      parameters:
+        - name: tenantId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: applicationId
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Details for RequestInfo meta data
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/RequestInfoWrapper'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BillResponse'
+        '400':
+          description: bill fetch failed. Response body to provide specifics of failure.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/ErrorResponse'
+  /v1/_calculate:
+    post:
+      tags:
+        - Payment Calculator
+      operationId: v1CalculatePost
+      summary: calculate payment
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/CalculationReq'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/CalculationRes'
+        '400':
+          description: Payment calculation failed. Response body to provide specifics of failure.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/ErrorResponse'
+  /hub/v1/_create:
+    post:
+      tags:
+        - Postal Hub
+      operationId: createHub
+      summary: create hub
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PostalHubRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PostalHubResponse'
+        '400':
+          description: create postal hub failed. Response body to provide specifics of failure.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/ErrorResponse'
+  /hub/v1/_update:
+    post:
+      tags:
+        - Postal Hub
+      operationId: updateHub
+      summary: update hub
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PostalHubRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PostalHubResponse'
+        '400':
+          description: Update Postal Hub failed. Response body to provide specifics of failure.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/ErrorResponse'
+
+  /hub/v1/_search:
+    post:
+      tags:
+        - Postal Hub
+      operationId: searchHub
+      summary: search hub
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/HubSearchRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PostalHubResponse'
+        '400':
+          description: search postal hub failed. Response body to provide specifics of failure.
+          content:
+            '*/*':
+              schema:
+                $ref: 'https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    PostalHubResponse:
+      type: object
+    Hub:
+      type: object
+      properties:
+        hubId:
+          type: string
+        tenantId:
+          type: string
+        pincode:
+          type: number
+          format: integer
+    PostalHubRequest:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: >-
+            https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/RequestInfo
+        hubs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Hub'
+    HubSearchRequest:
+      type: object
+      description: hub search is based on HubSearchCriteria Object.
+      properties:
+        RequestInfo:
+          $ref: >-
+            https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/RequestInfo
+        tenantId:
+          type: string
+        criteria:
+          $ref: '#/components/schemas/HubSearchCriteria'
+
+    HubSearchCriteria:
+      type: object
+      description: the fields specified will be used in a logical AND condition
+      properties:
+        hubId:
+          type: string
+    RequestInfoWrapper:
+      required:
+        - RequestInfo
+      type: object
+      properties:
+        RequestInfo:
+          $ref: "https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/RequestInfo"
+    Bill:
+      type: object
+      properties:
+        id:
+          type: string
+        mobileNumber:
+          type: string
+        payerName:
+          type: string
+        payerAddress:
+          type: string
+        payerEmail:
+          type: string
+        isActive:
+          type: boolean
+        isCancelled:
+          type: boolean
+        additionalDetails:
+          type: object
+        taxAndPayments:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaxAndPayment'
+        billDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillDetail'
+        tenantId:
+          type: string
+        auditDetails:
+          $ref: >-
+            https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/AuditDetails
+    BillAccountDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        tenantId:
+          type: string
+        billDetail:
+          type: string
+        demandDetailId:
+          type: string
+        order:
+          type: integer
+          format: int32
+        amount:
+          type: number
+        adjustedAmount:
+          type: number
+        isActualDemand:
+          type: boolean
+        glcode:
+          type: string
+        taxHeadCode:
+          type: string
+        additionalDetails:
+          type: object
+        purpose:
+          type: string
+          enum:
+            - ARREAR
+            - CURRENT
+            - ADVANCE
+    BillDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        tenantId:
+          type: string
+        demandId:
+          type: string
+        bill:
+          type: string
+        businessService:
+          type: string
+        billNumber:
+          type: string
+        billDate:
+          type: number
+        consumerCode:
+          type: string
+        consumerType:
+          type: string
+        minimumAmount:
+          type: number
+        totalAmount:
+          type: number
+        fromPeriod:
+          type: number
+        toPeriod:
+          type: number
+        collectedAmount:
+          type: number
+        collectionModesNotAllowed:
+          type: array
+          items:
+            type: string
+        partPaymentAllowed:
+          type: boolean
+        additionalDetails:
+          type: object
+        billAccountDetails:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillAccountDetail'
+        status:
+          type: string
+          enum:
+            - CREATED
+            - CANCELLED
+            - INSTRUMENT_BOUNCED
+    BillResponse:
+      type: object
+      properties:
+        ResposneInfo:
+          $ref: "https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/ResponseInfo"
+        Bill:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bill'
+    TaxAndPayment:
+      type: object
+      properties:
+        businessService:
+          type: string
+        taxAmount:
+          type: string
+        amountPaid:
+          type: string
+    CalculationCriteria:
+      type: object
+      properties:
+        applicationId:
+          type: string
+        tenantId:
+          type: string
+        formType:
+          type: string
+          enum:
+            - SUMMONS
+            - E-FILLING
+        request:
+          type: object
+    CalculationReq:
+      type: object
+      properties:
+        RequestInfo:
+          $ref: "https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/RequestInfo"
+        CalculationCriteria:
+          type: array
+          items:
+            $ref: '#/components/schemas/CalculationCriteria'
+    Calculation:
+      type: object
+      properties:
+        applicationId:
+          type: string
+        tenantId:
+          type: string
+        formType:
+          type: string
+          enum:
+            - SUMMONS
+            - E-FILLING
+        totalAmount:
+          type: number
+          format: double
+        breakDown:
+          type: object
+    CalculationRes:
+      type: object
+      properties:
+        ResponseInfo:
+          $ref: "https://raw.githubusercontent.com/egovernments/DIGIT-Specs/common-contract-update/Common%20Services/common-contract.yaml#/components/schemas/ResponseInfo"
+        Calculation:
+          type: array
+          items:
+            $ref: '#/components/schemas/Calculation'
