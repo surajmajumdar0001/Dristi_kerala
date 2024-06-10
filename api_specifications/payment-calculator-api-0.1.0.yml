@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Payment calculator service
-  description: please update this description
+  description: this api spec provide end point to calculate payment and update postal hub information in system
   version: 0.1.0
 tags:
   - name: Payment Calculator
