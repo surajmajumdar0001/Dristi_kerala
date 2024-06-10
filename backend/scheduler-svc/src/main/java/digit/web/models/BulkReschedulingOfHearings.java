@@ -25,6 +25,6 @@ public class BulkReschedulingOfHearings {
     @JsonProperty("endTime")
     private LocalDateTime endTime;
 
-    @JsonProperty("fromDate")
-    private LocalDate fromDate;
+    @JsonProperty("scheduleAfter")
+    private LocalDate scheduleAfter;
 }

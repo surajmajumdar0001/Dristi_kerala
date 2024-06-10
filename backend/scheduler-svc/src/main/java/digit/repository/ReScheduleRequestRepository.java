@@ -25,10 +25,10 @@ public class ReScheduleRequestRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<ReScheduleHearing> getReScheduleRequest(ReScheduleHearingReqSearchCriteria criteria) {
+    public List<ReScheduleHearing> getReScheduleRequest(ReScheduleHearingReqSearchCriteria criteria, Integer limit, Integer offset) {
 
         List<Object> preparedStmtList = new ArrayList<>();
-        String query = queryBuilder.getReScheduleRequestQuery(criteria, preparedStmtList);
+        String query = queryBuilder.getReScheduleRequestQuery(criteria, preparedStmtList, limit, offset);
         log.debug("Final query: " + query);
         return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
 

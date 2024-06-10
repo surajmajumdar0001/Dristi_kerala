@@ -46,10 +46,27 @@ public class HearingEnrichment {
         List<String> idList = idgenUtil.getIdList(requestInfo, hearingList.get(0).getTenantId(), configuration.getHearingIdFormat(), null, hearingList.size());
         AuditDetails auditDetails = getAuditDetailsScheduleHearing(requestInfo);
 
+
+        int index = 0;
+        for (ScheduleHearing hearing : hearingList) {
+            hearing.setAuditDetails(auditDetails);
+            hearing.setHearingBookingId(idList.get(index++));
+            hearing.setRowVersion(1);
+
+        }
+
+        updateTimingInHearings(hearingList, hearingTypeMap, defaultSlots);
+
+
+    }
+
+
+    void updateTimingInHearings(List<ScheduleHearing> hearingList, Map<String, MdmsHearing> hearingTypeMap,List<MdmsSlot> defaultSlots) {
+
         List<Status> statuses = new ArrayList<>();
         statuses.add(Status.SCHEDULED);
         statuses.add(Status.BLOCKED);
-        int index = 0;
+        HashMap<String, List<ScheduleHearing>> sameDayHearings = new HashMap<>();
         for (ScheduleHearing hearing : hearingList) {
 
 
@@ -59,9 +76,7 @@ public class HearingEnrichment {
                     .judgeId(hearing.getJudgeId())
                     .status(statuses).build();
 
-            hearing.setAuditDetails(auditDetails);
-            hearing.setHearingBookingId(idList.get(index++));
-            hearing.setRowVersion(1);
+
             if (hearing.getStatus() == null) hearing.setStatus(Status.SCHEDULED);
 
             StringBuilder key = new StringBuilder();
@@ -69,10 +84,10 @@ public class HearingEnrichment {
 
             List<ScheduleHearing> hearings = new ArrayList<>();
 
-            if(sameDayHearings.containsKey(key.toString())){
+            if (sameDayHearings.containsKey(key.toString())) {
                 hearings = sameDayHearings.get(key.toString());
             } else {
-                hearings = repository.getHearings(searchCriteria);
+                hearings = repository.getHearings(searchCriteria, null, null);
                 sameDayHearings.put(key.toString(), hearings);
             }
 
@@ -127,7 +142,7 @@ public class HearingEnrichment {
                 }
                 currentStartTime = currentStartTime.plusMinutes(15); // Move to the next time slot
             }
-            if(!flag) break;
+            if (!flag) break;
         }
     }
 
@@ -165,4 +180,19 @@ public class HearingEnrichment {
     }
 
 
+    public void enrichBulkReschedule(ScheduleHearingRequest request, List<MdmsSlot> defaultHearings, Map<String, MdmsHearing> hearingTypeMap) {
+
+        List<ScheduleHearing> hearing = request.getHearing();
+
+        hearing.forEach((element) -> {
+
+            Long currentTime = System.currentTimeMillis();
+            element.getAuditDetails().setLastModifiedTime(currentTime);
+            element.getAuditDetails().setLastModifiedBy(request.getRequestInfo().getUserInfo().getUuid());
+            element.setRowVersion(element.getRowVersion() + 1);
+
+        });
+
+        updateTimingInHearings(hearing,hearingTypeMap,defaultHearings);
+    }
 }

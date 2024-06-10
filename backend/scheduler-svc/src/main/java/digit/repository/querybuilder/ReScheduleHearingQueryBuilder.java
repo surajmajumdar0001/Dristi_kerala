@@ -25,11 +25,11 @@ public class ReScheduleHearingQueryBuilder {
 
     private static final String FROM_TABLES = " FROM hearing_booking_reschedule_request hbr ";
 
-    private final String ORDER_BY = " ORDER BY ";
+    private final String ORDER_BY = " ORDER BY hbr.last_modified_time DESC";
 
     private final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
 
-    public String getReScheduleRequestQuery(ReScheduleHearingReqSearchCriteria searchCriteria, List<Object> preparedStmtList) {
+    public String getReScheduleRequestQuery(ReScheduleHearingReqSearchCriteria searchCriteria, List<Object> preparedStmtList, Integer limit, Integer offset) {
         StringBuilder query = new StringBuilder(BASE_APPLICATION_QUERY);
         query.append(FROM_TABLES);
 
@@ -51,7 +51,8 @@ public class ReScheduleHearingQueryBuilder {
             preparedStmtList.add(searchCriteria.getJudgeId());
         }
 
-        if (!ObjectUtils.isEmpty(searchCriteria.getJudgeId())) {
+        //bug
+        if (!ObjectUtils.isEmpty(searchCriteria.getCaseId())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.case_id = ? ");
             preparedStmtList.add(searchCriteria.getJudgeId());
@@ -72,11 +73,18 @@ public class ReScheduleHearingQueryBuilder {
             query.append(" hbr.status = ? ");
             preparedStmtList.add(searchCriteria.getStatus().toString());
         }
-        if (!ObjectUtils.isEmpty(searchCriteria.getBeforeTwoDays())) {
+        if (!ObjectUtils.isEmpty(searchCriteria.getDueDate())) {
             helper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hbr.last_modified_time < ?  ");
-            preparedStmtList.add(searchCriteria.getBeforeTwoDays());
+            preparedStmtList.add(searchCriteria.getDueDate());
         }
+        query.append(ORDER_BY);
+        if (!ObjectUtils.isEmpty(limit) && !ObjectUtils.isEmpty(offset)) {
+            query.append(LIMIT_OFFSET);
+            preparedStmtList.add(limit);
+            preparedStmtList.add(offset);
+        }
+
 
         return query.toString();
     }

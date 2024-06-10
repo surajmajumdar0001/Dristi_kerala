@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
@@ -106,7 +107,7 @@ public class CauseListService {
                 .fromDate(LocalDate.now().plusDays(1))
                 .toDate(LocalDate.now().plusDays(1))
                 .build();
-        List<ScheduleHearing> scheduleHearings = hearingRepository.getHearings(searchCriteria);
+        List<ScheduleHearing> scheduleHearings = hearingRepository.getHearings(searchCriteria, null, null);
         if (CollectionUtils.isEmpty(scheduleHearings)) {
             log.info("No hearings scheduled tomorrow for judgeId = {}", judgeId);
         } else {
@@ -222,19 +223,23 @@ public class CauseListService {
 
     public List<CauseList> viewCauseListForTomorrow(CauseListSearchRequest searchRequest) {
         log.info("operation = viewCauseListForTomorrow, with searchRequest : {}", searchRequest.toString());
-        return getCauseListForTomorrow(searchRequest);
+        return getCauseListForTomorrow(searchRequest.getCauseListSearchCriteria());
     }
 
-    private List<CauseList> getCauseListForTomorrow(CauseListSearchRequest searchRequest) {
-        return causeListRepository.getCauseLists(searchRequest.getCauseListSearchCriteria());
+    private List<CauseList> getCauseListForTomorrow(CauseListSearchCriteria searchCriteria) {
+        if (searchCriteria != null && searchCriteria.getSearchDate() != null
+                && searchCriteria.getSearchDate().isAfter(LocalDate.now().plusDays(1))) {
+            throw new CustomException("DK_CL_APP_ERR", "CauseList Search date cannot be after than tomorrow");
+        }
+        return causeListRepository.getCauseLists(searchCriteria);
     }
 
     public ByteArrayResource downloadCauseListForTomorrow(CauseListSearchRequest searchRequest) {
         log.info("operation = downloadCauseListForTomorrow, with searchRequest : {}", searchRequest.toString());
-        List<CauseList> causeLists = getCauseListForTomorrow(searchRequest);
-        CauseListResponse causeListResponse = CauseListResponse.builder()
-                .responseInfo(ResponseInfo.builder().build()).causeList(causeLists).build();
-        return pdfServiceUtil.generatePdfFromPdfService(causeListResponse , searchRequest.getRequestInfo().getUserInfo().getTenantId(),
-                config.getCauseListPdfTemplateKey(), searchRequest.getRequestInfo());
+        List<CauseList> causeLists = getCauseListForTomorrow(searchRequest.getCauseListSearchCriteria());
+        CauseListRequest causeListRequest = CauseListRequest.builder()
+                .requestInfo(searchRequest.getRequestInfo()).causeList(causeLists).build();
+        return pdfServiceUtil.generatePdfFromPdfService(causeListRequest , searchRequest.getRequestInfo().getUserInfo().getTenantId(),
+                config.getCauseListPdfTemplateKey());
     }
 }

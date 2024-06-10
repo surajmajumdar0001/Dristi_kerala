@@ -3,7 +3,7 @@ CREATE TABLE judge_calendar_rules (
     judge_id                varchar(64),
     id                      varchar(64),
     rule_type               varchar(64),
-    date                    date,
+    date                    varchar(64),
     notes                   text,
     created_by              character varying(64),
     created_time            bigint,
@@ -12,7 +12,8 @@ CREATE TABLE judge_calendar_rules (
     row_version             bigint,
     tenant_id               character varying(64),
 
-    CONSTRAINT pk_judge_calendar_rules_id PRIMARY KEY (id)
+    CONSTRAINT pk_judge_calendar_rules_id PRIMARY KEY (id),
+    CONSTRAINT unique_judge_date_constraint UNIQUE(judge_id, date)
 
 
 );

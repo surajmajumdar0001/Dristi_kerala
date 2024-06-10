@@ -12,6 +12,7 @@ import digit.web.models.ReScheduleHearing;
 import digit.web.models.ReScheduleHearingRequest;
 import digit.web.models.Workflow;
 import digit.web.models.enums.Status;
+import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.models.RequestInfoWrapper;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
@@ -28,16 +29,21 @@ import java.util.List;
 
 
 @Service
+@Slf4j
 public class WorkflowService {
 
-    @Autowired
-    private ObjectMapper mapper;
+    private final ObjectMapper mapper;
+
+    private final ServiceRequestRepository repository;
+
+    private final Configuration config;
 
     @Autowired
-    private ServiceRequestRepository repository;
-
-    @Autowired
-    private Configuration config;
+    public WorkflowService(ObjectMapper mapper, ServiceRequestRepository repository, Configuration config) {
+        this.mapper = mapper;
+        this.repository = repository;
+        this.config = config;
+    }
 
     public void updateWorkflowStatus(ReScheduleHearingRequest reScheduleHearingRequest) {
         reScheduleHearingRequest.getReScheduleHearing().forEach(application -> {
@@ -49,15 +55,16 @@ public class WorkflowService {
     }
 
     public State callWorkFlow(ProcessInstanceRequest workflowReq) {
-
-        ProcessInstanceResponse response = null;
-        StringBuilder url = new StringBuilder(config.getWfHost().concat(config.getWfTransitionPath()));
-        Object optional = repository.fetchResult(url, workflowReq);
-        response = mapper.convertValue(optional, ProcessInstanceResponse.class);
-        return response.getProcessInstances().get(0).getState();
+            ProcessInstanceResponse response = null;
+            StringBuilder url = new StringBuilder(config.getWfHost().concat(config.getWfTransitionPath()));
+            Object optional = repository.fetchResult(url, workflowReq);
+            response = mapper.convertValue(optional, ProcessInstanceResponse.class);
+            return response.getProcessInstances().get(0).getState();
     }
 
     private ProcessInstance getProcessInstanceForHearingReScheduler(ReScheduleHearing application, RequestInfo requestInfo) {
+
+        log.info("operation= getProcessInstanceForHearingReScheduler, result=IN_PROGRESS, tenantId={}", application.getTenantId());
         Workflow workflow = application.getWorkflow();
 
         ProcessInstance processInstance = new ProcessInstance();
@@ -80,38 +87,46 @@ public class WorkflowService {
 
             processInstance.setAssignes(users);
         }
-
+        log.info("operation= getProcessInstanceForHearingReScheduler, result=SUCCESS, judgeId={}, processInstanceAction={}", application.getJudgeId(), processInstance.getAction());
         return processInstance;
-
     }
 
     public ProcessInstance getCurrentWorkflow(RequestInfo requestInfo, String tenantId, String businessId) {
-
+        log.info("operation=getCurrentWorkflow, result=IN_PROCESS, tenantId={}, businessId={}", tenantId, businessId);
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-
         StringBuilder url = getSearchURLWithParams(tenantId, businessId);
-
-        Object res = repository.fetchResult(url, requestInfoWrapper);
+        Object res;
+        try {
+            res = repository.fetchResult(url, requestInfoWrapper);
+        } catch (Exception e) {
+            throw new CustomException("SERVICE_CALL_EXCEPTION", "Failed to fetch workflow from workflow service");
+        }
         ProcessInstanceResponse response = null;
-
         try {
             response = mapper.convertValue(res, ProcessInstanceResponse.class);
         } catch (Exception e) {
             throw new CustomException("PARSING_ERROR", "Failed to parse workflow search response");
         }
 
-        if (response != null && !CollectionUtils.isEmpty(response.getProcessInstances()) && response.getProcessInstances().get(0) != null)
+        if (response != null && !CollectionUtils.isEmpty(response.getProcessInstances()) && response.getProcessInstances().get(0) != null) {
+            log.info("operation= getCurrentWorkflow, result=SUCCESS, ProcessInstance={}", response.getProcessInstances());
             return response.getProcessInstances().get(0);
-
+        }
         return null;
     }
 
 
     private BusinessService getBusinessService(ReScheduleHearing application, RequestInfo requestInfo) {
+        log.info("operation = getBusinessService, result=IN_PROGRESS, judgeId={}, tenantId={}", application.getJudgeId(), application.getTenantId());
         String tenantId = application.getTenantId();
         StringBuilder url = getSearchURLWithParams(tenantId, "RESCHEDULER");
         RequestInfoWrapper requestInfoWrapper = RequestInfoWrapper.builder().requestInfo(requestInfo).build();
-        Object result = repository.fetchResult(url, requestInfoWrapper);
+        Object result;
+        try {
+            result = repository.fetchResult(url, requestInfoWrapper);
+        } catch (Exception e) {
+            throw new CustomException("SERVICE_CALL_EXCEPTION", "Failed to fetch business service from workflow service");
+        }
         BusinessServiceResponse response = null;
         try {
             response = mapper.convertValue(result, BusinessServiceResponse.class);
@@ -121,6 +136,8 @@ public class WorkflowService {
 
         if (CollectionUtils.isEmpty(response.getBusinessServices()))
             throw new CustomException("BUSINESSSERVICE_NOT_FOUND", "The businessService " + "RESCHEDULER" + " is not found");
+
+        log.info("operation=getBusinessService, result=SUCCESS, judgeId={}, BusinessServiceResponse={}", application.getJudgeId(), response.getBusinessServices());
 
         return response.getBusinessServices().get(0);
     }

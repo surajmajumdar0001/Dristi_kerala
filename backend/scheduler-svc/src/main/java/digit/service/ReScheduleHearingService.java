@@ -2,54 +2,81 @@ package digit.service;
 
 
 import digit.config.Configuration;
+import digit.config.ServiceConstants;
 import digit.enrichment.ReScheduleRequestEnrichment;
+import digit.helper.DefaultMasterDataHelper;
 import digit.kafka.Producer;
 import digit.repository.ReScheduleRequestRepository;
 import digit.validator.ReScheduleRequestValidator;
 import digit.web.models.*;
 import digit.web.models.enums.Status;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+
+/**
+ * Contains methods related to raised reschedule request, update request,search , bulk rescheduling
+ */
 @Service
+@Slf4j
 public class ReScheduleHearingService {
 
-
     private final Configuration config;
-    private ReScheduleRequestRepository repository;
-    private ReScheduleRequestValidator validator;
-    private ReScheduleRequestEnrichment enrichment;
-    private Producer producer;
-    @Autowired
-    private WorkflowService workflowService;
+
+    private final ReScheduleRequestRepository repository;
+
+    private final ReScheduleRequestValidator validator;
+
+    private final ReScheduleRequestEnrichment enrichment;
+
+    private final Producer producer;
+
+    private final WorkflowService workflowService;
+
+    private final HearingService hearingService;
+
+    private final CalendarService calendarService;
+
+    private final HearingScheduler hearingScheduler;
+
+    private final ServiceConstants serviceConstants;
+
+    private final DefaultMasterDataHelper helper;
 
     @Autowired
-    private HearingService hearingService;
-
-    @Autowired
-    private CalendarService calendarService;
-
-    @Autowired
-    private HearingScheduler hearingScheduler;
-
-    @Autowired
-    public ReScheduleHearingService(ReScheduleRequestRepository repository, ReScheduleRequestValidator validator, ReScheduleRequestEnrichment enrichment, Producer producer, Configuration config) {
+    public ReScheduleHearingService(Configuration config, ReScheduleRequestRepository repository, ReScheduleRequestValidator validator, ReScheduleRequestEnrichment enrichment, Producer producer, WorkflowService workflowService, HearingService hearingService, CalendarService calendarService, HearingScheduler hearingScheduler, ServiceConstants serviceConstants, DefaultMasterDataHelper helper) {
+        this.config = config;
         this.repository = repository;
         this.validator = validator;
         this.enrichment = enrichment;
         this.producer = producer;
-        this.config = config;
+        this.workflowService = workflowService;
+        this.hearingService = hearingService;
+        this.calendarService = calendarService;
+        this.hearingScheduler = hearingScheduler;
+        this.serviceConstants = serviceConstants;
+        this.helper = helper;
     }
 
+    /**
+     *
+     * @param reScheduleHearingsRequest
+     * @return
+     */
+
     public List<ReScheduleHearing> create(ReScheduleHearingRequest reScheduleHearingsRequest) {
+        log.info("operation = create, result = IN_PROGRESS,  RescheduledRequest = {}", reScheduleHearingsRequest.getReScheduleHearing());
+
         List<ReScheduleHearing> reScheduleHearing = reScheduleHearingsRequest.getReScheduleHearing();
 
         validator.validateRescheduleRequest(reScheduleHearingsRequest);
@@ -60,11 +87,19 @@ public class ReScheduleHearingService {
 
         producer.push(config.getRescheduleRequestCreateTopic(), reScheduleHearing);
 
+        log.info("operation = create, result=SUCCESS, ReScheduleHearing={}", reScheduleHearing);
+
         return reScheduleHearing;
 
     }
 
+    /**
+     *
+     * @param reScheduleHearingsRequest
+     * @return
+     */
     public List<ReScheduleHearing> update(ReScheduleHearingRequest reScheduleHearingsRequest) {
+        log.info("operation = update, result = IN_PROGRESS,  RescheduledRequest = {}", reScheduleHearingsRequest.getReScheduleHearing());
 
         List<ReScheduleHearing> existingReScheduleHearingsReq = validator.validateExistingApplication(reScheduleHearingsRequest);
 
@@ -77,29 +112,50 @@ public class ReScheduleHearingService {
         hearingScheduler.scheduleHearingForApprovalStatus(reScheduleHearingsRequest);
 
         producer.push(config.getUpdateRescheduleRequestTopic(), reScheduleHearingsRequest.getReScheduleHearing());
+        log.info("operation = create, result = SUCCESS, ReScheduleHearing={}", existingReScheduleHearingsReq);
 
         return reScheduleHearingsRequest.getReScheduleHearing();
 
     }
 
-    public List<ReScheduleHearing> search(ReScheduleHearingReqSearchRequest request) {
-        return repository.getReScheduleRequest(request.getCriteria());
+    /**
+     *
+     * @param request
+     * @return
+     */
+    public List<ReScheduleHearing> search(ReScheduleHearingReqSearchRequest request, Integer limit, Integer offset) {
+        return repository.getReScheduleRequest(request.getCriteria(), limit, offset);
     }
-
+    /**
+     *
+     * @param request
+     * @return
+     */
     public List<ReScheduleHearing> bulkReschedule(BulkReScheduleHearingRequest request) {
+        log.info("operation = bulkReschedule, result = IN_PROGRESS,  BulkRescheduling = {}", request.getBulkRescheduling());
 
+        validator.validateBulkRescheduleRequest(request);
+
+        List<MdmsSlot> defaultSlots = helper.getDataFromMDMS(MdmsSlot.class, serviceConstants.DEFAULT_SLOTTING_MASTER_NAME);
+
+        double totalHrs = defaultSlots.stream().reduce(0.0, (total, slot) -> total + slot.getSlotDuration() / 60.0, Double::sum);
+        List<MdmsHearing> defaultHearings = helper.getDataFromMDMS(MdmsHearing.class, serviceConstants.DEFAULT_HEARING_MASTER_NAME);
+        Map<String, MdmsHearing> hearingTypeMap = defaultHearings.stream().collect(Collectors.toMap(
+                MdmsHearing::getHearingType,
+                obj -> obj
+        ));
         BulkReschedulingOfHearings bulkRescheduling = request.getBulkRescheduling();
 
         String tenantId = request.getRequestInfo().getUserInfo().getTenantId();
         String judgeId = bulkRescheduling.getJudgeId();
         LocalDateTime endTime = bulkRescheduling.getEndTime();
         LocalDateTime startTime = bulkRescheduling.getStartTime();
-        LocalDate fromDate = bulkRescheduling.getFromDate();
+        LocalDate fromDate = bulkRescheduling.getScheduleAfter();
 
         HearingSearchCriteria criteria = HearingSearchCriteria.builder().judgeId(judgeId).startDateTime(startTime).endDateTime(endTime).tenantId(tenantId)
-                .status(Collections.singletonList(Status.SCHEDULED)).build();
+                .status(Arrays.asList(Status.SCHEDULED, Status.BLOCKED)).build();
 
-        List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().requestInfo(request.getRequestInfo()).criteria(criteria).build());
+        List<ScheduleHearing> hearings = hearingService.search(HearingSearchRequest.builder().requestInfo(request.getRequestInfo()).criteria(criteria).build(), null, null);
 
         if (CollectionUtils.isEmpty(hearings)) {
             return new ArrayList<>();
@@ -116,52 +172,47 @@ public class ReScheduleHearingService {
                                 .judgeId(judgeId)
                                 .fromDate(fromDate)
                                 .courtId("0001")
-                                .numberOfSuggestedDays(hearings.size())
+                                .numberOfSuggestedDays(hearings.size() + 10)
                                 .tenantId(tenantId)// need to configure some where
                                 .build()).build()
         );
 
         // assign slots and push for schedule hearing
-
-        List<LocalDateTime> dateTime = new ArrayList<>();
-        LocalDateTime startTimeOfHearing = LocalDateTime.of(LocalDateTime.now().toLocalDate(), LocalTime.of(10, 0));
-        LocalDateTime endTimeOfHearing = null;
         int index = 0;
+        Double requiredSlot = null;
         for (ScheduleHearing hearing : hearings) {
+            String eventType = hearing.getEventType().toString();
+
+            MdmsHearing hearingType = hearingTypeMap.get(eventType);
+            requiredSlot = hearingType.getHearingTime() / 60.00;
 
             Double occupiedBandwidth = availability.get(index).getOccupiedBandwidth();
-            if (8.0 - occupiedBandwidth > 1.0) {  // need to configure
+            if (totalHrs - occupiedBandwidth > requiredSlot) {  // need to configure
                 hearing.setDate(LocalDate.parse(availability.get(index).getDate()));
-                if (!dateTime.isEmpty()) {
-                    hearing.setStartTime(dateTime.get(index).plusMinutes(30));
-                    hearing.setEndTime(dateTime.get(index).plusHours(1));
-                    dateTime.add(dateTime.get(index).plusHours(1));
-                } else {
-                    hearing.setStartTime(startTimeOfHearing);
-                    hearing.setEndTime(startTimeOfHearing.plusHours(1));
-                    dateTime.add(startTimeOfHearing.plusHours(1));
-                }
-
-                availability.get(index).setOccupiedBandwidth(occupiedBandwidth + 1.0);  // need to configure
+                availability.get(index).setOccupiedBandwidth(occupiedBandwidth + requiredSlot);  // need to configure
             } else {
                 hearing.setDate(LocalDate.parse(availability.get(++index).getDate()));
-                hearing.setStartTime(startTimeOfHearing);
-                hearing.setEndTime(startTimeOfHearing.plusHours(1));
-                dateTime.add(startTimeOfHearing.plusHours(1));
-                availability.get(index).setOccupiedBandwidth(availability.get(index).getOccupiedBandwidth() + 1.0);  // need to configure
+                availability.get(index).setOccupiedBandwidth(availability.get(index).getOccupiedBandwidth() + requiredSlot);  // need to configure
             }
         }
-
-
+        // try to make it async
         // updated hearing in hearing table
-        hearingService.update(ScheduleHearingRequest.builder()
-                .hearing(hearings).requestInfo(request.getRequestInfo()).build());
+        hearingService.updateBulk(ScheduleHearingRequest.builder()
+                .hearing(hearings).requestInfo(request.getRequestInfo()).build(), defaultSlots, hearingTypeMap);
 
+        log.info("operation = bulkReschedule, result = SUCCESS, ReScheduleHearing={}", reScheduleHearings);
 
         return reScheduleHearings;
     }
 
+    /**
+     *
+     * @param hearings
+     * @param requesterId
+     * @return
+     */
     private List<ReScheduleHearing> createReschedulingRequest(List<ScheduleHearing> hearings, String requesterId) {
+        log.info("operation=createReschedulingRequest, result=IN_PROGRESS, hearings={}", hearings);
         List<ReScheduleHearing> resultList = new ArrayList<>();
 
         Workflow workflow = Workflow.builder().action("AUTO_SCHEDULE").assignees(new ArrayList<>()).comment("bulk reschedule by :" + requesterId).build();
@@ -181,6 +232,7 @@ public class ReScheduleHearingService {
             resultList.add(reScheduleHearingReq);
 
         }
+        log.info("operation= createReschedulingRequest, result=SUCCESS, ReScheduleHearing={}", resultList);
         return resultList;
     }
 }

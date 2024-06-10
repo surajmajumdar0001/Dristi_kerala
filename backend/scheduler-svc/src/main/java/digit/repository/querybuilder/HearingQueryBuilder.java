@@ -18,19 +18,19 @@ import java.util.List;
 public class HearingQueryBuilder {
 
     private static final String FROM_TABLES = " FROM hearing_booking hb ";
-    private final String BASE_APPLICATION_QUERY = "SELECT  hb.hearing_booking_id, hb.tenant_id, hb.court_id, hb.judge_id, hb.case_id, hb.hearing_date, hb.event_type, hb.title, hb.description, hb.status, hb.start_time, hb.end_time, hb.created_by,hb.last_modified_by,hb.created_time,hb.last_modified_time, hb.row_version ";
+    private final String BASE_APPLICATION_QUERY = "SELECT  hb.hearing_booking_id, hb.tenant_id, hb.court_id, hb.judge_id, hb.case_id, hb.hearing_date, hb.event_type, hb.title, hb.description, hb.status, hb.start_time, hb.end_time, hb.created_by,hb.last_modified_by,hb.created_time,hb.last_modified_time, hb.row_version ,hb.reschedule_request_id";
     private final String ORDER_BY = " ORDER BY ";
     private final String GROUP_BY = " GROUP BY ";
     private final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
     @Autowired
     private QueryBuilderHelper queryBuilderHelper;
 
-    public String getHearingQuery(HearingSearchCriteria hearingSearchCriteria, List<Object> preparedStmtList) {
+    public String getHearingQuery(HearingSearchCriteria hearingSearchCriteria, List<Object> preparedStmtList, Integer limit, Integer offset) {
 
         StringBuilder query = new StringBuilder(BASE_APPLICATION_QUERY);
         query.append(FROM_TABLES);
 
-        getWhereFields(hearingSearchCriteria, query, preparedStmtList);
+        getWhereFields(hearingSearchCriteria, query, preparedStmtList, limit, offset);
 
         return query.toString();
     }
@@ -41,7 +41,7 @@ public class HearingQueryBuilder {
         query.append("SELECT hb.hearing_date, SUM(EXTRACT(EPOCH FROM (TO_TIMESTAMP(hb.end_time, 'YYYY-MM-DD HH24:MI:SS') - TO_TIMESTAMP(hb.start_time, 'YYYY-MM-DD HH24:MI:SS'))) / 3600) AS total_hours ");
         query.append("FROM hearing_booking hb ");
 
-        getWhereFields(hearingSearchCriteria, query, preparedStmtList);
+        getWhereFields(hearingSearchCriteria, query, preparedStmtList, null, null);
         // add status block
         queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
         query.append(" ( hb.status = ? ");
@@ -51,20 +51,25 @@ public class HearingQueryBuilder {
 
 
         query.append("GROUP BY hb.hearing_date) AS meeting_hours ");
-//        query.append("WHERE meeting_hours.total_hours < ? ");
-//        preparedStmtList.add(8);  //TODO:need to configure
 
         return query.toString();
     }
 
 
-    private void getWhereFields(HearingSearchCriteria hearingSearchCriteria, StringBuilder query, List<Object> preparedStmtList) {
+    private void getWhereFields(HearingSearchCriteria hearingSearchCriteria, StringBuilder query, List<Object> preparedStmtList, Integer limit, Integer offset) {
 
 
         if (!CollectionUtils.isEmpty(hearingSearchCriteria.getHearingIds())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" hb.hearing_booking_id IN ( ").append(queryBuilderHelper.createQuery(hearingSearchCriteria.getHearingIds())).append(" ) ");
             queryBuilderHelper.addToPreparedStatement(preparedStmtList, hearingSearchCriteria.getHearingIds());
+        }
+
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getTenantId())) {
+            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
+            query.append(" hb.tenant_id = ? ");
+            preparedStmtList.add(hearingSearchCriteria.getTenantId());
+
         }
 
         if (!ObjectUtils.isEmpty(hearingSearchCriteria.getJudgeId())) {
@@ -116,16 +121,28 @@ public class HearingQueryBuilder {
 
         }
 
+        if (!ObjectUtils.isEmpty(hearingSearchCriteria.getRescheduleId())) {
+            queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
+            query.append("hb.reschedule_request_id = ? ");
+            preparedStmtList.add(hearingSearchCriteria.getRescheduleId());
+        }
+
         if (!CollectionUtils.isEmpty(hearingSearchCriteria.getStatus())) {
             queryBuilderHelper.addClauseIfRequired(query, preparedStmtList);
             query.append(" ( ");
             for (int i = 0; i < hearingSearchCriteria.getStatus().size() - 1; i++) {
                 query.append(" hb.status = ? ").append(" or ");
-                preparedStmtList.add(hearingSearchCriteria.getStatus().get(i).toString());
+                preparedStmtList.add(hearingSearchCriteria.getStatus().get(i+1).toString());
             }
             query.append("hb.status = ? )");
             preparedStmtList.add(hearingSearchCriteria.getStatus().get(0).toString());
 
+        }
+
+        if (!ObjectUtils.isEmpty(limit) && !ObjectUtils.isEmpty(offset)) {
+            query.append(LIMIT_OFFSET);
+            preparedStmtList.add(limit);
+            preparedStmtList.add(offset);
         }
     }
 
