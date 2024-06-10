@@ -2,6 +2,7 @@ package digit.enrichment;
 
 import digit.config.Configuration;
 import digit.web.models.SummonsDelivery;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.models.AuditDetails;
 import org.egov.common.contract.request.RequestInfo;
@@ -34,5 +35,12 @@ public class SummonsDeliveryEnrichment {
                 .lastModifiedTime(System.currentTimeMillis())
                 .build();
 
+    }
+
+    public void enrichForUpdate(SummonsDelivery summonsDelivery, RequestInfo requestInfo) {
+        Long currentTime = System.currentTimeMillis();
+        summonsDelivery.getAuditDetails().setLastModifiedTime(currentTime);
+        summonsDelivery.getAuditDetails().setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+        summonsDelivery.setRowVersion(summonsDelivery.getRowVersion() + 1);
     }
 }

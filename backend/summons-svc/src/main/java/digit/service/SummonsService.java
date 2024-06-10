@@ -51,7 +51,6 @@ public class SummonsService {
         this.taskSummonsUtil = taskSummonsUtil;
     }
 
-
     public SummonsDocument generateSummonsDocument(GenerateSummonsRequest request) {
         ByteArrayResource byteArrayResource = pdfServiceUtil.generatePdfFromPdfService(request, config.getEgovStateTenantId(),
                 config.getSummonsPdfTemplateKey());
@@ -82,7 +81,6 @@ public class SummonsService {
                 .paymentFees(taskSummon.getDeliveryChannel().getPaymentFees())
                 .paymentStatus(taskSummon.getDeliveryChannel().getPaymentStatus())
                 .channelName(taskSummon.getDeliveryChannel().getChannelName())
-                .channelDetails(taskSummon.getDeliveryChannel().getChannelDetails())
                 .deliveryRequestDate(LocalDate.now())
                 .build();
     }
@@ -96,6 +94,7 @@ public class SummonsService {
             throw new CustomException("SUMMONS_UPDATE_STATUS_ERROR", "Update Summons api was provided with an invalid summons api");
         }
         SummonsDelivery summonsDelivery = optionalSummons.get();
+        summonsDeliveryEnrichment.enrichForUpdate(summonsDelivery, request.getRequestInfo());
         summonsDelivery.setDeliveryStatus(channelMessage.getStatus());
         summonsDelivery.setAdditionalFields(channelMessage.getAdditionalFields());
         SummonsRequest newRequest = SummonsRequest.builder()

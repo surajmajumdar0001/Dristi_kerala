@@ -27,8 +27,8 @@ public class TaskSummonsUtil {
     public void updateSummonsTaskStatus(SummonsTaskUpdateRequest summonsTaskUpdateRequest) {
         try {
             StringBuilder uri = new StringBuilder();
-            uri.append(config.getOrdersServiceHost())
-                    .append(config.getOrdersServiceEndpoint()).append("?tenantId=").append(config.getEgovStateTenantId());
+            uri.append(config.getTaskServiceHost())
+                    .append(config.getTaskServiceUpdateEndpoint()).append("?tenantId=").append(config.getEgovStateTenantId());
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);

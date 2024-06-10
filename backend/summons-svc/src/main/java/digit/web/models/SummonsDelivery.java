@@ -34,9 +34,6 @@ public class SummonsDelivery {
     @JsonProperty("channelName")
     private ChannelName channelName;
 
-    @JsonProperty("deliveryRequestDate")
-    private LocalDate deliveryRequestDate;
-
     @JsonProperty("paymentFees")
     private String paymentFees;
 
@@ -46,20 +43,17 @@ public class SummonsDelivery {
     @JsonProperty("paymentStatus")
     private String paymentStatus;
 
-    @JsonProperty("channelDetails")
-    private Map<String, String> channelDetails;
-
     @JsonProperty("isAcceptedByChannel")
     private Boolean isAcceptedByChannel;
 
     @JsonProperty("channelAcknowledgementId")
     private String channelAcknowledgementId;
 
+    @JsonProperty("deliveryRequestDate")
+    private LocalDate deliveryRequestDate;
+
     @JsonProperty("deliveryStatus")
     private String deliveryStatus;
-
-    @JsonProperty("deliveryStatusChangedDate")
-    private LocalDate deliveryStatusChangedDate;
 
     @JsonProperty("additionalFields")
     private AdditionalFields additionalFields;

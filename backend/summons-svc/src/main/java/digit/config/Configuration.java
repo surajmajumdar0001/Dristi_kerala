@@ -52,7 +52,7 @@ public class Configuration {
     private String pdfServiceEndpoint;
 
     // File Store Service
-    @Value("${summons.file.store.module}")
+    @Value("${egov.file.store.summons.module}")
     private String summonsFileStoreModule;
 
     @Value("${egov.file.store.host}")
@@ -61,13 +61,13 @@ public class Configuration {
     @Value("${egov.file.store.save.endpoint}")
     private String fileStoreEndPoint;
 
-    // orders service
+    // task service
 
-    @Value("${egov.orders.service.host}")
-    private String ordersServiceHost;
+    @Value("${egov.task.service.host}")
+    private String taskServiceHost;
 
-    @Value("${egov.orders.service.create.endpoint}")
-    private String ordersServiceEndpoint;
+    @Value("${egov.task.service.update.endpoint}")
+    private String taskServiceUpdateEndpoint;
 
     // ICops
 
