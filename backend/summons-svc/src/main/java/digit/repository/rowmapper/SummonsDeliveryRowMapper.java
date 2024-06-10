@@ -38,15 +38,6 @@ public class SummonsDeliveryRowMapper implements RowMapper<SummonsDelivery> {
         summonsDelivery.setTenantId(rs.getString("tenant_id"));
         summonsDelivery.setDocType(rs.getString("doc_type"));
         summonsDelivery.setChannelName(ChannelName.valueOf(rs.getString("channel_name")));
-
-        Map<String, String> channelDetails = new HashMap<>();
-        try {
-            channelDetails = objectMapper.readValue(rs.getString("additional_fields"), Map.class);
-        } catch (JsonProcessingException e) {
-            throw new SQLException(e);
-        }
-        summonsDelivery.setChannelDetails(channelDetails);
-
         summonsDelivery.setPaymentFees(rs.getString("payment_fees"));
         summonsDelivery.setPaymentTransactionId(rs.getString("payment_transaction_id"));
         summonsDelivery.setPaymentStatus(rs.getString("payment_status"));
@@ -56,11 +47,7 @@ public class SummonsDeliveryRowMapper implements RowMapper<SummonsDelivery> {
 
         Date requestDate = rs.getDate("delivery_request_date");
         summonsDelivery.setDeliveryRequestDate(requestDate!= null ? requestDate.toLocalDate() : null);
-
-        Date statusChangedDate = rs.getDate("delivery_status_changed_date");
-        summonsDelivery.setDeliveryStatusChangedDate(statusChangedDate!= null ? statusChangedDate.toLocalDate() : null);
-
-        summonsDelivery.setDeliveryStatus(rs.getString("status_of_delivery"));
+        summonsDelivery.setDeliveryStatus(rs.getString("delivery_status"));
 
         AdditionalFields additionalFields = new AdditionalFields();
         try {
