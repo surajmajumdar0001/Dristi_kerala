@@ -26,16 +26,16 @@ public class PostalHubRequest {
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("hubs")
+    @JsonProperty("postalServices")
     @Valid
-    private List<Hub> hubs = null;
+    private List<PostalService> postalServices = null;
 
 
-    public PostalHubRequest addHubsItem(Hub hubsItem) {
-        if (this.hubs == null) {
-            this.hubs = new ArrayList<>();
+    public PostalHubRequest addHubsItem(PostalService hubsItem) {
+        if (this.postalServices == null) {
+            this.postalServices = new ArrayList<>();
         }
-        this.hubs.add(hubsItem);
+        this.postalServices.add(hubsItem);
         return this;
     }
 

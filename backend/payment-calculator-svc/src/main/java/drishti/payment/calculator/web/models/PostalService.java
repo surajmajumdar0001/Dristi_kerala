@@ -1,6 +1,7 @@
 package drishti.payment.calculator.web.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import digit.models.coremodels.AuditDetails;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import java.math.BigDecimal;
 
 /**
- * Hub
+ * PostalService
  */
 @Validated
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-06-10T14:05:42.847785340+05:30[Asia/Kolkata]")
@@ -19,19 +20,29 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Hub {
-    @JsonProperty("hubId")
+public class PostalService {
 
-    private String hubId = null;
+    @JsonProperty("hubId")
+    private String postalServiceId = null;
 
     @JsonProperty("tenantId")
-
     private String tenantId = null;
 
     @JsonProperty("pincode")
-
     @Valid
-    private BigDecimal pincode = null;
+    private Integer pincode = null;
+
+    @JsonProperty("rowVersion")
+    private Integer rowVersion = null;
+
+    @JsonProperty("postalHubId")
+    private String postalHubId;
+
+    @JsonProperty("distanceKM")
+    private Double distanceKM;
+
+    @JsonProperty("auditDetails")
+    private AuditDetails auditDetails;
 
 
 }

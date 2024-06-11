@@ -13,8 +13,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class IPostConfigParams {
 
-    @JsonProperty("weightPerPage")
-    private int weightPerPage;
+    @JsonProperty("pageWeight")
+    private int pageWeight;
+
+    @JsonProperty("weightUnit")
+    private String weightUnit;
 
     @JsonProperty("printingFeePerPage")
     private int printingFeePerPage;
@@ -22,9 +25,18 @@ public class IPostConfigParams {
     @JsonProperty("businessFee")
     private int businessFee;
 
-    @JsonProperty("envelopeFee")
-    private int envelopeFee;
+    @JsonProperty("envelopeChargeIncludingGST")
+    private int envelopeChargeIncludingGst;
 
-    @JsonProperty("gst")
-    private double gst;
+    @JsonProperty("GSTPercentage")
+    private int gstPercentage;
+
+    @JsonProperty("courtFee")
+    private int courtFee;
+
+    @JsonProperty("applicationFee")
+    private int applicationFee;
+
+    @JsonProperty("speedPost")
+    private SpeedPost speedPost;
 }

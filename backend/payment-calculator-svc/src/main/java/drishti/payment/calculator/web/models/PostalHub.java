@@ -2,6 +2,7 @@ package drishti.payment.calculator.web.models;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import digit.models.coremodels.AuditDetails;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +30,9 @@ public class PostalHub {
     @JsonProperty("rowVersion")
     private Integer rowVersion = null;
 
-
     @JsonProperty("address")
     private Address address;
+
+    @JsonProperty("auditDetails")
+    private AuditDetails auditDetails;
 }

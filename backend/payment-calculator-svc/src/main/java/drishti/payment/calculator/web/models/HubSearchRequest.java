@@ -20,17 +20,15 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @Builder
 public class HubSearchRequest {
-    @JsonProperty("RequestInfo")
 
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 
     @JsonProperty("tenantId")
-
     private String tenantId = null;
 
     @JsonProperty("criteria")
-
     @Valid
     private HubSearchCriteria criteria = null;
 

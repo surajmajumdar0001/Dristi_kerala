@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(HubApiController.class)
 @Import(TestConfiguration.class)
-public class HubApiControllerTest {
+public class PostalServiceApiControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
