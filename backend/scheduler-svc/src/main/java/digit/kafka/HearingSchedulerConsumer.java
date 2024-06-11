@@ -1,7 +1,8 @@
 package digit.kafka;
 
 
-import digit.service.HearingScheduler;
+import digit.service.OptOutConsumerService;
+import digit.service.ScheduleHearingConsumerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,20 +16,25 @@ import java.util.HashMap;
 @Slf4j
 public class HearingSchedulerConsumer {
 
+
+    private final ScheduleHearingConsumerService hearingConsumerService;
+
+    private final OptOutConsumerService optOutConsumerService;
+
     @Autowired
-    private HearingScheduler hearingScheduler;
+    public HearingSchedulerConsumer(ScheduleHearingConsumerService hearingConsumerService, OptOutConsumerService optOutConsumerService) {
+        this.hearingConsumerService = hearingConsumerService;
+        this.optOutConsumerService = optOutConsumerService;
+    }
 
 
     @KafkaListener(topics = {"schedule-hearing-to-block-calendar"})
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
         try {
-            hearingScheduler.updateRequestForBlockCalendar(record);
-
+            hearingConsumerService.updateRequestForBlockCalendar(record);
         } catch (Exception e) {
-
             log.error("error occurred while serializing", e);
-
         }
 
     }
@@ -38,12 +44,9 @@ public class HearingSchedulerConsumer {
     public void listenOptOut(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
 
         try {
-            hearingScheduler.checkAndScheduleHearingForOptOut(record);
-
+            optOutConsumerService.checkAndScheduleHearingForOptOut(record);
         } catch (Exception e) {
-
             log.error("error occurred while serializing", e);
-
         }
 
     }
