@@ -88,14 +88,14 @@ public class Configuration {
 
 
     // id format
-    @Value("${egov.idgen.idformat}")
+    @Value("${drishti.idgen.hearing.id.format}")
     private String hearingIdFormat;
 
-    @Value("${egov.idgen.reschedule}")
+    @Value("${drishti.idgen.reschedule.id.format}")
     private String rescheduleHearingIdFormat;
 
     // id format
-    @Value("${idgen.async.submission.format}")
+    @Value("${drishti.idgen.async.submission.id.format}")
     private String asyncSubmissionIdFormat;
 
     //Workflow Config
@@ -125,8 +125,12 @@ public class Configuration {
 
 
     //Due date of hearing
-    @Value("${opt-out-due-date}")
+    @Value("${drishti.opt-out.due.days}")
     private Long optOutDueDate;
+
+    //date before reschedule request can be raised
+    @Value("${drishti.reschedule.before.date}")
+    private Long rescheduleRequestDueDate;
 
     //Pdf Services
     @Value("${egov.pdf.service.host}")
@@ -136,9 +140,13 @@ public class Configuration {
     private String pdfServiceEndpoint;
 
     //CaseCriteria
-    @Value("${config.case.url}")
+    @Value("${drishti.case.host}")
     private String caseUrl;
 
-    @Value("${config.case.url.endpoint}")
+    @Value("${drishti.case.endpoint}")
     private String caseEndpoint;
+
+
+    @Value("${drishti.opt-out.selection.limit}")
+    private Long optOutLimit;
 }

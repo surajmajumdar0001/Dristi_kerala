@@ -83,8 +83,8 @@ public class OptOutConsumerService {
 
 
                 //TODO: get list of litigants
-                SearchCaseRequest searchCaseRequest = SearchCaseRequest.builder().RequestInfo(requestInfo).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(optOut.getCaseId()).build())).build();
-                JsonNode representatives = caseUtil.getRepresentatives(searchCaseRequest);
+//                SearchCaseRequest searchCaseRequest = SearchCaseRequest.builder().RequestInfo(requestInfo).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(optOut.getCaseId()).build())).build();
+//                JsonNode representatives = caseUtil.getRepresentatives(searchCaseRequest);
 
 
                 //TODO: get opt out of litigants
@@ -111,7 +111,7 @@ public class OptOutConsumerService {
 
                 reScheduleRequest.get(0).setAvailableDates(new ArrayList<>(suggestedDatesSet));
                 //if this is last one then update the status to review
-                if (representatives.size() - existingOptOut.size() == 1)
+//                if (representatives.size() - existingOptOut.size() == 1)
                     reScheduleRequest.get(0).setStatus(Status.REVIEW);
 
 
