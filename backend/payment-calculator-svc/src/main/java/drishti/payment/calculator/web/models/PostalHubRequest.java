@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.egov.common.contract.request.RequestInfo;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
@@ -28,10 +29,10 @@ public class PostalHubRequest {
 
     @JsonProperty("postalServices")
     @Valid
-    private List<PostalService> postalServices = null;
+    private List<PostalHub> postalServices = null;
 
 
-    public PostalHubRequest addHubsItem(PostalService hubsItem) {
+    public PostalHubRequest addHubsItem(PostalHub hubsItem) {
         if (this.postalServices == null) {
             this.postalServices = new ArrayList<>();
         }

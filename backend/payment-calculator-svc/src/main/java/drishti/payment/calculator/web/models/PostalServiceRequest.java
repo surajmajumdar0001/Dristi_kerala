@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CalculationReq
+ * PostalServiceRequest
  */
 @Validated
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-06-10T14:05:42.847785340+05:30[Asia/Kolkata]")
@@ -21,23 +21,24 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SummonCalculationReq {
+public class PostalServiceRequest {
+
 
     @JsonProperty("RequestInfo")
+
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("SummonCalculationCriteria")
+    @JsonProperty("postalServices")
     @Valid
-    private List<SummonCalculationCriteria> calculationCriteria = null;
+    private List<PostalService> postalServices = null;
 
 
-    public SummonCalculationReq addCalculationCriteriaItem(SummonCalculationCriteria calculationCriteriaItem) {
-        if (this.calculationCriteria == null) {
-            this.calculationCriteria = new ArrayList<>();
+    public PostalServiceRequest addHubsItem(PostalService hubsItem) {
+        if (this.postalServices == null) {
+            this.postalServices = new ArrayList<>();
         }
-        this.calculationCriteria.add(calculationCriteriaItem);
+        this.postalServices.add(hubsItem);
         return this;
     }
-
 }

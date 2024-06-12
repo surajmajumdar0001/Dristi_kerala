@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @Ignore
 @RunWith(SpringRunner.class)
-@WebMvcTest(V1ApiController.class)
+@WebMvcTest(PaymentApiController.class)
 @Import(TestConfiguration.class)
 public class V1ApiControllerTest {
 

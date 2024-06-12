@@ -1,10 +1,7 @@
 package drishti.payment.calculator.service;
 
 import drishti.payment.calculator.util.IPostUtil;
-import drishti.payment.calculator.web.models.DistanceRange;
-import drishti.payment.calculator.web.models.IPostConfigParams;
-import drishti.payment.calculator.web.models.SpeedPost;
-import drishti.payment.calculator.web.models.WeightRange;
+import drishti.payment.calculator.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +9,18 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class IPostFeesCalculation {
+public class IPostFeesCalculation implements SummonPayment {
     private final IPostUtil iPostUtil;
 
 
     @Autowired
     public IPostFeesCalculation(IPostUtil iPostUtil) {
         this.iPostUtil = iPostUtil;
+
+    }
+
+    @Override
+    public void calculatePayment(SummonCalculationReq request) {
 
     }
 

@@ -82,4 +82,12 @@ public class Configuration {
     //SMSNotification
     @Value("${egov.sms.notification.topic}")
     private String smsNotificationTopic;
+
+
+    //PostalService
+    @Value("${drishti.postal.create.topic}")
+    private String postalServiceCreateTopic;
+
+    @Value("${drishti.postal.update.topic}")
+    private String postalServiceUpdateTopic;
 }

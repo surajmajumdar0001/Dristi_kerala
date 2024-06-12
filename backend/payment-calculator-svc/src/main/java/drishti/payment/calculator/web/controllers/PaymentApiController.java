@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-06-10T14:05:42.847785340+05:30[Asia/Kolkata]")
 @Controller
 @RequestMapping("")
-public class V1ApiController {
+public class PaymentApiController {
 
     private final CaseFeesCalculationService caseFeesService;
     private final SummonCalculationService summonCalculationService;
 
     @Autowired
-    public V1ApiController(CaseFeesCalculationService caseFeesService, SummonCalculationService summonCalculationService) {
+    public PaymentApiController(CaseFeesCalculationService caseFeesService, SummonCalculationService summonCalculationService) {
         this.caseFeesService = caseFeesService;
         this.summonCalculationService = summonCalculationService;
 
