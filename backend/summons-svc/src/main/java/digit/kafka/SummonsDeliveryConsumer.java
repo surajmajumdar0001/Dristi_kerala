@@ -25,7 +25,7 @@ public class SummonsDeliveryConsumer {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @KafkaListener(topics = "update-summons-topic")
+    @KafkaListener(topics = "update-summons")
     @Async
     public void listen(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         try {
