@@ -19,10 +19,6 @@ public class Configuration {
     @Value("${egov-state-level-tenant-id}")
     private String egovStateTenantId;
 
-    // id format
-    @Value("${idgen.summons.format}")
-    private String summonsIdFormat;
-
     //Idgen Config
     @Value("${egov.idgen.host}")
     private String idGenHost;

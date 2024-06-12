@@ -18,11 +18,11 @@ import java.util.List;
 @Builder
 public class SendSummonsRequest {
 
-    @JsonProperty("requestInfo")
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("taskSummon")
+    @JsonProperty("TaskSummon")
     @Valid
     private TaskSummon taskSummon;
 }

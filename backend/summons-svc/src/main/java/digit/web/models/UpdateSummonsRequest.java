@@ -20,11 +20,11 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class UpdateSummonsRequest {
 
-    @JsonProperty("requestInfo")
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("channelMessage")
+    @JsonProperty("ChannelMessage")
     private ChannelMessage channelMessage = null;
 
 

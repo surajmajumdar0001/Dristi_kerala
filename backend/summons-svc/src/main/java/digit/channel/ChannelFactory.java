@@ -3,6 +3,7 @@ package digit.channel;
 import digit.web.models.ChannelName;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.tracer.model.CustomException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +14,7 @@ public class ChannelFactory {
 
     private final ESummonsChannel eSummonsChannel;
 
+    @Autowired
     public ChannelFactory(ICopsChannel iCopsChannel, ESummonsChannel eSummonsChannel) {
         this.iCopsChannel = iCopsChannel;
         this.eSummonsChannel = eSummonsChannel;

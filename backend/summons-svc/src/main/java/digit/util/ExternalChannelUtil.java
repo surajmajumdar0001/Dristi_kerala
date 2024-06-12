@@ -4,6 +4,7 @@ import digit.channel.ChannelFactory;
 import digit.channel.ExternalChannel;
 import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,6 +13,7 @@ public class ExternalChannelUtil {
 
     private final ChannelFactory channelFactory;
 
+    @Autowired
     public ExternalChannelUtil(ChannelFactory channelFactory) {
         this.channelFactory = channelFactory;
     }

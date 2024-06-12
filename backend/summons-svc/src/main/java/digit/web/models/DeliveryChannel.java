@@ -30,10 +30,4 @@ public class DeliveryChannel {
 
     @JsonProperty("deliveryStatus")
     private String deliveryStatus;
-
-    @JsonProperty("deliveryStatusChangedDate")
-    private String deliveryStatusChangedDate;
-
-    @JsonProperty("channelDetails")
-    private Map<String, String> channelDetails;
 }

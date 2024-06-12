@@ -20,7 +20,7 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class GenerateSummonResponse {
 
-    @JsonProperty("responseInfo")
+    @JsonProperty("ResponseInfo")
     @Valid
     private ResponseInfo responseInfo = null;
 
