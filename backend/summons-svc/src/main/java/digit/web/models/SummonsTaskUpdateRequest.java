@@ -17,11 +17,11 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class SummonsTaskUpdateRequest {
 
-    @JsonProperty("requestInfo")
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("summonsTaskStatus")
+    @JsonProperty("SummonsTaskStatus")
     @Valid
     private SummonsTaskStatus summonsTaskStatus = null;
 

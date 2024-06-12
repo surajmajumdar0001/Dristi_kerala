@@ -17,11 +17,11 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class SummonsRequest {
 
-    @JsonProperty("requestInfo")
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("summonsDelivery")
+    @JsonProperty("SummonsDelivery")
     @Valid
     private SummonsDelivery summonsDelivery = null;
 }

@@ -51,7 +51,7 @@ public class FileStorageUtil {
                 && rootNode.get("files").get(0).isObject()) {
             return rootNode.get("files").get(0).get("fileStoreId").asText();
         } else {
-            throw new CustomException("SU_FILE_STORE_ERROR", "Failed to get valid file store id from file store service");
+            throw new CustomException("SUMMONS_FILE_STORE_ERROR", "Failed to get valid file store id from file store service");
         }
     }
 }

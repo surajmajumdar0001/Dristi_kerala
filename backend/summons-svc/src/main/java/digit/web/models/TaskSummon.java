@@ -26,5 +26,5 @@ public class TaskSummon {
     private DeliveryChannel deliveryChannel = null;
 
     @JsonProperty("summonsDocument")
-    private SummonsDocument summonsDocument;
+    private SummonsDocument summonsDocument = null;
 }

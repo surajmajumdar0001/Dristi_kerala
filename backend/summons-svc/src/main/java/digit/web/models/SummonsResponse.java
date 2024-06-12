@@ -22,10 +22,10 @@ import java.util.List;
 @Builder
 public class SummonsResponse {
 
-    @JsonProperty("responseInfo")
+    @JsonProperty("ResponseInfo")
     @Valid
     private ResponseInfo responseInfo = null;
 
-    @JsonProperty("summonsDelivery")
+    @JsonProperty("SummonsDelivery")
     private SummonsDelivery summonsDelivery = null;
 }
