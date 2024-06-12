@@ -9,7 +9,6 @@ import org.egov.common.contract.models.AuditDetails;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 @Validated
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-05-29T13:38:04.562296+05:30[Asia/Calcutta]")
@@ -19,8 +18,8 @@ import java.util.Map;
 @Builder
 public class SummonsDelivery {
 
-    @JsonProperty("summonsId")
-    private String summonsId;
+    @JsonProperty("summonId")
+    private String summonId;
 
     @JsonProperty("caseId")
     private String caseId;

@@ -60,7 +60,6 @@ public class SummonsService {
     }
 
     public SummonsDelivery sendSummonsViaChannels(SendSummonsRequest request) {
-        TaskSummon summonsTask = request.getTaskSummon();
         SummonsDelivery summonsDelivery = generateSummonsDelivery(request.getTaskSummon());
         summonsDeliveryEnrichment.enrichSummonsDelivery(summonsDelivery, request.getRequestInfo());
         ChannelMessage channelMessage = externalChannelUtil.sendSummonsByDeliveryChannel(request, summonsDelivery);
@@ -75,7 +74,7 @@ public class SummonsService {
 
     private SummonsDelivery generateSummonsDelivery(TaskSummon taskSummon) {
         return SummonsDelivery.builder()
-                .summonsId(taskSummon.getSummonDetails().getSummonId())
+                .summonId(taskSummon.getSummonDetails().getSummonId())
                 .caseId(taskSummon.getCaseDetails().getCaseId())
                 .docType(taskSummon.getCaseDetails().getDocType())
                 .paymentFees(taskSummon.getDeliveryChannel().getPaymentFees())
@@ -106,7 +105,7 @@ public class SummonsService {
     public void processStatusAndUpdateSummonsTask(SummonsRequest request) {
         SummonsDelivery summonsDelivery = request.getSummonsDelivery();
         SummonsTaskStatus taskStatus = SummonsTaskStatus.builder()
-                .summonsId(summonsDelivery.getSummonsId())
+                .summonsId(summonsDelivery.getSummonId())
                 .statusTobeUpdated(summonsDelivery.getDeliveryStatus())
                 .build();
         SummonsTaskUpdateRequest updateRequest = SummonsTaskUpdateRequest.builder()

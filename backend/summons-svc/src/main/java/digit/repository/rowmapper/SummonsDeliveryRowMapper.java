@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @Slf4j
@@ -33,7 +31,7 @@ public class SummonsDeliveryRowMapper implements RowMapper<SummonsDelivery> {
     public SummonsDelivery mapRow(ResultSet rs, int rowNum) throws SQLException {
         SummonsDelivery summonsDelivery = new SummonsDelivery();
 
-        summonsDelivery.setSummonsId(rs.getString("summons_id"));
+        summonsDelivery.setSummonId(rs.getString("summons_id"));
         summonsDelivery.setCaseId(rs.getString("case_id"));
         summonsDelivery.setTenantId(rs.getString("tenant_id"));
         summonsDelivery.setDocType(rs.getString("doc_type"));
