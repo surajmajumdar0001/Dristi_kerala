@@ -68,7 +68,7 @@ public class SummonsService {
         summonsDelivery.setChannelAcknowledgementId(channelMessage.getChannelAcknowledgementId());
         SummonsRequest summonsRequest = SummonsRequest.builder()
                 .summonsDelivery(summonsDelivery).requestInfo(request.getRequestInfo()).build();
-        producer.push("insert-summons-delivery", summonsRequest);
+        producer.push("insert-summons", summonsRequest);
         return summonsDelivery;
     }
 
@@ -98,7 +98,7 @@ public class SummonsService {
         summonsDelivery.setAdditionalFields(channelMessage.getAdditionalFields());
         SummonsRequest newRequest = SummonsRequest.builder()
                 .requestInfo(request.getRequestInfo()).summonsDelivery(summonsDelivery).build();
-        producer.push("update-summons-delivery", newRequest);
+        producer.push("update-summons", newRequest);
         return summonsDelivery;
     }
 
