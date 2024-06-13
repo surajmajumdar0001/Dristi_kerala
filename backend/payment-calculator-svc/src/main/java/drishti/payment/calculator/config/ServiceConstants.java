@@ -20,4 +20,9 @@ public class ServiceConstants {
     public static final String SUMMON_MODULE = "summons";
     public static final String I_POST_MASTER = "e-post";
 
+    public static final String CASE_MODULE = "case";
+    public static final String E_FILLING_MASTER = "e-filling";
+
+
+
 }

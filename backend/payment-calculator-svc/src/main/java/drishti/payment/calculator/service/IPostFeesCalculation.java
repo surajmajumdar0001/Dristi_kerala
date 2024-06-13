@@ -2,9 +2,12 @@ package drishti.payment.calculator.service;
 
 import drishti.payment.calculator.util.IPostUtil;
 import drishti.payment.calculator.web.models.*;
+import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.DoubleBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,61 +23,78 @@ public class IPostFeesCalculation implements SummonPayment {
     }
 
     @Override
-    public void calculatePayment(SummonCalculationReq request) {
+    public Calculation calculatePayment(RequestInfo requestInfo, SummonCalculationCriteria criteria) {
 
+
+        IPostConfigParams iPostFeesDefaultData = iPostUtil.getIPostFeesDefaultData(requestInfo, criteria.getTenantId());
+
+
+        Double iPostFeeWithoutGST = calculateTotalIPostFee(2, 10.0, iPostFeesDefaultData);
+
+        Double courtFees = calculateCourtFees(iPostFeesDefaultData);
+
+        Double envelopeFee = iPostFeesDefaultData.getEnvelopeChargeIncludingGst();
+        Double gstPercentage = iPostFeesDefaultData.getGstPercentage();
+
+        Double gstFee = iPostFeeWithoutGST * gstPercentage;
+
+        List<BreakDown> breakDowns = new ArrayList<>();
+
+        BreakDown courtFee = BreakDown.builder()
+                .type("COURT_FEES")
+                .amount(courtFees).build();
+        breakDowns.add(courtFee);
+        BreakDown gst = BreakDown.builder()
+                .type("GST")
+                .amount(gstFee).build();
+        breakDowns.add(gst);
+
+        BreakDown ipost = BreakDown.builder()
+                .type("I_POST")
+                .amount(iPostFeeWithoutGST + envelopeFee).build();
+        breakDowns.add(ipost);
+
+        double totalAmount=iPostFeeWithoutGST + gstPercentage * iPostFeeWithoutGST + courtFees + envelopeFee;
+        Calculation result = Calculation.builder()
+                .applicationId(criteria.getSummonId())
+                .totalAmount(Math.round(totalAmount*100.0)/100.0)
+                .tenantId(criteria.getTenantId())
+                .breakDown(breakDowns)
+                .build();
+        return result;
+    }
+
+    private Double calculateCourtFees(IPostConfigParams iPostFeesDefaultData) {
+        return iPostFeesDefaultData.getCourtFee() + iPostFeesDefaultData.getCourtFee();
     }
 
 
-    public void calculateFees() {
-
-        IPostConfigParams iPostFeesDefaultData = iPostUtil.getIPostFeesDefaultData();
-        int numberOfPages = 2;
-
-        //todo: distance calculation
-        int distance = 10;
-
-        calculateTotalIPostFee(2, 10, iPostFeesDefaultData);
-
-        calculateCourtFees(iPostFeesDefaultData);
-
-
-    }
-
-    private void calculateCourtFees(IPostConfigParams iPostFeesDefaultData) {
-    }
-
-
-    public double calculateTotalIPostFee(int numberOfPages, int distance, IPostConfigParams configParams) {
-        int weightPerPage = configParams.getPageWeight();
-        int printingFeePerPage = configParams.getPrintingFeePerPage();
-        int businessFee = configParams.getBusinessFee();
-        int envelopeFee = configParams.getEnvelopeChargeIncludingGst();
+    private Double calculateTotalIPostFee(Integer numberOfPages, Double distance, IPostConfigParams configParams) {
+        Double weightPerPage = configParams.getPageWeight();
+        Double printingFeePerPage = configParams.getPrintingFeePerPage();
+        Double businessFee = configParams.getBusinessFee();
 
         SpeedPost speedPost = configParams.getSpeedPost();
-        double gst = configParams.getGstPercentage();
 
         // Total Weight in grams
-        int totalWeight = numberOfPages * weightPerPage;
+        Double totalWeight = numberOfPages * weightPerPage;
 
         // Total Printing Fee
-        int totalPrintingFee = numberOfPages * printingFeePerPage;
+        Double totalPrintingFee = numberOfPages * printingFeePerPage;
 
         // Speed Post Fee
-        int speedPostFee = getSpeedPostFee(totalWeight, distance, speedPost);
+        Double speedPostFee = getSpeedPostFee(totalWeight, distance, speedPost);
 
         // Total Fee before GST
-        double totalFeeBeforeGST = totalWeight + totalPrintingFee + speedPostFee + businessFee;
+        Double totalFeeBeforeGST = totalWeight + totalPrintingFee + speedPostFee + businessFee;
 
-        // GST Fee
-        double gstFee = gst * totalFeeBeforeGST;
-
-        // Total Fee
-        return totalFeeBeforeGST + gstFee + envelopeFee;
+        // Total Fee without GST
+        return totalFeeBeforeGST;
     }
 
 
     // Method to get speed post fee
-    public int getSpeedPostFee(int weight, int distance, SpeedPost speedPost) {
+    public Double getSpeedPostFee(Double weight, Double distance, SpeedPost speedPost) {
         WeightRange weightRange = getWeightRange(weight, speedPost.getWeightRanges());
 
         assert weightRange != null;
@@ -85,7 +105,7 @@ public class IPostFeesCalculation implements SummonPayment {
     }
 
     // Method to calculate weight range based on weight
-    private WeightRange getWeightRange(int weight, List<WeightRange> weightRanges) {
+    private WeightRange getWeightRange(Double weight, List<WeightRange> weightRanges) {
         for (WeightRange range : weightRanges) {
             int lowerBound = range.getMinWeight();
             int upperBound = range.getMaxWeight();
@@ -97,12 +117,11 @@ public class IPostFeesCalculation implements SummonPayment {
     }
 
     // Method to calculate distance range based on distance
-    private DistanceRange calculateDistanceRange(int distance, WeightRange weightRange) {
+    private DistanceRange calculateDistanceRange(Double distance, WeightRange weightRange) {
         Map<String, DistanceRange> distanceMap = weightRange.getDistanceRanges();
         for (DistanceRange range : distanceMap.values()) {
-//                String[] bounds = range.split("-");
-            int lowerBound = range.getMinDistance();
-            int upperBound = range.getMaxDistance();
+            Double lowerBound = range.getMinDistance();
+            Double upperBound = range.getMaxDistance();
             if (distance >= lowerBound && distance <= upperBound) {
                 return range;
             }

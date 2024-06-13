@@ -1,9 +1,11 @@
 package drishti.payment.calculator.web.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -16,5 +18,7 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @Builder
 public class PostalHubResponse {
+    @JsonProperty("ResponseInfo")
+    private ResponseInfo responseInfo;
 
 }

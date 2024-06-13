@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DistanceRange {
 
-    private int minDistance;
-    private int maxDistance;
+    private Double minDistance;
+    private Double maxDistance;
     private String distanceUnit;
-    private int fee;
+    private Double fee;
 }

@@ -2,16 +2,26 @@ package drishti.payment.calculator.web.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.egov.common.contract.request.RequestInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class EFillingCalculationReq {
 
 
     @JsonProperty("RequestInfo")
     @Valid
-    private final RequestInfo requestInfo = null;
+    private  RequestInfo requestInfo = null;
 
     @JsonProperty("EFillingCalculationCriteria")
     @Valid

@@ -7,37 +7,26 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.egov.common.contract.response.ResponseInfo;
-import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
 import java.util.List;
 
-/**
- * CalculationRes
- */
-@Validated
-@jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-06-10T14:05:42.847785340+05:30[Asia/Kolkata]")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CalculationRes {
+public class EFillingCalculationResponse {
+
     @JsonProperty("ResponseInfo")
 
     @Valid
     private ResponseInfo responseInfo = null;
+
+    private String caseId;
 
     @JsonProperty("Calculation")
     @Valid
     private List<Calculation> calculation = null;
 
 
-    public CalculationRes addCalculationItem(Calculation calculationItem) {
-        if (this.calculation == null) {
-            this.calculation = new ArrayList<>();
-        }
-        this.calculation.add(calculationItem);
-        return this;
-    }
-
+    private List<BreakDown> breakDowns;
 }

@@ -1,7 +1,6 @@
 package drishti.payment.calculator.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import drishti.payment.calculator.config.ServiceConstants;
 import drishti.payment.calculator.web.models.IPostConfigParams;
 import net.minidev.json.JSONArray;
 import org.egov.common.contract.request.RequestInfo;
@@ -10,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Map;
+
+import static drishti.payment.calculator.config.ServiceConstants.I_POST_MASTER;
+import static drishti.payment.calculator.config.ServiceConstants.SUMMON_MODULE;
 
 @Component
 public class IPostUtil {
@@ -23,16 +25,16 @@ public class IPostUtil {
         this.objectMapper = objectMapper;
     }
 
-    public IPostConfigParams getIPostFeesDefaultData() {
+    public IPostConfigParams getIPostFeesDefaultData(RequestInfo requestInfo, String tenantId) {
 
-        RequestInfo requestInfo = RequestInfo.builder().build(); //todo: change it with user request
-        String tenantId = "kl";// todo: change with request tenant
-        String module = ServiceConstants.SUMMON_MODULE;
-        String master = ServiceConstants.I_POST_MASTER;
-        Map<String, Map<String, JSONArray>> response = mdmsUtil.fetchMdmsData(requestInfo, tenantId, module, Collections.singletonList(master));
 
+        Map<String, Map<String, JSONArray>> response = mdmsUtil.fetchMdmsData(requestInfo, tenantId, SUMMON_MODULE, Collections.singletonList(I_POST_MASTER));
+        JSONArray array = response.get(SUMMON_MODULE).get(I_POST_MASTER);
+        Object object = array.get(0);
+
+        IPostConfigParams iPostConfigParams = objectMapper.convertValue(object, IPostConfigParams.class);
         //todo :add other methods
-        return new IPostConfigParams();
+        return iPostConfigParams;
 
     }
 }
