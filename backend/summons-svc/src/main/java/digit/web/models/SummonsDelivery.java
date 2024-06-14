@@ -30,6 +30,12 @@ public class SummonsDelivery {
     @JsonProperty("docType")
     private String docType;
 
+    @JsonProperty("docSubType")
+    private String docSubType;
+
+    @JsonProperty("partyType")
+    private String partyType;
+
     @JsonProperty("channelName")
     private ChannelName channelName;
 

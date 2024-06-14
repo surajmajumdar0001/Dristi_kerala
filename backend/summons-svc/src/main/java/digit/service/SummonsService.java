@@ -52,11 +52,20 @@ public class SummonsService {
     }
 
     public SummonsDocument generateSummonsDocument(GenerateSummonsRequest request) {
+        String issueType = request.getTaskSummon().getSummonDetails().getIssueType();
+        String pdfTemplateKey;
+        if (issueType.equalsIgnoreCase("summons")) {
+            pdfTemplateKey = config.getSummonsPdfTemplateKey();
+        } else if (issueType.equalsIgnoreCase("warrants")) {
+            pdfTemplateKey = config.getWarrantPdfTemplateKey();
+        } else {
+            throw new CustomException("INVALID_ISSUE_TYPE", "Issued Summons Type must be Valid");
+        }
         ByteArrayResource byteArrayResource = pdfServiceUtil.generatePdfFromPdfService(request, config.getEgovStateTenantId(),
-                config.getSummonsPdfTemplateKey());
+                pdfTemplateKey);
         String fileStoreId = fileStorageUtil.saveDocumentToFileStore(byteArrayResource);
         return SummonsDocument
-                .builder().fileStoreId(fileStoreId).docType("pdf").docName("summons").build();
+                .builder().fileStoreId(fileStoreId).docType("pdf").docName(issueType).build();
     }
 
     public SummonsDelivery sendSummonsViaChannels(SendSummonsRequest request) {
@@ -76,7 +85,9 @@ public class SummonsService {
         return SummonsDelivery.builder()
                 .summonId(taskSummon.getSummonDetails().getSummonId())
                 .caseId(taskSummon.getCaseDetails().getCaseId())
-                .docType(taskSummon.getCaseDetails().getDocType())
+                .docType(taskSummon.getSummonDetails().getDocType())
+                .docSubType(taskSummon.getSummonDetails().getDocSubType())
+                .partyType(taskSummon.getSummonDetails().getPartyType())
                 .paymentFees(taskSummon.getDeliveryChannel().getPaymentFees())
                 .paymentStatus(taskSummon.getDeliveryChannel().getPaymentStatus())
                 .channelName(taskSummon.getDeliveryChannel().getChannelName())

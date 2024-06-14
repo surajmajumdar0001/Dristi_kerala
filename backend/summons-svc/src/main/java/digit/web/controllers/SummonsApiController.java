@@ -21,7 +21,7 @@ import java.util.Collections;
 
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-05-29T13:38:04.562296+05:30[Asia/Calcutta]")
 @Controller
-@RequestMapping("/api")
+@RequestMapping
 public class SummonsApiController {
 
     private final SummonsService summonsService;

@@ -3,6 +3,8 @@ CREATE TABLE summons_delivery (
     case_id VARCHAR(255) NOT NULL,
     tenant_id VARCHAR(255) NOT NULL,
     doc_type VARCHAR(50) NOT NULL,
+    doc_sub_type VARCHAR(50) NOT NULL,
+    party_type VARCHAR(50) NOT NULL,
     channel_name VARCHAR(255) NOT NULL,
     payment_fees VARCHAR(255) NULL,
     payment_transaction_id VARCHAR(255) NULL,
