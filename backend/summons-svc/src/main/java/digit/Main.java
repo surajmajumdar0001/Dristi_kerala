@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 
 @Import({ TracerConfiguration.class })
 @SpringBootApplication
-@ComponentScan(basePackages = { "digit", "digit.web.controllers" , "digit.config"})
+@ComponentScan(basePackages = { "digit", "digit.web.controllers" , "digit.config", "digit.channel"})
 public class Main {
 
 

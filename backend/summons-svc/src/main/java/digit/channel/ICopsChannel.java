@@ -18,11 +18,15 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class ICopsChannel implements ExternalChannel {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    private final Configuration config;
 
     @Autowired
-    private Configuration config;
+    public ICopsChannel(RestTemplate restTemplate, Configuration config) {
+        this.restTemplate = restTemplate;
+        this.config = config;
+    }
 
     @Override
     public ChannelMessage sendSummons(SendSummonsRequest request) {

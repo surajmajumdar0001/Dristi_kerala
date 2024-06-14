@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 @Component
-@Data
 @Import({TracerConfiguration.class})
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,6 +28,9 @@ public class Configuration {
     //Pdf Service Config
     @Value("${summons.pdf.template.key}")
     private String summonsPdfTemplateKey;
+
+    @Value("${warrant.pdf.template.key}")
+    private String warrantPdfTemplateKey;
 
     //MDMS
     @Value("${egov.mdms.host}")

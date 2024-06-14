@@ -31,8 +31,8 @@ public class FileStorageUtil {
 
     public String saveDocumentToFileStore(ByteArrayResource byteArrayResource) {
         StringBuilder uri = new StringBuilder();
-        uri.append(config.getPdfServiceHost())
-                .append(config.getPdfServiceEndpoint())
+        uri.append(config.getFileStoreHost())
+                .append(config.getFileStoreEndPoint())
                 .append("?tenantId=").append(config.getEgovStateTenantId()).append("&module=").append(config.getSummonsFileStoreModule());
 
         HttpHeaders headers = new HttpHeaders();
