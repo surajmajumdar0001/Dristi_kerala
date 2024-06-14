@@ -10,12 +10,12 @@ export const newconfigAdvocate = {
         processSearchCriteria: {
           businessService: ["advocate"],
           moduleName: "Advocate services",
-          tenantId: "pg",
+          tenantId: "kl",
         },
         moduleSearchCriteria: {
-          tenantId: "pg",
+          tenantId: "kl",
         },
-        tenantId: "pg",
+        tenantId: "kl",
         limit: 10,
         offset: 0,
       },
@@ -37,7 +37,7 @@ export const newconfigAdvocate = {
         defaultValues: {
           applicationNumber: "",
           isActive: false,
-          tenantId: "pg",
+          tenantId: "kl",
         },
         fields: [
           {
@@ -115,12 +115,12 @@ export const newconfigClerk = {
         processSearchCriteria: {
           businessService: ["advocateclerk"],
           moduleName: "Advocate Clerk Service",
-          tenantId: "pg",
+          tenantId: "kl",
         },
         moduleSearchCriteria: {
-          tenantId: "pg",
+          tenantId: "kl",
         },
-        tenantId: "pg",
+        tenantId: "kl",
         limit: 10,
         offset: 0,
       },
@@ -142,7 +142,7 @@ export const newconfigClerk = {
         defaultValues: {
           applicationNumber: "",
           isActive: false,
-          tenantId: "pg",
+          tenantId: "kl",
         },
         fields: [
           {
@@ -216,7 +216,7 @@ export const newconfigClerk = {
 //     requestParam: {},
 //     requestBody: {
 //       applicationNumber: "",
-//       tenantId: "pg",
+//       tenantId: "kl",
 //       status: ["INWORKFLOW"],
 //     },
 //     minParametersForSearchForm: 1,
@@ -307,7 +307,7 @@ export const newconfigClerk = {
 //     requestParam: {},
 //     requestBody: {
 //       applicationNumber: "",
-//       tenantId: "pg",
+//       tenantId: "kl",
 //       status: ["INWORKFLOW"],
 //     },
 //     minParametersForSearchForm: 1,
