@@ -118,19 +118,18 @@ public class ReScheduleRequestValidator {
         });
 
 
-//        // validation through case service
-//        rescheduleRequests.forEach((element) -> {
-//
-//            //Case Integration
-//            SearchCaseRequest searchCaseRequest = SearchCaseRequest.builder().RequestInfo(requestInfo).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(element.getCaseId()).build())).build();
-//
-//            JsonNode representatives = caseUtil.getRepresentatives(searchCaseRequest);
-//            Set<String> representativeIds = caseUtil.getIdsFromJsonNodeArray(representatives);
-//            if (!representativeIds.contains(element.getRequesterId())) {
-//                throw new CustomException("DK_RR_INVALID_REQ_ERR", "Invalid requesterId.");
-//            }
-//
-//        });
+        // validation through case service
+        rescheduleRequests.forEach((element) -> {
+
+            //Case Integration
+            SearchCaseRequest searchCaseRequest = SearchCaseRequest.builder().RequestInfo(requestInfo).tenantId(config.getEgovStateTenantId()).criteria(Collections.singletonList(CaseCriteria.builder().caseId(element.getCaseId()).build())).build();
+
+            JsonNode representatives = caseUtil.getRepresentatives(searchCaseRequest);
+            Set<String> representativeIds = caseUtil.getIdsFromJsonNodeArray(representatives);
+            if (!representativeIds.contains(element.getRequesterId())) {
+                throw new CustomException("DK_RR_INVALID_REQ_ERR", "Invalid requesterId.");
+            }
+        });
 
         log.info("operation = validateRescheduleRequest, result = SUCCESS");
 

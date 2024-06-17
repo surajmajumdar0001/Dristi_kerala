@@ -62,16 +62,16 @@ public class RescheduleRequestOptOutValidator {
         });
 
         //case service validation
-//        request.getOptOuts().forEach((application) -> {
-//            //case validation
-//            SearchCaseRequest searchCaseRequest = SearchCaseRequest.builder().RequestInfo(request.getRequestInfo()).tenantId("pg").criteria(Collections.singletonList(CaseCriteria.builder().caseId(application.getCaseId()).build())).build();
-//            JsonNode representatives = caseUtil.getRepresentatives(searchCaseRequest);
-//            Set<String> representativeIds = caseUtil.getIdsFromJsonNodeArray(representatives);
-//
-//            if (!representativeIds.contains(application.getIndividualId())) {
-//                throw new CustomException("DK_OO_APP_ERR", "Invalid individualId.");
-//            }
-//        });
+        request.getOptOuts().forEach((application) -> {
+            //case validation
+            SearchCaseRequest searchCaseRequest = SearchCaseRequest.builder().RequestInfo(request.getRequestInfo()).tenantId(config.getEgovStateTenantId()).criteria(Collections.singletonList(CaseCriteria.builder().caseId(application.getCaseId()).build())).build();
+            JsonNode representatives = caseUtil.getRepresentatives(searchCaseRequest);
+            Set<String> representativeIds = caseUtil.getIdsFromJsonNodeArray(representatives);
+
+            if (!representativeIds.contains(application.getIndividualId())) {
+                throw new CustomException("DK_OO_APP_ERR", "Invalid individualId.");
+            }
+        });
 
         // validate reschedule request exist in db
         List<String> ids = request.getOptOuts().stream().map((OptOut::getRescheduleRequestId)).toList();
@@ -97,6 +97,11 @@ public class RescheduleRequestOptOutValidator {
         for (OptOut optOut : request.getOptOuts()) {
 
             Set<LocalDate> optoutDates = optOut.getOptoutDates().stream().map(LocalDate::from).collect(Collectors.toSet());
+
+            if(optoutDates.size() > config.getOptOutLimit()){
+                throw new CustomException("DK_OO_SELECTION_LIMIT_ERR", "you are eligible to opt out " + config.getOptOutLimit() + "dates only");
+            }
+
             String rescheduleRequestId = optOut.getRescheduleRequestId();
 
             if (resultMap.containsKey(rescheduleRequestId)) {

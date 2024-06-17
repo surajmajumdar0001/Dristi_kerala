@@ -35,10 +35,10 @@ public class CaseUtil {
         StringBuilder url = new StringBuilder(config.getCaseUrl() + config.getCaseEndpoint());
 
         Object response = requestRepository.postMethod(url, searchCaseRequest);
-        JsonNode caseList;
+        JsonNode caseList = null;
         try {
             JsonNode jsonNode = mapper.readTree(response.toString());
-            caseList = jsonNode.get("cases").get(0).get("responseList");
+            caseList = jsonNode.get("criteria").get(0).get("responseList");
 
         } catch (JsonProcessingException e) {
             log.error("operation = getCases, result = FAILURE");
