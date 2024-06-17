@@ -1,10 +1,14 @@
 package digit.service;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import digit.config.Configuration;
 import digit.kafka.Producer;
+import digit.util.CaseUtil;
 import digit.web.models.*;
+import digit.web.models.cases.CaseCriteria;
+import digit.web.models.cases.SearchCaseRequest;
 import digit.web.models.enums.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
@@ -13,10 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -32,12 +33,15 @@ public class ScheduleHearingConsumerService {
 
     private final HearingService hearingService;
 
-    public ScheduleHearingConsumerService(Configuration configuration, ObjectMapper mapper, CalendarService calendarService, Producer producer, HearingService hearingService) {
+    private final CaseUtil caseUtil;
+
+    public ScheduleHearingConsumerService(Configuration configuration, ObjectMapper mapper, CalendarService calendarService, Producer producer, HearingService hearingService, CaseUtil caseUtil) {
         this.configuration = configuration;
         this.mapper = mapper;
         this.calendarService = calendarService;
         this.producer = producer;
         this.hearingService = hearingService;
+        this.caseUtil = caseUtil;
     }
 
 
@@ -55,6 +59,12 @@ public class ScheduleHearingConsumerService {
 
             for (ReScheduleHearing hearingDetail : hearingDetails) {
 
+                SearchCaseRequest searchCaseRequest = SearchCaseRequest.builder().RequestInfo(requestInfo).tenantId("kl").criteria(Collections.singletonList(CaseCriteria.builder().caseId(hearingDetail.getCaseId()).build())).build();
+                JsonNode representatives = caseUtil.getRepresentatives(searchCaseRequest);
+                Set<String> representativeIds = caseUtil.getIdsFromJsonNodeArray(representatives);
+                int noOfAttendees = representativeIds.size();
+                Integer numberOfSuggestedDays = Math.toIntExact(configuration.getOptOutLimit() * noOfAttendees + 1);
+
                 List<AvailabilityDTO> availability = calendarService.getJudgeAvailability(JudgeAvailabilitySearchRequest
                         .builder()
                         .requestInfo(requestInfo)
@@ -62,7 +72,7 @@ public class ScheduleHearingConsumerService {
                                 .judgeId(hearingDetail.getJudgeId())
                                 .fromDate(hearingDetail.getAvailableAfter())
                                 .courtId("0001")  //TODO: need to configure somewhere
-                                .numberOfSuggestedDays(5) //TODO: later we change this to no of attendees
+                                .numberOfSuggestedDays(numberOfSuggestedDays) //TODO: later we change this to no of attendees
                                 .tenantId(tenantId)
                                 .build()).build());
 
