@@ -35,8 +35,8 @@ public class SummonsDeliveryRowMapper implements RowMapper<SummonsDelivery> {
         summonsDelivery.setCaseId(rs.getString("case_id"));
         summonsDelivery.setTenantId(rs.getString("tenant_id"));
         summonsDelivery.setDocType(rs.getString("doc_type"));
-        summonsDelivery.setDocType(rs.getString("doc_sub_type"));
-        summonsDelivery.setDocType(rs.getString("party_type"));
+        summonsDelivery.setDocSubType(rs.getString("doc_sub_type"));
+        summonsDelivery.setPartyType(rs.getString("party_type"));
         summonsDelivery.setChannelName(ChannelName.valueOf(rs.getString("channel_name")));
         summonsDelivery.setPaymentFees(rs.getString("payment_fees"));
         summonsDelivery.setPaymentTransactionId(rs.getString("payment_transaction_id"));

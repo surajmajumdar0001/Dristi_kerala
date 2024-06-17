@@ -24,9 +24,6 @@ public class SummonsDetails {
     @JsonProperty("issueDate")
     private LocalDate issueDate;
 
-    @JsonProperty("issueType")
-    private String issueType;
-
     @JsonProperty("docType")
     private String docType;
 
