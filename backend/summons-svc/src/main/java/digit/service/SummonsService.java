@@ -52,7 +52,7 @@ public class SummonsService {
     }
 
     public SummonsDocument generateSummonsDocument(GenerateSummonsRequest request) {
-        String issueType = request.getTaskSummon().getSummonDetails().getIssueType();
+        String issueType = request.getTaskSummon().getSummonDetails().getDocType();
         String pdfTemplateKey;
         if (issueType.equalsIgnoreCase("summons")) {
             pdfTemplateKey = config.getSummonsPdfTemplateKey();
