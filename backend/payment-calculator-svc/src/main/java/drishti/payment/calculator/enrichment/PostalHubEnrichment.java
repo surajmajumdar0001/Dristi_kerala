@@ -16,6 +16,7 @@ public class PostalHubEnrichment {
         AuditDetails auditData = getAuditDetailsFromRqstInfo(requestInfo);
         request.getPostalHubs().forEach((hub) -> {
             hub.setHubId(UUID.randomUUID().toString());
+            hub.setRowVersion(1);
 
             hub.getAddress().setId(UUID.randomUUID().toString());
 
@@ -25,6 +26,17 @@ public class PostalHubEnrichment {
     }
 
     public void enrichExistingPostalHubRequest(PostalHubRequest request) {
+
+        RequestInfo requestInfo = request.getRequestInfo();
+
+        request.getPostalHubs().forEach((application) -> {
+            Long currentTime = System.currentTimeMillis();
+            application.getAuditDetails().setLastModifiedTime(currentTime);
+            application.getAuditDetails().setLastModifiedBy(requestInfo.getUserInfo().getUuid());
+            application.setRowVersion(application.getRowVersion() + 1);
+        });
+
+
     }
 
     private AuditDetails getAuditDetailsFromRqstInfo(RequestInfo requestInfo) {

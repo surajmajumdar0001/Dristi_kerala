@@ -6,10 +6,13 @@ import drishti.payment.calculator.enrichment.PostalServiceEnrichment;
 import drishti.payment.calculator.kafka.Producer;
 import drishti.payment.calculator.repository.PostalServiceRepository;
 import drishti.payment.calculator.validator.PostalServiceValidator;
+import drishti.payment.calculator.web.models.PostalService;
 import drishti.payment.calculator.web.models.PostalServiceRequest;
 import drishti.payment.calculator.web.models.PostalServiceSearchRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -29,20 +32,29 @@ public class PostalPinService {
         this.config = config;
     }
 
-    public void create(PostalServiceRequest request) {
+    public List<PostalService> create(PostalServiceRequest request) {
 
         validator.validatePostalServiceRequest(request);
+
         enrichment.enrichPostalServiceRequest(request);
+
         producer.push(config.getPostalServiceCreateTopic(), request.getPostalServices());
+
+        return request.getPostalServices();
     }
 
-    public void search(PostalServiceSearchRequest searchRequest) {
-        repository.getPostalService(searchRequest.getCriteria(), null, null);
+    public List<PostalService> search(PostalServiceSearchRequest searchRequest) {
+        return repository.getPostalService(searchRequest.getCriteria(), null, null);
     }
 
-    public void update(PostalServiceRequest request) {
+    public List<PostalService> update(PostalServiceRequest request) {
+
         validator.validateExistingPostalServiceRequest(request);
+
         enrichment.enrichExistingPostalServiceRequest(request);
+
         producer.push(config.getPostalServiceUpdateTopic(), request.getPostalServices());
+
+        return request.getPostalServices();
     }
 }

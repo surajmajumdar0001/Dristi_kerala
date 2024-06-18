@@ -29,7 +29,4 @@ public class HubSearchCriteria {
     @JsonProperty("pincode")
     private Integer pincode;
 
-
-
-
 }

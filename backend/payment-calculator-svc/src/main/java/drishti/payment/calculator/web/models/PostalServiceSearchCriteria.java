@@ -14,4 +14,7 @@ public class PostalServiceSearchCriteria {
 
     @JsonProperty("id")
     private String id;
+
+    @JsonProperty("pincode")
+    private Integer pincode;
 }
