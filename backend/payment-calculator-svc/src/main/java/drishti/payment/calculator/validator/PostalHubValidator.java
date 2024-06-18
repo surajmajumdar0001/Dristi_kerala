@@ -25,11 +25,11 @@ public class PostalHubValidator {
 
     public void validateExistingPostalHubRequest(PostalHubRequest request) {
 
-        request.getPostalHubs().forEach((element) -> {
+//        request.getPostalHubs().forEach((element) -> {
+//
+//        });
 
-        });
 
 
-        request.getPostalHubs();
     }
 }
