@@ -22,36 +22,29 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class Bill {
-    @JsonProperty("id")
 
+    @JsonProperty("id")
     private String id = null;
 
     @JsonProperty("mobileNumber")
-
     private String mobileNumber = null;
 
     @JsonProperty("payerName")
-
     private String payerName = null;
 
     @JsonProperty("payerAddress")
-
     private String payerAddress = null;
 
     @JsonProperty("payerEmail")
-
     private String payerEmail = null;
 
     @JsonProperty("isActive")
-
     private Boolean isActive = null;
 
     @JsonProperty("isCancelled")
-
     private Boolean isCancelled = null;
 
     @JsonProperty("additionalDetails")
-
     private Object additionalDetails = null;
 
     @JsonProperty("taxAndPayments")
@@ -63,11 +56,9 @@ public class Bill {
     private List<BillDetail> billDetails = null;
 
     @JsonProperty("tenantId")
-
     private String tenantId = null;
 
     @JsonProperty("auditDetails")
-
     @Valid
     private AuditDetails auditDetails = null;
 

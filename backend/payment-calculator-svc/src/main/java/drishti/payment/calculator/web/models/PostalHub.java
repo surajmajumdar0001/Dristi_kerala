@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.egov.common.contract.models.Address;
 
 @Data
 @AllArgsConstructor
@@ -29,6 +28,7 @@ public class PostalHub {
 
     @JsonProperty("rowVersion")
     private Integer rowVersion = null;
+
 
     @JsonProperty("address")
     private Address address;

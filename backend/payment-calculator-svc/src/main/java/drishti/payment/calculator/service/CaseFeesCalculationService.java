@@ -1,6 +1,7 @@
 package drishti.payment.calculator.service;
 
 
+import drishti.payment.calculator.config.Configuration;
 import drishti.payment.calculator.util.EFillingUtil;
 import drishti.payment.calculator.web.models.Calculation;
 import drishti.payment.calculator.web.models.EFilingParam;
@@ -17,10 +18,14 @@ import java.util.List;
 public class CaseFeesCalculationService {
 
     private final EFillingUtil eFillingUtil;
+    private final DemandService demandService;
+    private final Configuration config;
 
     @Autowired
-    public CaseFeesCalculationService(EFillingUtil eFillingUtil) {
+    public CaseFeesCalculationService(EFillingUtil eFillingUtil, DemandService demandService, Configuration config) {
         this.eFillingUtil = eFillingUtil;
+        this.demandService = demandService;
+        this.config = config;
     }
 
 
@@ -60,6 +65,8 @@ public class CaseFeesCalculationService {
 
             result.add(calculation);
         }
+
+        demandService.generateDemands(requestInfo, result,config.getCaseModuleCode(),config.getCaseTaxHeadMasterCode());
         return result;
 
     }

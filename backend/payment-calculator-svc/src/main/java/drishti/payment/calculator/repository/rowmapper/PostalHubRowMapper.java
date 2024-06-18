@@ -1,6 +1,7 @@
 package drishti.payment.calculator.repository.rowmapper;
 
 import digit.models.coremodels.AuditDetails;
+import drishti.payment.calculator.web.models.Address;
 import drishti.payment.calculator.web.models.PostalHub;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -13,29 +14,26 @@ public class PostalHubRowMapper implements RowMapper<PostalHub> {
     @Override
     public PostalHub mapRow(ResultSet rs, int rowNum) throws SQLException {
 
-
         PostalHub postalHub = PostalHub.builder()
                 .hubId(rs.getString("hubId"))
                 .name(rs.getString("name"))
                 .pincode(rs.getInt("pincode"))
-//                .address(Address.builder()
-//                        .id(rs.getString("aid"))
-                .tenantId(rs.getString("atenantid"))
-//                        .doorNo(rs.getString("doorNo"))
-//                        .latitude(rs.getDouble("latitude"))
-//                        .longitude(rs.getDouble("longitude"))
-//                        .locationAccuracy(rs.getDouble("locationAccuracy"))
-//                        .type(AddressType.fromValue(rs.getString("type")))
-//                        .addressLine1(rs.getString("addressLine1"))
-//                        .addressLine2(rs.getString("addressLine2"))
-//                        .landmark(rs.getString("landmark"))
-//                        .city(rs.getString("city"))
-//                        .pincode(rs.getString("pinCode"))
-//                        .buildingName(rs.getString("buildingName"))
-//                        .street(rs.getString("street"))
-//                        .locality(rs.getString("localityCode") != null ? Boundary.builder().code(rs.getString("localityCode")).build() : null)
-//                        .build())
-
+                .address(Address.builder()
+                        .id(rs.getString("aid"))
+                        .tenantId(rs.getString("atenantid"))
+                        .doorNo(rs.getString("doorNo"))
+                        .latitude(rs.getDouble("latitude"))
+                        .longitude(rs.getDouble("longitude"))
+                        .locationAccuracy(rs.getDouble("locationAccuracy"))
+                        .type((rs.getString("type")))
+                        .addressLine1(rs.getString("addressLine1"))
+                        .addressLine2(rs.getString("addressLine2"))
+                        .landmark(rs.getString("landmark"))
+                        .city(rs.getString("city"))
+                        .pincode(rs.getString("pinCode"))
+                        .buildingName(rs.getString("buildingName"))
+                        .street(rs.getString("street"))
+                        .build())
                 .tenantId(rs.getString("tenant_id"))
                 .auditDetails(AuditDetails.builder()
                         .createdBy(rs.getString("created_by"))

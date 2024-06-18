@@ -29,7 +29,7 @@ public class HubSearchRequest {
     @JsonProperty("tenantId")
     private String tenantId = null;
 
-    @JsonProperty("criteria")
+    @JsonProperty("Criteria")
     @Valid
     private HubSearchCriteria criteria = null;
 

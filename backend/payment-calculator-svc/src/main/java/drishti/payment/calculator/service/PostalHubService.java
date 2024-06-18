@@ -6,8 +6,11 @@ import drishti.payment.calculator.kafka.Producer;
 import drishti.payment.calculator.repository.PostalHubRepository;
 import drishti.payment.calculator.validator.PostalHubValidator;
 import drishti.payment.calculator.web.models.HubSearchRequest;
+import drishti.payment.calculator.web.models.PostalHub;
 import drishti.payment.calculator.web.models.PostalHubRequest;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PostalHubService {
@@ -27,21 +30,30 @@ public class PostalHubService {
     }
 
 
-    public void create(PostalHubRequest request) {
+    public List<PostalHub> create(PostalHubRequest request) {
 
         validator.validatePostalHubRequest(request);
+
         enrichment.enrichPostalHubRequest(request);
-        producer.push(config.getPostalServiceCreateTopic(), request.getPostalServices());
+
+        producer.push(config.getPostalServiceCreateTopic(), request.getPostalHubs());
+
+        return request.getPostalHubs();
     }
 
-    public void search(HubSearchRequest searchRequest) {
-        repository.getPostalHub(searchRequest.getCriteria(), null, null);
+    public List<PostalHub> search(HubSearchRequest searchRequest) {
+       return repository.getPostalHub(searchRequest.getCriteria(), null, null);
     }
 
-    public void update(PostalHubRequest request) {
+    public List<PostalHub> update(PostalHubRequest request) {
+
         validator.validateExistingPostalHubRequest(request);
+
         enrichment.enrichExistingPostalHubRequest(request);
-        producer.push(config.getPostalServiceUpdateTopic(), request.getPostalServices());
+
+        producer.push(config.getPostalServiceUpdateTopic(), request.getPostalHubs());
+
+        return request.getPostalHubs();
     }
 
 }

@@ -90,4 +90,26 @@ public class Configuration {
 
     @Value("${drishti.postal.update.topic}")
     private String postalServiceUpdateTopic;
+
+
+    @Value("${egov.billingservice.host}")
+    private String billingServiceHost;
+
+    @Value("${egov.demand.create.endpoint}")
+    private String demandCreateEndpoint;
+
+    @Value("${egov.billingservice.fetch.bill}")
+    private String fetchBillEndpoint;
+
+    @Value("${case.taxhead.master.code}")
+    private String caseTaxHeadMasterCode;
+
+    @Value("${case.module.code}")
+    private String caseModuleCode;
+
+    @Value("${summon.taxhead.master.code}")
+    private String summonTaxHeadMasterCode;
+
+    @Value("${summon.module.code}")
+    private String summonModuleCode;
 }

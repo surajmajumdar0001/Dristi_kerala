@@ -17,16 +17,14 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @Builder
 public class TaxAndPayment {
-    @JsonProperty("businessService")
 
+    @JsonProperty("businessService")
     private String businessService = null;
 
     @JsonProperty("taxAmount")
-
     private String taxAmount = null;
 
     @JsonProperty("amountPaid")
-
     private String amountPaid = null;
 
 

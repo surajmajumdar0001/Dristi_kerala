@@ -17,7 +17,6 @@ public class PostalServiceRowMapper implements RowMapper<PostalService> {
                 .postalServiceId(rs.getString("postalServiceId"))
                 .pincode(rs.getInt("pincode"))
                 .distanceKM(rs.getDouble("distanceKM"))
-
                 .tenantId(rs.getString("tenant_id"))
                 .auditDetails(AuditDetails.builder()
                         .createdBy(rs.getString("created_by"))

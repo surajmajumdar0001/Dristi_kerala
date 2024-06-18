@@ -1,6 +1,7 @@
 package drishti.payment.calculator.service;
 
 
+import drishti.payment.calculator.config.Configuration;
 import drishti.payment.calculator.factory.SummonContext;
 import drishti.payment.calculator.factory.SummonFactory;
 import drishti.payment.calculator.web.models.Calculation;
@@ -17,10 +18,14 @@ import java.util.List;
 public class SummonCalculationService {
 
     private final SummonFactory summonFactory;
+    private final DemandService demandService;
+    private final Configuration config;
 
     @Autowired
-    public SummonCalculationService(SummonFactory summonFactory) {
+    public SummonCalculationService(SummonFactory summonFactory, DemandService demandService, Configuration config) {
         this.summonFactory = summonFactory;
+        this.demandService = demandService;
+        this.config = config;
     }
 
 
@@ -36,8 +41,8 @@ public class SummonCalculationService {
             Calculation calculation = context.calculatePayment(requestInfo, criteria);
             response.add(calculation);
         }
+        demandService.generateDemands(requestInfo, response, config.getSummonModuleCode(), config.getSummonTaxHeadMasterCode());
         return response;
-
 
     }
 

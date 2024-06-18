@@ -20,7 +20,7 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class PostalService {
 
-    @JsonProperty("hubId")
+    @JsonProperty("postalServiceId")
     private String postalServiceId = null;
 
     @JsonProperty("tenantId")

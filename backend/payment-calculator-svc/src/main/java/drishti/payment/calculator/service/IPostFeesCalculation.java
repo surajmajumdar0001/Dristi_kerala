@@ -6,20 +6,19 @@ import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class IPostFeesCalculation implements SummonPayment {
+
     private final IPostUtil iPostUtil;
 
 
     @Autowired
     public IPostFeesCalculation(IPostUtil iPostUtil) {
         this.iPostUtil = iPostUtil;
-
     }
 
     @Override
@@ -54,13 +53,15 @@ public class IPostFeesCalculation implements SummonPayment {
                 .amount(iPostFeeWithoutGST + envelopeFee).build();
         breakDowns.add(ipost);
 
-        double totalAmount=iPostFeeWithoutGST + gstPercentage * iPostFeeWithoutGST + courtFees + envelopeFee;
+        double totalAmount = iPostFeeWithoutGST + gstPercentage * iPostFeeWithoutGST + courtFees + envelopeFee;
         Calculation result = Calculation.builder()
                 .applicationId(criteria.getSummonId())
-                .totalAmount(Math.round(totalAmount*100.0)/100.0)
+                .totalAmount(Math.round(totalAmount * 100.0) / 100.0)
                 .tenantId(criteria.getTenantId())
                 .breakDown(breakDowns)
                 .build();
+
+
         return result;
     }
 
@@ -68,7 +69,7 @@ public class IPostFeesCalculation implements SummonPayment {
         return iPostFeesDefaultData.getCourtFee() + iPostFeesDefaultData.getCourtFee();
     }
 
-
+    // Method to calculate I-Post fee without GST
     private Double calculateTotalIPostFee(Integer numberOfPages, Double distance, IPostConfigParams configParams) {
         Double weightPerPage = configParams.getPageWeight();
         Double printingFeePerPage = configParams.getPrintingFeePerPage();
