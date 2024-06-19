@@ -42,7 +42,7 @@ public class SummonsApiController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @RequestMapping(value = "summons/v1/_send", method = RequestMethod.POST)
+    @RequestMapping(value = "summons/v1/_sendSummons", method = RequestMethod.POST)
     public ResponseEntity<SummonsResponse> sendSummons(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the Sending Summons + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody SendSummonsRequest request) {
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
         SummonsDelivery summonsDelivery = summonsService.sendSummonsViaChannels(request);
