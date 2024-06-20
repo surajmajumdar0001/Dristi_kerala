@@ -2,6 +2,7 @@ package digit.channel;
 
 import digit.config.Configuration;
 import digit.web.models.ChannelMessage;
+import digit.web.models.ChannelResponse;
 import digit.web.models.SendSummonsRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,9 @@ public class ESummonsChannel implements ExternalChannel{
 
         HttpEntity<SendSummonsRequest> requestEntity = new HttpEntity<>(request, headers);
 
-        ResponseEntity<ChannelMessage> responseEntity = restTemplate.postForEntity(uri.toString(),
-                requestEntity, ChannelMessage.class);
+        ResponseEntity<ChannelResponse> responseEntity = restTemplate.postForEntity(uri.toString(),
+                requestEntity, ChannelResponse.class);
 
-        return responseEntity.getBody();
+        return responseEntity.getBody().getChannelMessage();
     }
 }

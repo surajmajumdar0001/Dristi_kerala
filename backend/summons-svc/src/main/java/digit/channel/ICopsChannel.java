@@ -2,6 +2,7 @@ package digit.channel;
 
 import digit.config.Configuration;
 import digit.web.models.ChannelMessage;
+import digit.web.models.ChannelResponse;
 import digit.web.models.GenerateSummonsRequest;
 import digit.web.models.SendSummonsRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -37,9 +38,9 @@ public class ICopsChannel implements ExternalChannel {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<SendSummonsRequest> requestEntity = new HttpEntity<>(request, headers);
-        ResponseEntity<ChannelMessage> responseEntity = restTemplate.postForEntity(uri.toString(),
-                requestEntity, ChannelMessage.class);
+        ResponseEntity<ChannelResponse> responseEntity = restTemplate.postForEntity(uri.toString(),
+                requestEntity, ChannelResponse.class);
         log.info("Response Body: {}", responseEntity.getBody());
-        return responseEntity.getBody();
+        return responseEntity.getBody().getChannelMessage();
     }
 }
