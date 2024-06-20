@@ -73,7 +73,9 @@ public class SummonsService {
         summonsDeliveryEnrichment.enrichSummonsDelivery(summonsDelivery, request.getRequestInfo());
         ChannelMessage channelMessage = externalChannelUtil.sendSummonsByDeliveryChannel(request, summonsDelivery);
         summonsDelivery.setIsAcceptedByChannel(Boolean.TRUE);
-        summonsDelivery.setDeliveryStatus(channelMessage.getAcknowledgementStatus());
+        if (channelMessage.getAcknowledgementStatus().equalsIgnoreCase("success")) {
+            summonsDelivery.setDeliveryStatus("SUMMONS_IN_PROGRESS");
+        }
         summonsDelivery.setChannelAcknowledgementId(channelMessage.getAcknowledgeUniqueNumber());
         SummonsRequest summonsRequest = SummonsRequest.builder()
                 .summonsDelivery(summonsDelivery).requestInfo(request.getRequestInfo()).build();
