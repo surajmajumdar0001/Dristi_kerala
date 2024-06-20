@@ -155,7 +155,11 @@ const ApplicationDetails = ({ location, match }) => {
         toast.error(t("ES_API_ERROR"));
       })
       .then(() => {
-        history.push(`/digit-ui/employee/dristi/registration-requests`);
+        history.push(
+          userType === "ADVOCATE_CLERK"
+            ? `/digit-ui/employee/dristi/registration-requests?type=clerk`
+            : `/digit-ui/employee/dristi/registration-requests?type=advocate`
+        );
       });
   }
 
@@ -209,13 +213,7 @@ const ApplicationDetails = ({ location, match }) => {
         content: fileName,
       },
       {
-        doc: (
-          <DocViewerWrapper
-            fileStoreId={fileStoreId}
-            tenantId={tenantId}
-            docViewerCardClassName={"doc-card"}
-          ></DocViewerWrapper>
-        ),
+        doc: <DocViewerWrapper fileStoreId={fileStoreId} tenantId={tenantId} docViewerCardClassName={"doc-card"}></DocViewerWrapper>,
         image: true,
       },
     ];
@@ -246,14 +244,12 @@ const ApplicationDetails = ({ location, match }) => {
   return (
     <React.Fragment>
       <div className="view-application">
-        <div className="application-main" >
+        <div className="application-main">
           <Header className="application-header">{header}</Header>
           <div className="application-card">
             <DocumentDetailCard cardData={aadharData} />
             <DocumentDetailCard cardData={personalData} />
-            {type === "advocate" && userType !== "ADVOCATE_CLERK" && (
-              <DocumentDetailCard cardData={barDetails} />
-            )}
+            {type === "advocate" && userType !== "ADVOCATE_CLERK" && <DocumentDetailCard cardData={barDetails} />}
           </div>
           {!applicationNo && (
             <div className="action-button-application">
