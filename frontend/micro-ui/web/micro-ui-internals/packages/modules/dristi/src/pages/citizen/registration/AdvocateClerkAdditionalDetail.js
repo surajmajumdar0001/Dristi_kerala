@@ -80,6 +80,9 @@ function AdvocateClerkAdditionalDetail({ params, setParams, path, config, pathOn
         if (Array.isArray(formData[curr.body[0].key][input.name]) && formData[curr.body[0].key][input.name].length === 0) {
           isDisabled = true;
         }
+        if (formData?.clientDetails?.barRegistrationNumber?.length < 8) {
+          isDisabled = true;
+        }
       });
     });
     if (isDisabled) {
