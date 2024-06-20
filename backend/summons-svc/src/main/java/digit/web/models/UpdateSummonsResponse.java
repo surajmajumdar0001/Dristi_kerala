@@ -6,25 +6,22 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
 
-/**
- * UpdateSummonsRequest
- */
 @Validated
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-05-29T13:38:04.562296+05:30[Asia/Calcutta]")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateSummonsRequest {
+public class UpdateSummonsResponse {
 
-    @JsonProperty("RequestInfo")
+
+    @JsonProperty("ResponseInfo")
     @Valid
-    private RequestInfo requestInfo = null;
+    private ResponseInfo responseInfo = null;
 
-    @JsonProperty("channelReport")
-    private ChannelReport channelReport = null;
-
+    @JsonProperty("ChannelMessage")
+    private ChannelMessage channelMessage = null;
 }

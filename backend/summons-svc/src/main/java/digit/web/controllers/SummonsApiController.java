@@ -51,10 +51,10 @@ public class SummonsApiController {
     }
 
     @RequestMapping(value = "summons/v1/_/updateSummons", method = RequestMethod.POST)
-    public ResponseEntity<SummonsResponse> updateSummonsStatus(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the Updating Summons + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody UpdateSummonsRequest request) {
+    public ResponseEntity<UpdateSummonsResponse> updateSummonsStatus(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the Updating Summons + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody UpdateSummonsRequest request) {
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
-        SummonsDelivery summonsDelivery = summonsService.updateSummonsDeliveryStatus(request);
-        SummonsResponse response = SummonsResponse.builder().summonsDelivery(summonsDelivery).responseInfo(responseInfo).build();
+        ChannelMessage channelMessage = summonsService.updateSummonsDeliveryStatus(request);
+        UpdateSummonsResponse response = UpdateSummonsResponse.builder().channelMessage(channelMessage).responseInfo(responseInfo).build();
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 

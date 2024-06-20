@@ -15,18 +15,12 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class ChannelMessage {
 
-    @JsonProperty("status")
-    private String status;
+    @JsonProperty("acknowledgeUniquenumber")
+    private String acknowledgeUniqueNumber;
 
-    @JsonProperty("message")
-    private String message;
+    @JsonProperty("failureMsg")
+    private String failureMsg;
 
-    @JsonProperty("summonsId")
-    private String summonsId;
-
-    @JsonProperty("channelAcknowledgementId")
-    private String channelAcknowledgementId;
-
-    @JsonProperty("additionalFields")
-    private AdditionalFields additionalFields;
+    @JsonProperty("acknowledgementStatus")
+    private String acknowledgementStatus;
 }

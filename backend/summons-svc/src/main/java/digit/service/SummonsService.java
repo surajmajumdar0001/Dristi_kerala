@@ -73,8 +73,8 @@ public class SummonsService {
         summonsDeliveryEnrichment.enrichSummonsDelivery(summonsDelivery, request.getRequestInfo());
         ChannelMessage channelMessage = externalChannelUtil.sendSummonsByDeliveryChannel(request, summonsDelivery);
         summonsDelivery.setIsAcceptedByChannel(Boolean.TRUE);
-        summonsDelivery.setDeliveryStatus(channelMessage.getStatus());
-        summonsDelivery.setChannelAcknowledgementId(channelMessage.getChannelAcknowledgementId());
+        summonsDelivery.setDeliveryStatus(channelMessage.getAcknowledgementStatus());
+        summonsDelivery.setChannelAcknowledgementId(channelMessage.getAcknowledgeUniqueNumber());
         SummonsRequest summonsRequest = SummonsRequest.builder()
                 .summonsDelivery(summonsDelivery).requestInfo(request.getRequestInfo()).build();
         producer.push("insert-summons", summonsRequest);
@@ -95,22 +95,25 @@ public class SummonsService {
                 .build();
     }
 
-    public SummonsDelivery updateSummonsDeliveryStatus(UpdateSummonsRequest request) {
-        ChannelMessage channelMessage = request.getChannelMessage();
+    public ChannelMessage updateSummonsDeliveryStatus(UpdateSummonsRequest request) {
+        ChannelReport channelReport = request.getChannelReport();
         SummonsDeliverySearchCriteria searchCriteria = SummonsDeliverySearchCriteria
-                .builder().summonsId(channelMessage.getSummonsId()).build();
+                .builder().summonsId(channelReport.getSummonId()).build();
         Optional<SummonsDelivery> optionalSummons = summonsRepository.getSummons(searchCriteria).stream().findFirst();
         if (optionalSummons.isEmpty()) {
             throw new CustomException("SUMMONS_UPDATE_STATUS_ERROR", "Update Summons api was provided with an invalid summons api");
         }
         SummonsDelivery summonsDelivery = optionalSummons.get();
         summonsDeliveryEnrichment.enrichForUpdate(summonsDelivery, request.getRequestInfo());
-        summonsDelivery.setDeliveryStatus(channelMessage.getStatus());
-        summonsDelivery.setAdditionalFields(channelMessage.getAdditionalFields());
+        summonsDelivery.setDeliveryStatus(channelReport.getDeliveryStatus());
+        summonsDelivery.setAdditionalFields(channelReport.getAdditionalFields());
         SummonsRequest newRequest = SummonsRequest.builder()
                 .requestInfo(request.getRequestInfo()).summonsDelivery(summonsDelivery).build();
         producer.push("update-summons", newRequest);
-        return summonsDelivery;
+        ChannelMessage channelMessage = ChannelMessage.builder()
+                .acknowledgeUniqueNumber(summonsDelivery.getSummonId().concat(LocalDate.now().toString()))
+                .acknowledgementStatus("SUCCESS").build();
+        return channelMessage;
     }
 
     public void processStatusAndUpdateSummonsTask(SummonsRequest request) {
