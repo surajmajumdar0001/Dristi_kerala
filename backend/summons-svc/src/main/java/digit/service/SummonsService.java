@@ -77,6 +77,7 @@ public class SummonsService {
         summonsDelivery.setChannelAcknowledgementId(channelMessage.getAcknowledgeUniqueNumber());
         SummonsRequest summonsRequest = SummonsRequest.builder()
                 .summonsDelivery(summonsDelivery).requestInfo(request.getRequestInfo()).build();
+        log.info("Summons Delivery: {}", summonsDelivery);
         producer.push("insert-summons", summonsRequest);
         return summonsDelivery;
     }
