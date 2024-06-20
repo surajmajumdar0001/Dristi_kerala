@@ -18,7 +18,7 @@ import static org.pucar.dristi.config.ServiceConstants.*;
 public class CaseQueryBuilder {
     private static final String BASE_CASE_QUERY = " SELECT cases.id as id, cases.tenantid as tenantid, cases.casenumber as casenumber, cases.resolutionmechanism as resolutionmechanism, cases.casetitle as casetitle, cases.casedescription as casedescription, " +
             "cases.filingnumber as filingnumber, cases.casenumber as casenumber, cases.accesscode as accesscode, cases.courtcasenumber as courtcasenumber, cases.cnrNumber as cnrNumber, " +
-            " cases.courtid as courtid, cases.benchid as benchid, cases.filingdate as filingdate, cases.registrationdate as registrationdate, cases.natureofpleading as natureofpleading, cases.status as status, cases.remarks as remarks, cases.isactive as isactive, cases.casedetails as casedetails, cases.additionaldetails as additionaldetails, cases.casecategory as casecategory, cases.createdby as createdby," +
+            " cases.courtid as courtid, cases.benchid as benchid, cases.judgeid as judgeid, cases.stage as stage, cases.substage as substage, cases.filingdate as filingdate, cases.registrationdate as registrationdate, cases.natureofpleading as natureofpleading, cases.status as status, cases.remarks as remarks, cases.isactive as isactive, cases.casedetails as casedetails, cases.additionaldetails as additionaldetails, cases.casecategory as casecategory, cases.createdby as createdby," +
             " cases.lastmodifiedby as lastmodifiedby, cases.createdtime as createdtime, cases.lastmodifiedtime as lastmodifiedtime ";
     private static final String FROM_CASES_TABLE = " FROM dristi_cases cases";
     private static final String ORDERBY_CREATEDTIME = " ORDER BY cases.createdtime DESC ";
@@ -123,6 +123,27 @@ public class CaseQueryBuilder {
                     addClauseIfRequired(query, firstCriteria);
                     query.append("cases.courtcasenumber = ?");
                     preparedStmtList.add(criteria.getCourtCaseNumber());
+                    firstCriteria = false;
+                }
+
+                if (criteria.getLitigantId() != null && !criteria.getLitigantId().isEmpty()) {
+                    addClauseIfRequired(query, firstCriteria);
+                    query.append("cases.id IN ( SELECT litigant.case_id from dristi_case_litigants litigant WHERE litigant.individualId = ?)");
+                    preparedStmtList.add(criteria.getLitigantId());
+                    firstCriteria = false;
+                }
+
+                if (criteria.getAdvocateId() != null && !criteria.getAdvocateId().isEmpty()) {
+                    addClauseIfRequired(query, firstCriteria);
+                    query.append("cases.id IN ( SELECT advocate.case_id from dristi_case_representatives advocate WHERE advocate.advocateId = ?)");
+                    preparedStmtList.add(criteria.getAdvocateId());
+                    firstCriteria = false;
+                }
+
+                if (criteria.getStatus() != null && !criteria.getStatus().isEmpty()) {
+                    addClauseIfRequired(query, firstCriteria);
+                    query.append("cases.status = ?");
+                    preparedStmtList.add(criteria.getStatus());
                     firstCriteria = false;
                 }
 

@@ -32,6 +32,12 @@ ServiceMaps:
                 outJsonPath: $.Data.caseDetails.courtId
               - inJsonPath: $.benchId
                 outJsonPath: $.Data.caseDetails.benchId
+              - inJsonPath: $.judgeId
+                outJsonPath: $.Data.caseDetails.judgeId
+              - inJsonPath: $.stage
+                outJsonPath: $.Data.caseDetails.stage
+              - inJsonPath: $.substage
+                outJsonPath: $.Data.caseDetails.substage
               - inJsonPath: $.filingDate
                 outJsonPath: $.Data.caseDetails.filingDate
               - inJsonPath: $.registrationDate
@@ -58,7 +64,7 @@ ServiceMaps:
                 outJsonPath: $.Data.caseDetails.additionalDetails
             externalUriMapping:
               - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
-                queryParam: businessIds=$.caseNumber,tenantId=$.tenantId,history=true
+                queryParam: businessIds=$.filingNumber,tenantId=$.tenantId,history=true
                 apiRequest:
                   {
                     "RequestInfo":
@@ -127,6 +133,12 @@ ServiceMaps:
                 outJsonPath: $.Data.caseDetails.courtId
               - inJsonPath: $.benchId
                 outJsonPath: $.Data.caseDetails.benchId
+              - inJsonPath: $.judgeId
+                outJsonPath: $.Data.caseDetails.judgeId
+              - inJsonPath: $.stage
+                outJsonPath: $.Data.caseDetails.stage
+              - inJsonPath: $.substage
+                outJsonPath: $.Data.caseDetails.substage
               - inJsonPath: $.filingDate
                 outJsonPath: $.Data.caseDetails.filingDate
               - inJsonPath: $.registrationDate
@@ -153,7 +165,7 @@ ServiceMaps:
                 outJsonPath: $.Data.caseDetails.additionalDetails
             externalUriMapping:
               - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
-                queryParam: businessIds=$.caseNumber,tenantId=$.tenantId,history=true
+                queryParam: businessIds=$.filingNumber,tenantId=$.tenantId,history=true
                 apiRequest:
                   {
                     "RequestInfo":
