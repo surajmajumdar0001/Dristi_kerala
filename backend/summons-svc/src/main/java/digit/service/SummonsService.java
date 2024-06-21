@@ -88,6 +88,7 @@ public class SummonsService {
         return SummonsDelivery.builder()
                 .summonId(taskSummon.getSummonDetails().getSummonId())
                 .caseId(taskSummon.getCaseDetails().getCaseId())
+                .tenantId(config.getEgovStateTenantId())
                 .docType(taskSummon.getSummonDetails().getDocType())
                 .docSubType(taskSummon.getSummonDetails().getDocSubType())
                 .partyType(taskSummon.getSummonDetails().getPartyType())
