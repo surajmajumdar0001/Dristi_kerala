@@ -13,10 +13,10 @@ public class PostalServiceRowMapper implements RowMapper<PostalService> {
     @Override
     public PostalService mapRow(ResultSet rs, int rowNum) throws SQLException {
         PostalService postalService = PostalService.builder()
-                .postalHubId(rs.getString("postalHubId"))
-                .postalServiceId(rs.getString("postalServiceId"))
+                .postalHubId(rs.getString("postal_hub_id"))
+                .postalServiceId(rs.getString("postal_service_id"))
                 .pincode(rs.getInt("pincode"))
-                .distanceKM(rs.getDouble("distanceKM"))
+                .distanceKM(rs.getDouble("distance_km"))
                 .tenantId(rs.getString("tenant_id"))
                 .auditDetails(AuditDetails.builder()
                         .createdBy(rs.getString("created_by"))
