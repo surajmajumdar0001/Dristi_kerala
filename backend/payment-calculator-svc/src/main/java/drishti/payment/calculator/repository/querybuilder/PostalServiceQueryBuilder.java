@@ -3,6 +3,7 @@ package drishti.payment.calculator.repository.querybuilder;
 
 import drishti.payment.calculator.web.models.PostalServiceSearchCriteria;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 
@@ -17,6 +18,28 @@ public class PostalServiceQueryBuilder {
 
 
     public String getPostalServiceQuery(PostalServiceSearchCriteria criteria, List<Object> preparedStmtList, Integer limit, Integer offset) {
-        return BASE_APPLICATION_QUERY + FROM_TABLES;
+
+            StringBuilder query = new StringBuilder(BASE_APPLICATION_QUERY);
+            query.append(FROM_TABLES);
+
+            if(!ObjectUtils.isEmpty(criteria.getId())){
+                addClauseIfRequired(query, preparedStmtList);
+                query.append(" ps.postal_service_id = ? ");
+                preparedStmtList.add(criteria.getId());
+            }
+            if(!ObjectUtils.isEmpty(criteria.getPincode())){
+                addClauseIfRequired(query, preparedStmtList);
+                query.append(" ps.pincode = ? ");
+                preparedStmtList.add(criteria.getPincode());
+            }
+            return query.toString();
+    }
+
+    private void addClauseIfRequired(StringBuilder query, List<Object> preparedStmtList) {
+        if (preparedStmtList.isEmpty()) {
+            query.append(" WHERE ");
+        } else {
+            query.append(" AND ");
+        }
     }
 }

@@ -91,6 +91,12 @@ public class Configuration {
     @Value("${drishti.postal.update.topic}")
     private String postalServiceUpdateTopic;
 
+    //Postal Hub
+    @Value("${drishti.postalhub.create.topic}")
+    private String postalHubCreateTopic;
+
+    @Value("${drishti.postalhub.update.topic}")
+    private String postalHubUpdateTopic;
 
     @Value("${egov.billingservice.host}")
     private String billingServiceHost;

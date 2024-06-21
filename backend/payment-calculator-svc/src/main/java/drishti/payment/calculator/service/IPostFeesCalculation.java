@@ -1,5 +1,6 @@
 package drishti.payment.calculator.service;
 
+import drishti.payment.calculator.repository.PostalServiceRepository;
 import drishti.payment.calculator.util.IPostUtil;
 import drishti.payment.calculator.web.models.*;
 import org.egov.common.contract.request.RequestInfo;
@@ -15,10 +16,12 @@ public class IPostFeesCalculation implements SummonPayment {
 
     private final IPostUtil iPostUtil;
 
+    private final PostalServiceRepository  repository;
 
     @Autowired
-    public IPostFeesCalculation(IPostUtil iPostUtil) {
+    public IPostFeesCalculation(IPostUtil iPostUtil, PostalServiceRepository repository) {
         this.iPostUtil = iPostUtil;
+        this.repository = repository;
     }
 
     @Override
@@ -27,8 +30,9 @@ public class IPostFeesCalculation implements SummonPayment {
 
         IPostConfigParams iPostFeesDefaultData = iPostUtil.getIPostFeesDefaultData(requestInfo, criteria.getTenantId());
 
-
-        Double iPostFeeWithoutGST = calculateTotalIPostFee(2, 10.0, iPostFeesDefaultData);
+        PostalServiceSearchCriteria searchCriteria = PostalServiceSearchCriteria.builder().pincode(criteria.getReceiverPincode()).build();
+        Double distance = repository.getPostalService(searchCriteria, null, null).get(0).getDistanceKM();
+        Double iPostFeeWithoutGST = calculateTotalIPostFee(2, distance, iPostFeesDefaultData);
 
         Double courtFees = calculateCourtFees(iPostFeesDefaultData);
 
