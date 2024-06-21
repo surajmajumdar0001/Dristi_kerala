@@ -93,6 +93,7 @@ public class SummonsService {
                 .partyType(taskSummon.getSummonDetails().getPartyType())
                 .paymentFees(taskSummon.getDeliveryChannel().getPaymentFees())
                 .paymentStatus(taskSummon.getDeliveryChannel().getPaymentStatus())
+                .paymentTransactionId(taskSummon.getDeliveryChannel().getPaymentTransactionId())
                 .channelName(taskSummon.getDeliveryChannel().getChannelName())
                 .deliveryRequestDate(LocalDate.now())
                 .build();
