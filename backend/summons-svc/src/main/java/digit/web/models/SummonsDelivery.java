@@ -55,7 +55,7 @@ public class SummonsDelivery {
     private String channelAcknowledgementId;
 
     @JsonProperty("deliveryRequestDate")
-    private LocalDate deliveryRequestDate;
+    private String deliveryRequestDate;
 
     @JsonProperty("deliveryStatus")
     private String deliveryStatus;

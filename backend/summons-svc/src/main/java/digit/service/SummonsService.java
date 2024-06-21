@@ -95,7 +95,7 @@ public class SummonsService {
                 .paymentStatus(taskSummon.getDeliveryChannel().getPaymentStatus())
                 .paymentTransactionId(taskSummon.getDeliveryChannel().getPaymentTransactionId())
                 .channelName(taskSummon.getDeliveryChannel().getChannelName())
-                .deliveryRequestDate(LocalDate.now())
+                .deliveryRequestDate(LocalDate.now().toString())
                 .build();
     }
 

@@ -11,7 +11,7 @@ CREATE TABLE summons_delivery (
     payment_status VARCHAR(255) NULL,
     is_accepted_by_channel BOOLEAN NULL,
     channel_acknowledgement_id VARCHAR(255),
-    delivery_request_date DATE NULL,
+    delivery_request_date VARCHAR(50) NULL,
     delivery_status VARCHAR(255) NULL,
     additional_fields jsonb NULL,
     created_by varchar(64) NULL,

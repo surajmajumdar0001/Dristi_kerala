@@ -45,8 +45,7 @@ public class SummonsDeliveryRowMapper implements RowMapper<SummonsDelivery> {
         summonsDelivery.setIsAcceptedByChannel(rs.getBoolean("is_accepted_by_channel"));
         summonsDelivery.setChannelAcknowledgementId(rs.getString("channel_acknowledgement_id"));
 
-        Date requestDate = rs.getDate("delivery_request_date");
-        summonsDelivery.setDeliveryRequestDate(requestDate!= null ? requestDate.toLocalDate() : null);
+        summonsDelivery.setDeliveryRequestDate(rs.getString("delivery_request_date"));
         summonsDelivery.setDeliveryStatus(rs.getString("delivery_status"));
 
         AdditionalFields additionalFields = new AdditionalFields();
