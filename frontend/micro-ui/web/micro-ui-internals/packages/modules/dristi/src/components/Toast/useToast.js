@@ -31,7 +31,7 @@ export function useToast() {
   const success = useCallback((message, timeout = 3000) => {
     toast(message, timeout, "success");
   }, []);
-  
+
   const error = useCallback((message, timeout = 3000) => {
     toast(message, timeout, "error");
   }, []);

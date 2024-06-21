@@ -30,7 +30,7 @@ jobs:
 
       - name: Login to Azure Container Registry
         if: github.ref == 'refs/heads/e-filling' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-        run: docker login -u pucardev -p ${{ secrets.ACR_PASSWORD }} pucarsolutionsdev.azurecr.io
+        run: docker login -u pucarsolutionsdev -p ${{ secrets.ACR_PASSWORD }} pucarsolutionsdev.azurecr.io
 
       - name: Build and Push Docker image for advocate
         if: github.ref == 'refs/heads/e-filling' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')

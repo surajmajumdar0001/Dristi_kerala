@@ -676,7 +676,7 @@ const FileDownloadIcon = () => (
       </clipPath>
     </defs>
   </svg>
-)
+);
 const CalendarLeftArrow = () => (
   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 15L7 10L12 5" stroke="#1F2937" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />

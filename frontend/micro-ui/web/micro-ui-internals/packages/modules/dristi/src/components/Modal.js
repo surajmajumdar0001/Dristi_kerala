@@ -23,7 +23,7 @@ const Modal = ({
   isOBPSFlow = false,
   popupModuleActionBarStyles = {},
   submitTextClassName = "",
-  className
+  className,
 }) => {
   /**
    * TODO: It needs to be done from the desgin changes

@@ -8,7 +8,6 @@ import { initHearingsComponents } from "@egovernments/digit-ui-module-hearings";
 import { initCasesComponents } from "@egovernments/digit-ui-module-cases";
 import { initDRISTIComponents } from "@egovernments/digit-ui-module-dristi";
 
-
 import "@egovernments/digit-ui-css/example/index.css";
 
 import { UICustomizations } from "./UICustomizations";
@@ -35,7 +34,7 @@ const initTokens = (stateCode) => {
   if (userType !== "CITIZEN") {
     window.Digit.SessionStorage.set("User", {
       access_token: token,
-      info: userType !== "CITIZEN" ? JSON.parse(employeeInfo) : citizenInfo
+      info: userType !== "CITIZEN" ? JSON.parse(employeeInfo) : citizenInfo,
     });
   } else {
     // if (!window.Digit.SessionStorage.get("User")?.extraRoleInfo) window.Digit.SessionStorage.set("User", { access_token: token, info: citizenInfo });
@@ -49,7 +48,7 @@ const initTokens = (stateCode) => {
 const initDigitUI = () => {
   window.contextPath = window?.globalConfigs?.getConfig("CONTEXT_PATH") || "digit-ui";
   window.Digit.Customizations = {
-    commonUiConfig: UICustomizations
+    commonUiConfig: UICustomizations,
   };
   window?.Digit.ComponentRegistryService.setupRegistry({});
   initCoreComponents();
@@ -64,8 +63,7 @@ const initDigitUI = () => {
   initTokens(stateCode);
 
   ReactDOM.render(
-    <DigitUI stateCode={stateCode} enabledModules={enabledModules} defaultLanding="employee"
-             moduleReducers={moduleReducers} />,
+    <DigitUI stateCode={stateCode} enabledModules={enabledModules} defaultLanding="employee" moduleReducers={moduleReducers} />,
     document.getElementById("root")
   );
 };

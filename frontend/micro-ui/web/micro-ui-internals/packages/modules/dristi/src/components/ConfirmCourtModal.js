@@ -14,7 +14,6 @@ const Heading = (props) => {
 };
 
 function ConfirmCourtModal({ t, setOpenConfirmCourtModal, onSubmitCase }) {
-
   const onCancel = () => {
     setOpenConfirmCourtModal(false);
   };
