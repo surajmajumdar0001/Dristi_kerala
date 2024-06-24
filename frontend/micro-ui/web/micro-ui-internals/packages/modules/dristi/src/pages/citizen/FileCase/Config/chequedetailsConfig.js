@@ -86,8 +86,8 @@ export const chequeDetailsFormConfig = [
         populators: {
           name: "issuanceDate",
           validation: {
-            max: new Date().toISOString().split("T")[0],
-          },
+            max: new Date().toISOString().split('T')[0],
+          }
         },
       },
     ],
@@ -146,8 +146,8 @@ export const chequeDetailsFormConfig = [
         populators: {
           name: "depositDate",
           validation: {
-            max: new Date().toISOString().split("T")[0],
-          },
+            max: new Date().toISOString().split('T')[0],
+          }
         },
       },
     ],

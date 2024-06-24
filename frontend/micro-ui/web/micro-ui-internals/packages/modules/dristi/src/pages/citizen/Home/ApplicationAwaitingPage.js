@@ -73,7 +73,9 @@ function ApplicationAwaitingPage({ individualId }) {
         <CardHeader> {t("APPROVAL_WAITING")}</CardHeader>
       </div>
       <div style={{ "text-align": "center", maxWidth: "50%" }}>
-        <CardText>{`${t("RG_YOUR_REGISTRATION_NUMBER")} (ID: ${applicationNumber}).${t("RG_RECEIVE_MESSAGE")}`}</CardText>
+        <CardText>
+          {`Your registration (ID: ${applicationNumber}) is in progress. It takes 2-3 days for verification. You'll get an SMS when it's done.`}
+        </CardText>
       </div>
       <div>
         <Button
