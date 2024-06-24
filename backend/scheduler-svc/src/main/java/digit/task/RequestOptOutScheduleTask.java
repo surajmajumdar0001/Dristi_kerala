@@ -40,15 +40,15 @@ public class RequestOptOutScheduleTask {
     @Autowired
     private Configuration config;
 
-    @Scheduled(cron = "${config.optout.duedate}", zone = "Asia/Kolkata")
+    @Scheduled(cron = "${drishti.cron.opt-out.due.date}", zone = "Asia/Kolkata")
     public void updateAvailableDatesFromOptOuts(){
         try {
             log.info("operation = updateAvailableDatesFromOptOuts, result=IN_PROGRESS");
             Long dueDate = LocalDate.now().minusDays(config.getOptOutDueDate()).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
-            List<ReScheduleHearing> reScheduleHearings = reScheduleRepository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().tenantId(config.getEgovStateTenantId()).status(Status.APPROVED).dueDate(dueDate).build());
+            List<ReScheduleHearing> reScheduleHearings = reScheduleRepository.getReScheduleRequest(ReScheduleHearingReqSearchCriteria.builder().tenantId(config.getEgovStateTenantId()).status(Status.APPROVED).dueDate(dueDate).build(), null, null);
 
             for (ReScheduleHearing reScheduleHearing : reScheduleHearings) {
-                List<OptOut> optOuts = requestOptOutRepository.getOptOut(OptOutSearchCriteria.builder().judgeId(reScheduleHearing.getJudgeId()).caseId(reScheduleHearing.getCaseId()).rescheduleRequestId(reScheduleHearing.getRescheduledRequestId()).tenantId(reScheduleHearing.getTenantId()).build());
+                List<OptOut> optOuts = requestOptOutRepository.getOptOut(OptOutSearchCriteria.builder().judgeId(reScheduleHearing.getJudgeId()).caseId(reScheduleHearing.getCaseId()).rescheduleRequestId(reScheduleHearing.getRescheduledRequestId()).tenantId(reScheduleHearing.getTenantId()).build(), null, null);
 
 
                 List<LocalDate> suggestedDays = new ArrayList<>(reScheduleHearing.getSuggestedDates());

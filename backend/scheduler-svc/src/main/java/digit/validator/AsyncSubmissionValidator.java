@@ -38,33 +38,37 @@ public class AsyncSubmissionValidator {
             throw new CustomException("DK_ASH_APP_ERR", "Tenant id is either null or invalid");
         }
         // Validate submission and response dates
-        if (validateSubmissionAndResponseDates(asyncSubmission)) {
-            // Build search criteria using case Id and retrieve list of scheduled hearings
-            HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
-                    .caseId(asyncSubmission.getCaseId()).build();
-            List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
+        validateSubmissionAndResponseDates(asyncSubmission);
 
-            // Find the latest hearing by start time
-            Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);
-            // Proceed only if a latest hearing is found
-            if (latestHearing.isPresent()) {
-                // Check if the response date is after the latest hearing date
-                if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {
-                    throw new CustomException("DK_ASH_APP_ERR", "async submission and response dates must be before hearing date");
-                }
+        // Build search criteria using case id and retrieve list of scheduled hearings
+        HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
+                .caseId(asyncSubmission.getCaseId()).build();
+        List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria,null,null);
+
+        // Find the latest hearing by start time
+        Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);
+        // Proceed only if a latest hearing is found
+        if (latestHearing.isPresent()) {
+            // Check if the response date is after the latest hearing date
+            if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {
+                throw new CustomException("DK_ASH_APP_ERR", "Async submission and response dates must be before hearing date");
             }
-        } else {
-            throw new CustomException("DK_ASR_APP_ERR", "async submission date must be before response date");
         }
     }
 
-    private Boolean validateSubmissionAndResponseDates(AsyncSubmission asyncSubmission) {
+    private void validateSubmissionAndResponseDates(AsyncSubmission asyncSubmission) {
         LocalDate submissionDate = LocalDate.parse(asyncSubmission.getSubmissionDate());
         LocalDate responseDate = LocalDate.parse(asyncSubmission.getResponseDate());
         LocalDate currentDate = LocalDate.now();
 
         // Check if both dates are after the current date and submission date is before response date
-        return submissionDate.isAfter(currentDate) && responseDate.isAfter(currentDate) && submissionDate.isBefore(responseDate);
+        if (!submissionDate.isAfter(currentDate)) {
+            throw new CustomException("DK_ASR_APP_ERR", "Submission date must be after current date");
+        } else if ( !responseDate.isAfter(currentDate)) {
+            throw new CustomException("DK_ASR_APP_ERR", "Response date must be after current date");
+        } else if (!submissionDate.isBefore(responseDate)) {
+            throw new CustomException("DK_ASR_APP_ERR", "Submission date must be before Response date");
+        }
     }
 
     public static Optional<ScheduleHearing> findLatestHearingByHearingDate(List<ScheduleHearing> hearings) {
@@ -80,7 +84,7 @@ public class AsyncSubmissionValidator {
         // Build search criteria using case Id and retrieve list of scheduled hearings
         HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
                 .caseId(asyncSubmission.getCaseId()).build();
-        List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria);
+        List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria,null,null);
 
         // Find the latest hearing by start time
         Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);

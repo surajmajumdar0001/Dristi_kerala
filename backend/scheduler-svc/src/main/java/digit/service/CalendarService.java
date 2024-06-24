@@ -93,14 +93,8 @@ public class CalendarService {
         Map<String, Map<String, JSONArray>> defaultCalendarResponse = mdmsUtil.fetchMdmsData(searchCriteriaRequest.getRequestInfo(), criteria.getTenantId(), serviceConstants.DEFAULT_JUDGE_CALENDAR_MODULE_NAME, Collections.singletonList(serviceConstants.DEFAULT_JUDGE_CALENDAR_MASTER_NAME));
         JSONArray court000334 = defaultCalendarResponse.get("schedule-hearing").get("COURT000334");
 
-        // fetch judge rules ( leaves and other information related to judge )
-        List<JudgeCalendarRule> judgeCalendarRule;
-        try {
-            judgeCalendarRule = calendarRepository.getJudgeRule(criteria);
-        } catch (Exception e) {
-            log.error("error occurred while retrieving data for judge from judge rule, searchCriteria= {} ", criteria);
-            throw new CustomException("EXTERNAL_SERVICE_CALL_EXCEPTION", "Failed to fetch judge rule");
-        }
+        //  fetch judge calendar rule for next thirty days
+        List<JudgeCalendarRule> judgeCalendarRule = calendarRepository.getJudgeRule(criteria);
 
         int calendarLength = judgeCalendarRule.size();
 
@@ -230,7 +224,7 @@ public class CalendarService {
         // sort on the basis of start time
         List<ScheduleHearing> hearings;
         try {
-            hearings = hearingService.search(HearingSearchRequest.builder().criteria(hearingSearchCriteria).build());
+            hearings = hearingService.search(HearingSearchRequest.builder().criteria(hearingSearchCriteria).build(), null, null);
         } catch (Exception e) {
             log.error("");
             throw new CustomException("", "");

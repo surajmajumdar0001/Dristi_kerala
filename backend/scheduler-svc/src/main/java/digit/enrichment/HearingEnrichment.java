@@ -87,7 +87,7 @@ public class HearingEnrichment {
             if (sameDayHearings.containsKey(key.toString())) {
                 hearings = sameDayHearings.get(key.toString());
             } else {
-                hearings = repository.getHearings(searchCriteria);
+                hearings = repository.getHearings(searchCriteria, null, null);
                 sameDayHearings.put(key.toString(), hearings);
             }
 
