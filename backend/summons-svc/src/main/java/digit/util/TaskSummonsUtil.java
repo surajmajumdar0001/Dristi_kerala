@@ -25,7 +25,11 @@ public class TaskSummonsUtil {
     }
 
     public void updateSummonsTaskStatus(SummonsTaskUpdateRequest summonsTaskUpdateRequest) {
-        try {
+
+        /**
+        TODO integrate with task or related module
+         try {
+
             StringBuilder uri = new StringBuilder();
             uri.append(config.getTaskServiceHost())
                     .append(config.getTaskServiceUpdateEndpoint()).append("?tenantId=").append(config.getEgovStateTenantId());
@@ -40,6 +44,6 @@ public class TaskSummonsUtil {
         } catch (Exception e) {
             log.error("Error getting response from Orders Service", e);
             throw new CustomException("SU_PDF_APP_ERROR", "Error getting response from Orders Service");
-        }
+        }*/
     }
 }

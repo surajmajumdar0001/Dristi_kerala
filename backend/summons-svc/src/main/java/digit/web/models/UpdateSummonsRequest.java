@@ -24,7 +24,7 @@ public class UpdateSummonsRequest {
     @Valid
     private RequestInfo requestInfo = null;
 
-    @JsonProperty("channelReport")
+    @JsonProperty("ChannelReport")
     private ChannelReport channelReport = null;
 
 }
