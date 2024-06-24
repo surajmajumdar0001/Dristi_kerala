@@ -131,7 +131,6 @@ const AdvocateDetailComponent = ({ t, config, onSelect, formData = {}, errors })
                     pattern={input.validation.pattern}
                     errMsg={input.validation.errMsg}
                     maxlength={input.validation.maxlength}
-                    minlength={input.validation.minlength}
                     style={{ minWidth: "500px" }}
                   />
                 )}

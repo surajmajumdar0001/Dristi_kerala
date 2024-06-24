@@ -20,12 +20,12 @@ const DRISTICard = () => {
       processSearchCriteria: {
         businessService: ["advocateclerk"],
         moduleName: "Advocate Clerk Service",
-        tenantId,
+        tenantId: "pg",
       },
       moduleSearchCriteria: {
-        tenantId,
+        tenantId: "pg",
       },
-      tenantId,
+      tenantId: "pg",
       limit: 10,
       offset: 0,
     },
@@ -36,12 +36,12 @@ const DRISTICard = () => {
       processSearchCriteria: {
         businessService: ["advocate"],
         moduleName: "Advocate services",
-        tenantId,
+        tenantId: "pg",
       },
       moduleSearchCriteria: {
-        tenantId,
+        tenantId: "pg",
       },
-      tenantId,
+      tenantId: "pg",
       limit: 10,
       offset: 0,
     },

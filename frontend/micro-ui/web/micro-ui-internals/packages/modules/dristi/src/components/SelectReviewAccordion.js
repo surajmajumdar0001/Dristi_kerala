@@ -14,11 +14,27 @@ import CustomPopUp from "./CustomPopUp";
 import CustomReviewCard from "./CustomReviewCard";
 import ImageModal from "./ImageModal";
 
+const extractValue = (data, key) => {
+  if (!key.includes(".")) {
+    return data[key];
+  }
+  const keyParts = key.split(".");
+  let value = data;
+  keyParts.forEach((part) => {
+    if (value && value.hasOwnProperty(part)) {
+      value = value[part];
+    } else {
+      value = undefined;
+    }
+  });
+  return value;
+};
+
 function SelectReviewAccordion({ t, config, onSelect, formData = {}, errors, formState, control, setError }) {
   const roles = Digit.UserService.getUser()?.info?.roles;
   const isScrutiny = useMemo(() => roles.some((role) => role.code === "CASE_REVIEWER"), [roles]);
   const isJudge = useMemo(() => roles.some((role) => role.code === "CASE_APPROVER"), [roles]);
-
+  const isPrevScrutiny = config?.isPrevScrutiny || false;
   const [isOpen, setOpen] = useState(true);
   const [isImageModal, setIsImageModal] = useState(false);
   const history = useHistory();
@@ -196,6 +212,7 @@ function SelectReviewAccordion({ t, config, onSelect, formData = {}, errors, for
     setValue("scrutinyMessage", { popupInfo: null, imagePopupInfo: null }, ["popupInfo", "imagePopupInfo"]);
     setScrutinyError("");
   };
+  let showFlagIcon = isScrutiny ? true : false;
   return (
     <div className="accordion-wrapper" onClick={() => {}}>
       <div className={`accordion-title ${isOpen ? "open" : ""}`} onClick={() => setOpen(!isOpen)}>
@@ -209,6 +226,10 @@ function SelectReviewAccordion({ t, config, onSelect, formData = {}, errors, for
           {inputs.map((input, index) => {
             const sectionValue = formData && formData[config.key] && formData[config.key]?.[input.name];
             const sectionError = sectionValue?.scrutinyMessage?.FSOError;
+            const prevSectionError = input?.prevErrors?.scrutinyMessage;
+            if (isPrevScrutiny) {
+              showFlagIcon = prevSectionError ? true : false;
+            }
             return (
               <div className={`content-item ${sectionError && isScrutiny && "error"}`}>
                 <div className="item-header">
@@ -216,21 +237,17 @@ function SelectReviewAccordion({ t, config, onSelect, formData = {}, errors, for
                     {input?.icon && <Icon icon={input?.icon} />}
                     <span>{t(input?.label)}</span>
                   </div>
-                  {(!isScrutiny || sectionError) && !isJudge && (
+                  {!isScrutiny && !isJudge && (
                     <div
                       className="header-right"
                       onClick={(e) => {
-                        if (!isScrutiny) {
-                          history.push(`?caseId=${caseId}&selected=${input?.key}`);
-                        } else {
-                          handleOpenPopup(e, config.key, input?.name);
-                        }
+                        history.push(`?caseId=${caseId}&selected=${input?.key}`);
                       }}
                     >
                       <EditPencilIcon />
                     </div>
                   )}
-                  {!sectionError && isScrutiny && sectionValue && (
+                  {showFlagIcon && input?.data?.length > 0 && (
                     <div
                       style={{ cursor: "pointer" }}
                       onClick={(e) => {
@@ -238,7 +255,7 @@ function SelectReviewAccordion({ t, config, onSelect, formData = {}, errors, for
                       }}
                       key={index}
                     >
-                      <FlagIcon />
+                      {sectionError ? <EditPencilIcon /> : <FlagIcon />}
                     </div>
                   )}
                 </div>
@@ -251,11 +268,23 @@ function SelectReviewAccordion({ t, config, onSelect, formData = {}, errors, for
                 {Array.isArray(input.data) &&
                   input.data.map((item, index) => {
                     const dataErrors = sectionValue?.form?.[index];
+                    const prevDataErrors = input?.prevErrors?.form?.[index] || {};
                     const titleHeading = input.name === "chequeDetails" ? true : false;
+                    const updatedConfig = input?.config?.filter((config) => {
+                      if (!config?.dependentOn || !config?.dependentValue) {
+                        return true;
+                      } else {
+                        debugger;
+                        if (extractValue(item.data, config?.dependentOn) === config?.dependentValue) {
+                          return true;
+                        }
+                        return false;
+                      }
+                    });
                     return (
                       <CustomReviewCard
                         isScrutiny={isScrutiny}
-                        config={input.config}
+                        config={updatedConfig}
                         titleIndex={index + 1}
                         data={item?.data}
                         key={index}
@@ -266,8 +295,10 @@ function SelectReviewAccordion({ t, config, onSelect, formData = {}, errors, for
                         formData={formData}
                         input={input}
                         dataErrors={dataErrors}
+                        prevDataErrors={prevDataErrors}
                         configKey={config.key}
                         titleHeading={titleHeading}
+                        isPrevScrutiny={isPrevScrutiny}
                       />
                     );
                   })}
@@ -286,7 +317,7 @@ function SelectReviewAccordion({ t, config, onSelect, formData = {}, errors, for
                 const { value } = e.target;
                 setScrutinyError(value);
               }}
-              maxlength="255"
+              maxlength={config.textAreaMaxLength || "255"}
               style={{ minWidth: "300px", maxWidth: "300px", maxHeight: "150px", minHeight: "50px" }}
             ></TextArea>
             <div

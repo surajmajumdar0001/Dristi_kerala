@@ -69,7 +69,7 @@ const MultiUploadWrapper = ({
   containerStyles,
   noteMsg,
   notSupportedError,
-  maxFileErrorMessage,
+  maxFileErrorMessage
 }) => {
   const FILES_UPLOADED = "FILES_UPLOADED";
   const TARGET_FILE_REMOVAL = "TARGET_FILE_REMOVAL";
@@ -110,16 +110,7 @@ const MultiUploadWrapper = ({
     const files = Array.from(e.target.files);
 
     if (!files.length) return;
-    const [validationMsg, error] = checkIfAllValidFiles(
-      files,
-      allowedFileTypesRegex,
-      allowedMaxSizeInMB,
-      t,
-      maxFilesAllowed,
-      state,
-      notSupportedError,
-      maxFileErrorMessage
-    );
+    const [validationMsg, error] = checkIfAllValidFiles(files, allowedFileTypesRegex, allowedMaxSizeInMB, t, maxFilesAllowed, state, notSupportedError, maxFileErrorMessage);
 
     if (!error) {
       try {
