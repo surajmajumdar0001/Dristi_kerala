@@ -1,9 +1,12 @@
 package com.example.esign;
 
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
 import javax.crypto.Cipher;
+import javax.servlet.ServletContext;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,12 +15,18 @@ import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+
+@Component
 public class Encryption {
+
+    @Autowired
+    private ServletContext servletContext;
 
     private String getKey(String filename) throws IOException {
         // Read key from file
         String strKeyPEM = "";
-        BufferedReader br = new BufferedReader(new FileReader(filename));
+        String realPath = servletContext.getRealPath("/WEB-INF/" + filename);
+        BufferedReader br = new BufferedReader(new FileReader(realPath));
         String line;
         while ((line = br.readLine()) != null) {
             strKeyPEM += line + "\n";

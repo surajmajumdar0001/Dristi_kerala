@@ -26,7 +26,12 @@ import java.util.*;
 public class EsignController {
 
     @Autowired
+    private XmlSigning xmlSigning;
+
+    @Autowired
     private PdfEmbedder pdfEmbedder;
+    @Autowired
+    private Encryption encryption;
 
     @Autowired
     private HttpSession session;
@@ -177,11 +182,11 @@ public class EsignController {
         String encryptedText = "";
         String xmlData = "";
         try {
-            Encryption encryption = new Encryption();
+//            Encryption encryption = new Encryption();
             PrivateKey rsaPrivateKey = encryption.getPrivateKey("testasp.pem");
             File encrFile = new File(uploadRootDir.getAbsolutePath() + File.separator + "Excrypted.xml");
             String encryptedFile = uploadRootDir.getAbsolutePath() + File.separator + "Excrypted.xml";
-            xmlData = new XmlSigning().signXmlStringNew(uploadRootDir.getAbsolutePath() + File.separator + "Testing.xml", rsaPrivateKey);
+            xmlData = xmlSigning.signXmlStringNew(uploadRootDir.getAbsolutePath() + File.separator + "Testing.xml", rsaPrivateKey);
             System.out.println(xmlData);
             aspXmlGenerator.writeToXmlFile(xmlData, uploadRootDir.getAbsolutePath() + File.separator + "Testing.xml");
 
@@ -205,21 +210,21 @@ public class EsignController {
     }
 
 
-    @RequestMapping(value = "/finalResponse", method = RequestMethod.POST )
+    @RequestMapping(value = "/finalResponse", method = RequestMethod.POST)
     public String ReadEspResponse(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId, RedirectAttributes rdAttr, HttpServletRequest request) throws IOException {
         // HttpSession session = request.getSession(false);
         //PdfEmbedder pdfEmbedder = (PdfEmbedder)request.getSession().getAttribute("pdfEmbedder");
 //        System.out.println("**************************************"+session.getId());
-        System.out.println("**************************************"+response);
+        System.out.println("**************************************" + response);
         String filename = pdfEmbedder.signPdfwithDS(response, request, session);
-        System.out.println(" Response--->"+response+"ESP ID"+espId);
-        if(filename.equals("Error")) {
-            String error = response.substring(response.indexOf("errCode"),response.indexOf("resCode"));
+        System.out.println(" Response--->" + response + "ESP ID" + espId);
+        if (filename.equals("Error")) {
+            String error = response.substring(response.indexOf("errCode"), response.indexOf("resCode"));
             ModelAndView model = new ModelAndView();
             model.addObject("error", error);
-            System.out.println("**************************************"+session.getId());
+            System.out.println("**************************************" + session.getId());
             return "errorFile";
-        }else {
+        } else {
             return "downloadPdf";
         }
     }

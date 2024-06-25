@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.PdfSignatureAppearance.RenderingMode;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,8 @@ import java.util.HashMap;
 @Component
 //@Scope("session")
 public class PdfEmbedder {
+    @Autowired
+    private XmlSigning xmlSigning;
     String destFile = null;
     // HttpSession session = null;
     FileOutputStream fout;
@@ -118,7 +121,7 @@ public class PdfEmbedder {
             String errorCode = response.substring(response.indexOf("errCode"), response.indexOf("errMsg"));
             errorCode = errorCode.trim();
             if (errorCode.contains("NA")) {
-                String pkcsResponse = new XmlSigning().parseXml(response.trim());
+                String pkcsResponse = xmlSigning.parseXml(response.trim());
                 byte[] sigbytes = Base64.decodeBase64(pkcsResponse);
                 byte[] paddedSig = new byte[contentEstimated];
                 System.arraycopy(sigbytes, 0, paddedSig, 0, sigbytes.length);

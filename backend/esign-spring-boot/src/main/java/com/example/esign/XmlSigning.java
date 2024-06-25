@@ -1,5 +1,7 @@
 package com.example.esign;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -27,7 +29,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Collections;
 
+@Component
 public class XmlSigning {
+    @Autowired
+    private Encryption encryption;
 
 
     /**
@@ -69,7 +74,7 @@ public class XmlSigning {
         KeyInfoFactory keyInfoFact = xmlSigFactory.getKeyInfoFactory();
 
         try {
-            PublicKey privKey = new Encryption().getPublicKey("testasp.cer");
+            PublicKey privKey = encryption.getPublicKey("testasp.cer");
             keyValue = keyInfoFact.newKeyValue(privKey);
         }catch (KeyException ex) {
             ex.printStackTrace();
