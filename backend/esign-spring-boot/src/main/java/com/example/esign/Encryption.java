@@ -2,15 +2,16 @@ package com.example.esign;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
 import javax.crypto.Cipher;
 import javax.servlet.ServletContext;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -19,14 +20,23 @@ import java.security.spec.X509EncodedKeySpec;
 @Component
 public class Encryption {
 
+    @Value("${testasp.pem.location}")
+    private String testaspPemLocation;
+
+    // Load the file
+
+
+
     @Autowired
-    private ServletContext servletContext;
+    private ResourceLoader resourceLoader;
 
     private String getKey(String filename) throws IOException {
         // Read key from file
         String strKeyPEM = "";
-        String realPath = servletContext.getRealPath("/WEB-INF/" + filename);
-        BufferedReader br = new BufferedReader(new FileReader(realPath));
+        Resource resource = resourceLoader.getResource("classpath:"+filename);
+        InputStream is = resource.getInputStream();
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
         String line;
         while ((line = br.readLine()) != null) {
             strKeyPEM += line + "\n";
