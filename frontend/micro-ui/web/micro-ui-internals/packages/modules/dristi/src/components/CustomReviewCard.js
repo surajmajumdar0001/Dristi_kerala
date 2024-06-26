@@ -14,6 +14,9 @@ function CustomReviewCard({
   configKey,
   titleHeading,
   handleClickImage,
+  prevDataErrors,
+  isPrevScrutiny,
+  setShowImageModal,
 }) {
   if (data?.isAdvocateRepresenting?.code === "NO") {
     return null;
@@ -22,6 +25,7 @@ function CustomReviewCard({
     <div className="item-body">
       {config.map((item, i) => {
         const dataError = Array.isArray(item.value) ? dataErrors : dataErrors?.[item.value]?.FSOError;
+        const prevDataError = Array.isArray(item.value) ? prevDataErrors : prevDataErrors?.[item.value]?.FSOError;
         return (
           <CustomReviewCardRow
             config={item}
@@ -34,9 +38,12 @@ function CustomReviewCard({
             name={input.name}
             configKey={configKey}
             dataError={dataError}
+            prevDataError={prevDataError}
+            isPrevScrutiny={isPrevScrutiny}
             t={t}
             titleHeading={titleHeading}
             handleClickImage={handleClickImage}
+            setShowImageModal={setShowImageModal}
           />
         );
       })}
