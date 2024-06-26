@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - develop
+  pull_request:
+    branches:
+      - develop
   workflow_dispatch:
 jobs:
   docker_image-build:
@@ -10,15 +13,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Setup Docker
-        uses: docker/setup-buildx-action@v1
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - name: Build and analyze
+      - name: Build and analyze for scheduler-svc
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -B -f backend/scheduler-svc/pom.xml package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=solutions_scheduler_svc -Dsonar.organization=solutions -Dsonar.host.url=https://sonarcloud.io/
+        run: mvn -B -f backend/scheduler-svc/pom.xml package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=solutions_scheduler_svc -Dsonar.organization=solutions -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.qualitygate.wait=true
+      - name: Build and analyze for payment-calculator-svc
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B -f backend/payment-calculator-svc/pom.xml package org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=solutions_payment-calculator-svc -Dsonar.organization=solutions -Dsonar.host.url=https://sonarcloud.io/ -Dsonar.qualitygate.wait=true
+
