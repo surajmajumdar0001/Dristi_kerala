@@ -31,3 +31,14 @@ jobs:
           docker build  -t pucarsolutionsdev.azurecr.io/scheduler-svc_db:v1.0.0-${{ env.Merge_Commit }} -f  Dockerfile .
           docker push pucarsolutionsdev.azurecr.io/scheduler-svc_db:v1.0.0-${{ env.Merge_Commit }}
         working-directory: backend/scheduler-svc/src/main/resources/db
+
+      - name: Build and Push Docker image for Payment-calculator-svc
+        run: |
+          docker build --build-arg WORK_DIR="backend/payment-calculator-svc" -t pucarsolutionsdev.azurecr.io/payment-calculator-svc:v1.0.0-${{ env.Merge_Commit }} -f build/maven/Dockerfile .
+          docker push pucarsolutionsdev.azurecr.io/payment-calculator-svc:v1.0.0-${{ env.Merge_Commit }}
+
+      - name: Build and Push Docker image for Payment-calculator-svc_DB
+        run: |
+          docker build  -t pucarsolutionsdev.azurecr.io/payment-calculator-svc_db:v1.0.0-${{ env.Merge_Commit }} -f  Dockerfile .
+          docker push pucarsolutionsdev.azurecr.io/payment-calculator-svc_db:v1.0.0-${{ env.Merge_Commit }}
+        working-directory: backend/payment-calculator-svc/src/main/resources/db
