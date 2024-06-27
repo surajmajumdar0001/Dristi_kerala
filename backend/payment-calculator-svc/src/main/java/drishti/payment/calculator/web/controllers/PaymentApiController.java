@@ -30,14 +30,14 @@ public class PaymentApiController {
 
     private final CaseFeesCalculationService caseFeesService;
     private final SummonCalculationService summonCalculationService;
-    private final DemandService demandService;
+//    private final DemandService demandService;
 
     @Autowired
-    public PaymentApiController(CaseFeesCalculationService caseFeesService, SummonCalculationService summonCalculationService, DemandService demandService) {
+    public PaymentApiController(CaseFeesCalculationService caseFeesService, SummonCalculationService summonCalculationService) {
         this.caseFeesService = caseFeesService;
         this.summonCalculationService = summonCalculationService;
 
-        this.demandService = demandService;
+//        this.demandService = demandService;
     }
 
     @RequestMapping(value = "/v1/summons/_calculate", method = RequestMethod.POST)
@@ -58,9 +58,9 @@ public class PaymentApiController {
 
     }
 
-    @RequestMapping(value = "/v1/_getbill", method = RequestMethod.POST)
-    public ResponseEntity<BillResponse> v1GetbillPost(@NotNull @ApiParam(value = "Unique id for a tenant.", required = true) @javax.validation.Valid @RequestParam(value = "tenantId", required = true) String tenantId, @NotNull @ApiParam(value = "Unique birth registration application number.", required = true) @javax.validation.Valid @RequestParam(value = "applicationNumber", required = true) String applicationNumber, @NotNull @ApiParam(value = "Unique id for a business.", required = true) @javax.validation.Valid @RequestParam(value = "business", required = true) String businessService,@ApiParam(value = "Parameter to carry Request metadata in the request body") @javax.validation.Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
-        BillResponse billResponse = demandService.getBill(requestInfoWrapper, tenantId, applicationNumber,businessService);
-        return new ResponseEntity<BillResponse>(billResponse, HttpStatus.OK);
-    }
+//    @RequestMapping(value = "/v1/_getbill", method = RequestMethod.POST)
+//    public ResponseEntity<BillResponse> v1GetbillPost(@NotNull @ApiParam(value = "Unique id for a tenant.", required = true) @javax.validation.Valid @RequestParam(value = "tenantId", required = true) String tenantId, @NotNull @ApiParam(value = "Unique birth registration application number.", required = true) @javax.validation.Valid @RequestParam(value = "applicationNumber", required = true) String applicationNumber, @NotNull @ApiParam(value = "Unique id for a business.", required = true) @javax.validation.Valid @RequestParam(value = "business", required = true) String businessService,@ApiParam(value = "Parameter to carry Request metadata in the request body") @javax.validation.Valid @RequestBody RequestInfoWrapper requestInfoWrapper) {
+//        BillResponse billResponse = demandService.getBill(requestInfoWrapper, tenantId, applicationNumber,businessService);
+//        return new ResponseEntity<BillResponse>(billResponse, HttpStatus.OK);
+//    }
 }
