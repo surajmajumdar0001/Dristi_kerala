@@ -5,9 +5,9 @@ on:
       - closed
     branches:
       - develop
-  push:
-    branches:
-      - develop
+#  push:
+#    branches:
+#      - develop
   workflow_dispatch:
 
 jobs:
