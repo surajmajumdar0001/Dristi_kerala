@@ -51,14 +51,14 @@ public class ESignService {
         String fileHash = pdfEmbedder.pdfSigner(resource);
         ESignXmlData eSignXmlData = formDataSetter.setFormXmlData(fileHash, new ESignXmlData());
 
-        String strToEncrypt = xmlGenerator.generateXml(eSignXmlData);
+        String strToEncrypt = xmlGenerator.generateXml(eSignXmlData);  // this method is writing in testing.xml
         String xmlData = "";
 
         try {
             PrivateKey rsaPrivateKey = encryption.getPrivateKey("privateKey.pem");
             xmlData = xmlSigning.signXmlStringNew(servletRequest.getServletContext().getRealPath("upload") + File.separator + "Testing.xml", rsaPrivateKey);
 
-            xmlGenerator.writeToXmlFile(xmlData, "Testing.xml");
+            xmlGenerator.writeToXmlFile(xmlData, servletRequest.getServletContext().getRealPath("upload") + File.separator + "Testing.xml");
         } catch (Exception e) {
 //            System.out.println("Error in Encryption.");
 //            e.printStackTrace();
