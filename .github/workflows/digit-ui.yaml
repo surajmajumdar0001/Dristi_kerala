@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - e-filling-new
-    paths:
-      - 'frontend/micro-ui/**'
+#    paths:
+#      - 'frontend/micro-ui/**'
   pull_request:
     branches:
       - e-filling-new
@@ -27,7 +27,7 @@ jobs:
         run: docker login -u pucarsolutionsdev -p ${{ secrets.ACR_PASSWORD }} pucarsolutionsdev.azurecr.io
 
       - name: Build and Push Docker image for digit-ui
-#        if: github.ref == 'refs/heads/e-filling' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+#        if: github.ref == 'refs/heads/e-filling-new' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: |
           docker build -t digit-ui:v1.0.0-${{ github.sha }} -f web/docker/Dockerfile .
           docker tag digit-ui:v1.0.0-${{ github.sha }} pucarsolutionsdev.azurecr.io/digit-ui:v1.0.0-${{ github.sha }}
