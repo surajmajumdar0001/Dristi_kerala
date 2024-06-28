@@ -58,6 +58,7 @@ public class EsignController {
     }
 
     @PostMapping(value = "/esign", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseBody
     public RequestXmlForm esignRequest(@ModelAttribute @Valid MyUploadForm myUploadForm, Model model, HttpServletRequest request, HttpSession session) {
 
 //        try {
