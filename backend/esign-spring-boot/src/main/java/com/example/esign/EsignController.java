@@ -2,7 +2,9 @@ package com.example.esign;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -212,7 +214,7 @@ public class EsignController {
 
 
     @RequestMapping(value = "/finalResponse", method = RequestMethod.POST)
-    public String ReadEspResponse(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId, RedirectAttributes rdAttr, HttpServletRequest request) throws IOException {
+    public ResponseEntity<?> ReadEspResponse(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId, RedirectAttributes rdAttr, HttpServletRequest request) throws IOException {
         // HttpSession session = request.getSession(false);
         //PdfEmbedder pdfEmbedder = (PdfEmbedder)request.getSession().getAttribute("pdfEmbedder");
 //        System.out.println("**************************************"+session.getId());
@@ -224,9 +226,14 @@ public class EsignController {
             ModelAndView model = new ModelAndView();
             model.addObject("error", error);
             System.out.println("**************************************" + session.getId());
-            return "errorFile";
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.set("Location", "https://drishti-kerala-dev.pucar.org/digit-ui/citizen");
+            return ResponseEntity.status(302)
+                    .headers(responseHeaders).build();
+
         } else {
-            return "downloadPdf";
+//            return "downloadPdf";
+            return null;
         }
     }
 }
