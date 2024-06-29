@@ -1,7 +1,6 @@
 package digit.web.controllers;
 
 
-import digit.kafka.Producer;
 import digit.service.SummonsService;
 import digit.util.ResponseInfoFactory;
 import digit.web.models.*;
@@ -28,27 +27,18 @@ public class SummonsApiController {
 
     private final ResponseInfoFactory responseInfoFactory;
 
-    private final Producer producer;
-
     @Autowired
-    public SummonsApiController(SummonsService summonsService, ResponseInfoFactory responseInfoFactory, Producer producer) {
+    public SummonsApiController(SummonsService summonsService, ResponseInfoFactory responseInfoFactory) {
         this.summonsService = summonsService;
         this.responseInfoFactory = responseInfoFactory;
-        this.producer = producer;
     }
 
     @RequestMapping(value = "summons/v1/_generateSummons", method = RequestMethod.POST)
     public ResponseEntity<GenerateSummonResponse> generateSummons(@Parameter(in = ParameterIn.DEFAULT, description = "Details for generating a summon.", required = true, schema = @Schema()) @Valid @RequestBody GenerateSummonsRequest request) {
-        SummonsDocument summonsDocument = null;
+        SummonsDocument summonsDocument = summonsService.generateSummonsDocument(request);
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
         GenerateSummonResponse response = GenerateSummonResponse.builder().summonsDocument(summonsDocument).responseInfo(responseInfo).build();
         return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "summons/v1/_push", method = RequestMethod.POST)
-    public ResponseEntity<?>  testSmsPush(@RequestBody Object object) {
-        producer.push("egov.core.notification.sms", object);
-        return new ResponseEntity<>(null,HttpStatus.OK);
     }
 
     @RequestMapping(value = "summons/v1/_sendSummons", method = RequestMethod.POST)
