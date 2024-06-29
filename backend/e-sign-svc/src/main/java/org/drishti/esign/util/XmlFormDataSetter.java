@@ -26,13 +26,10 @@ public class XmlFormDataSetter {
         Date now = new Date();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+5:30"));
-        Random rand = new Random();
-        int randInt = rand.nextInt(100000);
 
         xmlData.setVer(configuration.getVersion());
         xmlData.setSc(configuration.getConsent());
         xmlData.setTs(dateFormat.format(now));
-        xmlData.setTxn(("" + randInt).replace("-", ""));
         xmlData.setEkycId("");
         xmlData.setEkycIdType(configuration.getEkycIdType());
         xmlData.setAspId(configuration.getAspId());

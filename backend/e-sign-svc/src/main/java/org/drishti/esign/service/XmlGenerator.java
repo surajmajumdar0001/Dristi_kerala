@@ -103,14 +103,6 @@ public class XmlGenerator {
             inputHash.appendChild(doc.createTextNode(aspXmlDetais.getDocHashHex()));
             docs.appendChild(inputHash);
 
-            // Signature elements
-//			Element signature = doc.createElement("Signature");
-//			signature.appendChild(doc.createTextNode(""));
-//			esign.appendChild(signature);
-
-            // shorten way
-            // inpuHash.setAttribute("id", "1");
-
             // write the content into xml file
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
@@ -188,5 +180,84 @@ public class XmlGenerator {
         }
 
     }
+
+
+
+//    public String generateXml(ESignXmlData aspXmlDetais) {
+//        try {
+//            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+//            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+//            Document doc = docBuilder.newDocument();
+//
+//            Element esign = doc.createElement("Esign");
+//            doc.appendChild(esign);
+//
+//            addAttributes(esign, aspXmlDetais,
+//                    "ver", "sc", "ts", "txn", "ekycId", "ekycIdType", "aspId", "AuthMode", "responseSigType", "responseUrl");
+//
+//            Element docs = doc.createElement("Docs");
+//            esign.appendChild(docs);
+//
+//            Element inputHash = doc.createElement("InputHash");
+//            addAttributes(inputHash, aspXmlDetais, "id", "hashAlgorithm", "docInfo");
+//            inputHash.appendChild(doc.createTextNode(aspXmlDetais.getDocHashHex()));
+//            docs.appendChild(inputHash);
+//
+//            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+//            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+//            DOMSource source = new DOMSource(doc);
+//
+//            String uploadRootPath = request.getServletContext().getRealPath("upload");
+//            File uploadRootDir = new File(uploadRootPath);
+//            uploadRootDir.mkdirs();
+//
+//            File serverFile = new File(uploadRootDir, "Testing.xml");
+//            StringWriter writer = new StringWriter();
+//            transformer.transform(source, new StreamResult(writer));
+//            writeToFile(serverFile, writer.toString());
+//
+//            return writer.toString();
+//        } catch (ParserConfigurationException | TransformerException e) {
+//            e.printStackTrace();
+//            return "";
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    private void addAttributes(Element element, ESignXmlData aspXmlDetais, String... attributeNames) {
+//        for (String attributeName : attributeNames) {
+//            Attr attr = element.getOwnerDocument().createAttribute(attributeName);
+//            attr.setValue(getAttributeValue(aspXmlDetais, attributeName));
+//            element.setAttributeNode(attr);
+//        }
+//    }
+//
+//    private String getAttributeValue(ESignXmlData aspXmlDetais, String attributeName) {
+//        return switch (attributeName) {
+//            case "ver" -> aspXmlDetais.getVer();
+//            case "sc" -> aspXmlDetais.getSc();
+//            case "ts" -> aspXmlDetais.getTs();
+//            case "txn" -> aspXmlDetais.getTxn();
+//            case "ekycId" -> aspXmlDetais.getEkycId();
+//            case "ekycIdType" -> aspXmlDetais.getEkycIdType();
+//            case "aspId" -> aspXmlDetais.getAspId();
+//            case "AuthMode" -> aspXmlDetais.getAuthMode();
+//            case "responseSigType" -> aspXmlDetais.getResponseSigType();
+//            case "responseUrl" -> aspXmlDetais.getResponseUrl();
+//            case "id" -> aspXmlDetais.getId();
+//            case "hashAlgorithm" -> aspXmlDetais.getHashAlgorithm();
+//            case "docInfo" -> aspXmlDetais.getDocInfo();
+//            default -> throw new IllegalArgumentException("Unknown attribute name: " + attributeName);
+//        };
+//    }
+//
+//    private void writeToFile(File file, String content) throws IOException {
+//        try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(file))) {
+//            stream.write(content.getBytes());
+//        }
+//    }
+
+
 }
 

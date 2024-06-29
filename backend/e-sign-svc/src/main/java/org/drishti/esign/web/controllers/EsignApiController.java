@@ -11,6 +11,7 @@ import org.drishti.esign.util.ResponseInfoFactory;
 import org.drishti.esign.web.models.ESignRequest;
 import org.drishti.esign.web.models.ESignResponse;
 import org.drishti.esign.web.models.ESignXmlForm;
+import org.drishti.esign.web.models.SignDocRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +41,15 @@ public class EsignApiController {
                 .eSignForm(eSignXmlForm).build();
         log.info("api=/v1/_esign, result = SUCCESS");
         return ResponseEntity.accepted().body(response);
+    }
+
+
+    @RequestMapping(value = "/v1/_signed", method = RequestMethod.POST)
+    public ResponseEntity<String> eSignDOC(@Parameter(in = ParameterIn.DEFAULT, description = "ESign Doc Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody SignDocRequest request) {
+        log.info("api=/v1/_signed, result = IN_PROGRESS");
+        String fileStoreId = eSignService.signDocWithDigitalSignature(request);
+        log.info("api=/v1/_signed, result = SUCCESS");
+        return ResponseEntity.accepted().body(fileStoreId);
     }
 
 

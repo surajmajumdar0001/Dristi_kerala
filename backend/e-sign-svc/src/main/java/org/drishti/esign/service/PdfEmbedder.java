@@ -6,11 +6,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.drishti.esign.web.models.ESignParameter;
+import org.drishti.esign.web.models.SignDocParameter;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
@@ -21,15 +26,13 @@ public class PdfEmbedder {
 
     PdfSignatureAppearance appearance;
 
-    public String pdfSigner(Resource resource) {
+    public MultipartFile signPdfWithDSAndReturnMultipartFile(Resource resource, SignDocParameter parameter) throws IOException {
 
-
-        String hashDocument = null;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         try {
             InputStream inputStream = resource.getInputStream();
             PdfReader reader = new PdfReader(inputStream);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
             PdfStamper stamper = PdfStamper.createSignature(reader, bos, '\0', null, true);
 
             PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
@@ -45,27 +48,9 @@ public class PdfEmbedder {
 
             HashMap<PdfName, Integer> exc = new HashMap<>();
             exc.put(PdfName.CONTENTS, 8192 * 2 + 2);
-//            appearance.preClose(exc);
 
-//            stamper.close();
-
-            InputStream is = new ByteArrayInputStream(bos.toByteArray());
-            hashDocument = DigestUtils.sha256Hex(is);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        return hashDocument;
-
-    }
-
-    public String signPdfwithDS(String response, HttpServletRequest request, HttpSession session) {
-        session = request.getSession(false);
-        int contentEstimated = 8192;
-        try {
-            if (request.getSession() == null) {
-                System.out.println("=================session===========");
-            }
-
+            String response = parameter.getESignResponse();
+            int contentEstimated = 8192;
             String errorCode = response.substring(response.indexOf("errCode"), response.indexOf("errMsg"));
             errorCode = errorCode.trim();
             if (errorCode.contains("NA")) {
@@ -78,12 +63,34 @@ public class PdfEmbedder {
                         new PdfString(paddedSig).setHexWriting(true));
                 appearance.close(dic2);
             } else {
-//                destFile = "Error";
+                // handle error case
             }
+
+            stamper.close();
+            bos.close();
+
+            byte[] pdfBytes = bos.toByteArray();
+            ByteArrayResource bar = new ByteArrayResource(pdfBytes) {
+                @Override
+                public String getFilename() {
+                    return "signed_pdf.pdf";
+                }
+            };
+//            MultipartFile multipartFile = new CommonsMultipartFile (bar);
+
+//            return multipartFile;
+            return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return "destFile";
+    }
+
+    public String generateHash(Resource resource) {
+        try (InputStream inputStream = resource.getInputStream()) {
+            return DigestUtils.sha256Hex(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
