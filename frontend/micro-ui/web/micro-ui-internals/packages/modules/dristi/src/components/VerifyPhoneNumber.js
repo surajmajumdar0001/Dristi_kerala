@@ -174,12 +174,20 @@ function VerifyPhoneNumber({ t, config, onSelect, formData = {}, errors, setErro
             { shouldValidate: true }
           );
         } else {
-          onSelect(config?.key, { ...formData?.[config.key], individualDetails: null, userDetails: info }, { shouldValidate: true });
+          onSelect(
+            config?.key,
+            { ...formData?.[config.key], individualDetails: null, userDetails: info, isUserVerified: true },
+            { shouldValidate: true }
+          );
         }
       })
       .catch(() => {
         setUser({ info, ...tokens });
-        onSelect(config?.key, { ...formData?.[config.key], individualDetails: null, userDetails: info }, { shouldValidate: true });
+        onSelect(
+          config?.key,
+          { ...formData?.[config.key], individualDetails: null, userDetails: info, isUserVerified: true },
+          { shouldValidate: true }
+        );
       });
   };
 
@@ -241,8 +249,13 @@ function VerifyPhoneNumber({ t, config, onSelect, formData = {}, errors, setErro
       </LabelFieldPair>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 24 }}>
         <div className="field user-details-form-style" style={{ display: "flex", width: "100%" }}>
-          {config?.componentInFront ? <span className="citizen-card-input citizen-card-input--front">{config?.componentInFront}</span> : null}
+          {config?.componentInFront ? (
+            <span className={`citizen-card-input citizen-card-input--front${errors[config.key] ? " alert-error-border" : ""}`}>
+              {config?.componentInFront}
+            </span>
+          ) : null}
           <TextInput
+            errorStyle={errors[config.key]}
             value={formData?.[config.key]?.[config.name]}
             name={config.name}
             minlength={config?.validation?.minLength}
@@ -282,7 +295,7 @@ function VerifyPhoneNumber({ t, config, onSelect, formData = {}, errors, setErro
             labelClassName={"secondary-label-selector"}
             isDisabled={
               !formData?.[config.key]?.[config.name] ||
-              errors?.[config?.key]?.[config.name] ||
+              errors?.[config?.key]?.[config?.isVerifiedOtpDisabledKey] ||
               formData?.[config.key]?.[config.name]?.length < config?.validation?.minLength ||
               formData?.[config.key]?.[config.name]?.length > config?.validation?.maxLength
             }
@@ -299,6 +312,7 @@ function VerifyPhoneNumber({ t, config, onSelect, formData = {}, errors, setErro
           />
         )}
       </div>
+      {errors[config.key]?.type === "required" && <CardLabelError className="error-text">{t("CORE_REQUIRED_FIELD_ERROR")}</CardLabelError>}
       {errors?.[config?.key]?.[config.name] && !formData?.complainantVerification?.isUserVerified && (
         <CardLabelError className={errors?.[config?.key]?.[config.name] ? "error-text" : "default-text"}>
           {t(errors?.[config?.key]?.[config.name] ? errors?.[config?.key]?.[config.name] || "VERIFY_PHONE_ERROR_TEXT" : "VERIFY_PHONE_DEFAULT_TEXT")}
@@ -360,7 +374,6 @@ function VerifyPhoneNumber({ t, config, onSelect, formData = {}, errors, setErro
                     }}
                     disable={input.isDisabled}
                     defaultValue={undefined}
-                    clas
                     {...input.validation}
                   />
                 )}
