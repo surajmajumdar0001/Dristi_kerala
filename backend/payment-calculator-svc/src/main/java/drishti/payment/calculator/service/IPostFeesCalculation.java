@@ -4,6 +4,7 @@ import drishti.payment.calculator.repository.PostalServiceRepository;
 import drishti.payment.calculator.util.IPostUtil;
 import drishti.payment.calculator.web.models.*;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,11 @@ public class IPostFeesCalculation implements SummonPayment {
         IPostConfigParams iPostFeesDefaultData = iPostUtil.getIPostFeesDefaultData(requestInfo, criteria.getTenantId());
 
         PostalServiceSearchCriteria searchCriteria = PostalServiceSearchCriteria.builder().pincode(criteria.getReceiverPincode()).build();
-        Double distance = repository.getPostalService(searchCriteria, null, null).get(0).getDistanceKM();
+        List<PostalService> postalServices = repository.getPostalService(searchCriteria, null, null);
+        if(postalServices.isEmpty()){
+            throw new CustomException("POSTAL_SERVICE_NOT_FOUND", "Pincode not found for speed post fee calculation");
+        }
+        Double distance = postalServices.get(0).getDistanceKM();
         Double iPostFeeWithoutGST = calculateTotalIPostFee(2, distance, iPostFeesDefaultData);
 
         Double courtFees = calculateCourtFees(iPostFeesDefaultData);
