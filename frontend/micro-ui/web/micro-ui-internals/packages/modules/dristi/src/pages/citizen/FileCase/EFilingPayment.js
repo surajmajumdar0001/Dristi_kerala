@@ -6,6 +6,9 @@ import { Link, useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import CustomCaseInfoDiv from "../../../components/CustomCaseInfoDiv";
 import useSearchCaseService from "../../../hooks/dristi/useSearchCaseService";
 import { useToast } from "../../../components/Toast/useToast";
+import useGetHearings from "../../../hooks/dristi/useGetHearings";
+import usePaymentCalculator from "../../../hooks/dristi/usePaymentCalculator";
+import { DRISTIService } from "../../../services";
 
 const mockSubmitModalInfo = {
   header: "CS_HEADER_FOR_E_FILING_PAYMENT",
@@ -19,13 +22,6 @@ const mockSubmitModalInfo = {
   isArrow: false,
   showTable: true,
 };
-
-const paymentCalculation = [
-  { key: "Amount Due", value: 600, currency: "Rs" },
-  { key: "Court Fees", value: 400, currency: "Rs" },
-  { key: "Advocate Fees", value: 1000, currency: "Rs" },
-  { key: "Total Fees", value: 2000, currency: "Rs", isTotalFee: true },
-];
 
 const CloseBtn = (props) => {
   return (
@@ -63,14 +59,55 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     caseId,
     caseId
   );
-
   const caseDetails = useMemo(
     () => ({
       ...caseData?.criteria?.[0]?.responseList?.[0],
     }),
     [caseData]
   );
+  const chequeDetails = useMemo(
+    () => ({
+      ...caseDetails?.caseDetails?.chequeDetails?.formdata?.[0],
+    }),
+    [caseDetails]
+  );
+  const { data: calculationResponse, isLoading: isPaymentLoading } = usePaymentCalculator(
+    {
+      EFillingCalculationCriteria: [
+        {
+          checkAmount: chequeDetails?.data?.chequeAmount.toString(),
+          numberOfApplication: 1,
+          tenantId: tenantId,
+          caseId: caseId,
+        },
+      ],
+    },
+    {},
+    "dristi",
+    Boolean(chequeDetails?.data?.chequeAmount)
+  );
 
+  const totalAmount = useMemo(() => {
+    const totalAmount = calculationResponse?.Calculation?.[0]?.totalAmount || 0;
+    return totalAmount;
+  }, [calculationResponse?.Calculation]);
+  const paymentCalculation = useMemo(() => {
+    const breakdown = calculationResponse?.Calculation?.[0]?.breakDown || [];
+    const updatedCalculation = breakdown.map((item) => ({
+      key: item?.type,
+      value: item?.amount,
+      currency: "Rs",
+    }));
+
+    updatedCalculation.push({
+      key: "Total amount",
+      value: totalAmount,
+      currency: "Rs",
+      isTotalFee: true,
+    });
+
+    return updatedCalculation;
+  }, [calculationResponse?.Calculation]);
   const submitInfoData = useMemo(() => {
     return {
       ...mockSubmitModalInfo,
@@ -86,79 +123,92 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
       showCopytext: true,
     };
   }, [caseDetails?.filingNumber]);
-
-  const { data: paymentDetails, isLoading: isFetchBillLoading } = Digit.Hooks.useFetchBillsForBuissnessService(
-    {
-      tenantId: tenantId,
-      consumerCode: caseDetails?.filingNumber,
-      businessService: "case",
-    },
-    {
-      enabled: Boolean(tenantId && caseDetails?.filingNumber),
-    }
-  );
-  const bill = paymentDetails?.Bill ? paymentDetails?.Bill[0] : {};
+  // const { data: paymentDetails, isLoading: isFetchBillLoading } = Digit.Hooks.useFetchBillsForBuissnessService(
+  //   {
+  //     tenantId: tenantId,
+  //     consumerCode: caseDetails?.filingNumber,
+  //     businessService: "case",
+  //   },
+  //   {
+  //     enabled: Boolean(tenantId && caseDetails?.filingNumber),
+  //   }
+  // );
+  // const bill = paymentDetails?.Bill ? paymentDetails?.Bill[0] : {};
 
   const onSubmitCase = async () => {
-    // if (!Object.keys(bill || {}).length) {
-    //   toast.error(t("CS_BILL_NOT_AVAILABLE"));
-    //   history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox`);
-    //   return;
-    // }
-    // try {
-    //  const receiptData =  await window?.Digit.PaymentService.createReciept(tenantId, {
-    //     Payment: {
-    //       paymentDetails: [
-    //         {
-    //           businessService: "case",
-    //           billId: bill.id,
-    //           totalDue: bill?.totalAmount,
-    //           totalAmountPaid: bill?.totalAmount || 2000,
-    //         },
-    //       ],
-    //       tenantId,
-    //       paymentMode: "ONLINE",
-    //       paidBy: 'PAY_BY_OWNER',
-    //       mobileNumber: caseDetails?.additionalDetails?.payerMobileNo || "",
-    //       payerName: caseDetails?.additionalDetails?.payerName || "",
-    //       totalAmountPaid: 2000,
-    //     },
-    //   });
-    //   history.push(`/${path}/e-filing-payment-response`, { state: { success: true, receiptData } });
-    // } catch (err) {
-    //   history.push(`/${path}/e-filing-payment-response`, { state: { success: false } });
-    // }
-    history.push(`${path}/e-filing-payment-response`, {
-      state: {
-        success: true,
-        receiptData: {
-          ...mockSubmitModalInfo,
-          caseInfo: [
-            {
-              key: "Mode of Payment",
-              value: "Online",
-              copyData: false,
-            },
-            {
-              key: "Amount",
-              value: "Rs 2000",
-              copyData: false,
-            },
-            {
-              key: "Transaction ID",
-              value: "KA08293928392",
-              copyData: true,
-            },
-          ],
-          isArrow: false,
-          showTable: true,
-          showCopytext: true,
-        },
-      },
-    });
-  };
+    const handleError = (message) => {
+      console.error(message);
+      history.push(`/${path}/e-filing-payment-response`, { state: { success: false } });
+    };
 
-  if (isLoading || isFetchBillLoading) {
+    try {
+      const demandResponse = await DRISTIService.createDemand({
+        Demands: [
+          {
+            tenantId,
+            consumerCode: caseDetails?.filingNumber,
+            consumerType: "case",
+            businessService: "case",
+            taxPeriodFrom: Date.now().toString(),
+            taxPeriodTo: Date.now().toString(),
+            demandDetails: [
+              {
+                taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
+                taxAmount: totalAmount,
+                collectionAmount: 0,
+              },
+            ],
+          },
+        ],
+      });
+
+      // if (!demandResponse) {
+      //   handleError("Error creating demand.");
+      //   return;
+      // }
+
+      const bill = await DRISTIService.callFetchBill({}, { consumerCode: caseDetails?.filingNumber, tenantId, businessService: "case" });
+
+      if (!bill) {
+        history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox`);
+        return;
+      }
+
+      const gateway = await DRISTIService.callETreasury(
+        {
+          PaymentDetails: {
+            FROM_DATE: "26/02/2020",
+            TO_DATE: "26/02/2020",
+            PAYMENT_MODE: "E",
+            NO_OF_HEADS: "1",
+            HEADS_DET: [
+              {
+                AMOUNT: "2",
+                HEADID: "00374",
+              },
+            ],
+            CHALLAN_AMOUNT: "2",
+            PARTY_NAME: "arun",
+            DEPARTMENT_ID: "16DSBTE20200614100505",
+            TSB_RECEIPTS: "N",
+          },
+        },
+        {}
+      );
+
+      if (gateway) {
+        console.log(gateway?.htmlPage?.htmlString);
+        history.push(`${path}/e-filing-payment-gateway`, {
+          state: gateway?.htmlPage?.htmlString,
+        });
+      } else {
+        handleError("Error calling e-Treasury.");
+      }
+    } catch (error) {
+      handleError(`Error in onSubmitCase: ${error.message}`);
+    }
+  };
+  if (isLoading || isPaymentLoading) {
     return <Loader />;
   }
   return (
@@ -186,7 +236,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
             className={"secondary-button-selector"}
             label={t("CS_GO_TO_HOME")}
             labelClassName={"secondary-label-selector"}
-            style={{minWidth: "30%"}}
+            style={{ minWidth: "30%" }}
             onButtonClick={() => {
               history.push(`/${window?.contextPath}/citizen/dristi/home`);
             }}
@@ -196,14 +246,14 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
             className={"secondary-button-selector"}
             label={t("CS_PRINT_CASE_FILE")}
             labelClassName={"secondary-label-selector"}
-            style={{minWidth: "30%"}}
+            style={{ minWidth: "30%" }}
             onButtonClick={() => {}}
           />
           <Button
             className={"tertiary-button-selector"}
             label={t("CS_MAKE_PAYMENT")}
             labelClassName={"tertiary-label-selector"}
-            style={{minWidth: "30%"}}
+            style={{ minWidth: "30%" }}
             onButtonClick={() => {
               setShowPaymentModal(true);
             }}
@@ -220,28 +270,29 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
             <div className="payment-due-wrapper" style={{ display: "flex", flexDirection: "column" }}>
               <div className="payment-due-text" style={{ fontSize: "18px" }}>
                 {`${t("CS_DUE_PAYMENT")} `}
-                <span style={{ fontWeight: 700 }}>Rs {amount}/-.</span>
+                <span style={{ fontWeight: 700 }}>Rs {totalAmount}/-.</span>
                 {` ${t("CS_MANDATORY_STEP_TO_FILE_CASE")}`}
               </div>
               <div className="payment-calculator-wrapper" style={{ display: "flex", flexDirection: "column" }}>
-                {paymentCalculation.map((item) => (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      borderTop: item.isTotalFee && "1px solid #BBBBBD",
-                      fontSize: item.isTotalFee && "16px",
-                      fontWeight: item.isTotalFee && "700",
-                      paddingTop: item.isTotalFee && "12px",
-                    }}
-                  >
-                    <span>{item.key}</span>
-                    <span>
-                      {item.currency} {item.value}
-                    </span>
-                  </div>
-                ))}
+                {paymentCalculation &&
+                  paymentCalculation.map((item) => (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        borderTop: item.isTotalFee && "1px solid #BBBBBD",
+                        fontSize: item.isTotalFee && "16px",
+                        fontWeight: item.isTotalFee && "700",
+                        paddingTop: item.isTotalFee && "12px",
+                      }}
+                    >
+                      <span>{item.key}</span>
+                      <span>
+                        {item.currency} {item.value}
+                      </span>
+                    </div>
+                  ))}
               </div>
               <div>
                 <InfoCard
