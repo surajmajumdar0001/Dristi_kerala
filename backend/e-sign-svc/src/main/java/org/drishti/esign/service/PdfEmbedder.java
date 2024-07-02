@@ -4,8 +4,7 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.drishti.esign.util.ResourceToMultipartFileConverter;
-import org.springframework.core.io.ByteArrayResource;
+import org.drishti.esign.util.ByteArrayMultipartFile;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -63,10 +62,7 @@ public class PdfEmbedder {
             stamper.close();
             bos.close();
 
-            Resource signedResource = new ByteArrayResource(bos.toByteArray());
-            return ResourceToMultipartFileConverter.convertResourceToMultipartFile(signedResource);
-
-
+            return new ByteArrayMultipartFile("signedDoc", bos.toByteArray());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
