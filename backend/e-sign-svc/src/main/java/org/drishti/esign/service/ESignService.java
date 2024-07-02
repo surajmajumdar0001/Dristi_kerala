@@ -10,8 +10,10 @@ import org.drishti.esign.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.PrivateKey;
 
 
@@ -43,10 +45,11 @@ public class ESignService {
 
         ESignParameter eSignParameter = request.getESignParameter();
         String fileStoreId = eSignParameter.getFileStoreId();
+        String tenantId = eSignParameter.getTenantId();
         Resource resource = fileStoreUtil.fetchFileStoreObjectById(fileStoreId, eSignParameter.getTenantId());
         String fileHash = pdfEmbedder.generateHash(resource);
         ESignXmlData eSignXmlData = formDataSetter.setFormXmlData(fileHash, new ESignXmlData());
-        eSignXmlData.setTxn(fileStoreId);
+        eSignXmlData.setTxn(tenantId + fileStoreId);
         String strToEncrypt = xmlGenerator.generateXml(eSignXmlData);  // this method is writing in testing.xml
         String xmlData = "";
 
@@ -74,14 +77,21 @@ public class ESignService {
     public String signDocWithDigitalSignature(SignDocRequest request) {
 
         SignDocParameter eSignParameter = request.getESignParameter();
-        String fileStoreId = eSignParameter.getEspTxnID();
-        String response = eSignParameter.getESignResponse();
+        String fileStoreId = eSignParameter.getFileStoreId();
+        String tenantId = eSignParameter.getTenantId();
+        String response = eSignParameter.getResponse();
 
         Resource resource = fileStoreUtil.fetchFileStoreObjectById(fileStoreId, eSignParameter.getTenantId());
-//        pdfEmbedder.pdfSigner(resource, response);
+        MultipartFile multipartFile;
+        try {
+            //fixme: get the multipart file and upload into fileStore
+            multipartFile = pdfEmbedder.signPdfWithDSAndReturnMultipartFile(resource, response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String sigendFileStoreId = fileStoreUtil.storeFileInFileStore(multipartFile, tenantId);
 
-        //fixme: get the multipart file and upload into fileStore
 
-        return null;
+        return sigendFileStoreId;
     }
 }

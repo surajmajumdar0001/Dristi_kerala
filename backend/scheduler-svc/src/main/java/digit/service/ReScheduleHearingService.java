@@ -171,7 +171,7 @@ public class ReScheduleHearingService {
                         .criteria(JudgeAvailabilitySearchCriteria.builder()
                                 .judgeId(judgeId)
                                 .fromDate(fromDate)
-                                .courtId("0001")
+                                .courtId("0001")  //fixme:hard coded
                                 .numberOfSuggestedDays(hearings.size() + 10)
                                 .tenantId(tenantId)// need to configure some where
                                 .build()).build()

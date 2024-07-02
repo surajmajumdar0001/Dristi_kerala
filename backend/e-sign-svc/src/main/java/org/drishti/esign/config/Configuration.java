@@ -27,7 +27,10 @@ public class Configuration {
     private String filestoreHost;
 
     @Value("${egov.filestore.search.endpoint}")
-    private String filestoreEndPoint;
+    private String filestoreSearchEndPoint;
+
+    @Value("${egov.filestore.create.endpoint}")
+    private String filestoreCreateEndPoint;
 
 
     //ESign

@@ -2,18 +2,14 @@ package org.drishti.esign.service;
 
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.drishti.esign.web.models.ESignParameter;
-import org.drishti.esign.web.models.SignDocParameter;
+import org.drishti.esign.util.ResourceToMultipartFileConverter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +19,9 @@ import java.util.HashMap;
 @Component
 public class PdfEmbedder {
 
-
     PdfSignatureAppearance appearance;
 
-    public MultipartFile signPdfWithDSAndReturnMultipartFile(Resource resource, SignDocParameter parameter) throws IOException {
+    public MultipartFile signPdfWithDSAndReturnMultipartFile(Resource resource, String response) throws IOException {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
@@ -49,7 +44,6 @@ public class PdfEmbedder {
             HashMap<PdfName, Integer> exc = new HashMap<>();
             exc.put(PdfName.CONTENTS, 8192 * 2 + 2);
 
-            String response = parameter.getESignResponse();
             int contentEstimated = 8192;
             String errorCode = response.substring(response.indexOf("errCode"), response.indexOf("errMsg"));
             errorCode = errorCode.trim();
@@ -69,17 +63,10 @@ public class PdfEmbedder {
             stamper.close();
             bos.close();
 
-            byte[] pdfBytes = bos.toByteArray();
-            ByteArrayResource bar = new ByteArrayResource(pdfBytes) {
-                @Override
-                public String getFilename() {
-                    return "signed_pdf.pdf";
-                }
-            };
-//            MultipartFile multipartFile = new CommonsMultipartFile (bar);
+            Resource signedResource = new ByteArrayResource(bos.toByteArray());
+            return ResourceToMultipartFileConverter.convertResourceToMultipartFile(signedResource);
 
-//            return multipartFile;
-            return null;
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
