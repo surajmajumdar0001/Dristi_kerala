@@ -13,12 +13,16 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -220,7 +224,7 @@ public class EsignController {
 
 
     @RequestMapping(value = "/finalResponse", method = RequestMethod.POST)
-    public ResponseEntity<?> ReadEspResponse(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId, RedirectAttributes rdAttr, HttpServletRequest request) throws IOException {
+    public String ReadEspResponse(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId, RedirectAttributes rdAttr, HttpServletRequest request) throws IOException {
         // HttpSession session = request.getSession(false);
         //PdfEmbedder pdfEmbedder = (PdfEmbedder)request.getSession().getAttribute("pdfEmbedder");
 //        System.out.println("**************************************"+session.getId());
@@ -231,26 +235,30 @@ public class EsignController {
             String error = response.substring(response.indexOf("errCode"), response.indexOf("resCode"));
             ModelAndView model = new ModelAndView();
             model.addObject("error", error);
-            System.out.println("**************************************" + session.getId());
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Location", "https://drishti-kerala-dev.pucar.org/digit-ui/citizen");
-            return ResponseEntity.status(302)
-                    .headers(responseHeaders).build();
-
+//            System.out.println("**************************************" + session.getId());
+            return "errorFile";
         } else {
-//            return "downloadPdf";
-            return null;
+            return "downloadPdf";
         }
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/sendEmail", method = RequestMethod.POST)
-    public String sendEmail(@RequestBody EmailRequest emailRequest){
-        try{
-            producer.push(emailTopic, emailRequest);
-            return "Email sent successfully";
-        } catch (Exception e){
-            return "Error sending email: " + e.getMessage();
+    @RequestMapping("/downloadPdfLocally")
+    public void downloadPDFResource(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        //If user is not authorized - he should be thrown out from here itself
+
+        //Authorized user will download the file
+        String dataDirectory = request.getServletContext().getRealPath("upload");
+        Path file = Paths.get(dataDirectory, "Signed_Pdf.pdf");
+        if (Files.exists(file)) {
+            response.setContentType("application/pdf");
+            response.addHeader("Content-Disposition", "attachment; filename=" + "Signed_Pdf.pdf");
+            try {
+                Files.copy(file, response.getOutputStream());
+                response.getOutputStream().flush();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
+
 }
