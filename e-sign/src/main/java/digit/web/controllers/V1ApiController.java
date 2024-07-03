@@ -38,7 +38,7 @@ public class V1ApiController {
     @Autowired
     private Configuration config;
 
-    @ResponseBody
+
     @RequestMapping(value = "/sendEmail", method = RequestMethod.POST)
     public String sendEmail(@RequestBody EmailRequest emailRequest) {
         try {
