@@ -1,9 +1,9 @@
 package digit.channel;
 
 import digit.web.models.ChannelMessage;
-import digit.web.models.SendSummonsRequest;
+import digit.web.models.TaskRequest;
 
 public interface ExternalChannel {
 
-    ChannelMessage sendSummons(SendSummonsRequest request);
+    ChannelMessage sendSummons(TaskRequest request);
 }

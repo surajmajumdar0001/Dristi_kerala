@@ -18,8 +18,11 @@ import java.time.LocalDate;
 @Builder
 public class SummonsDelivery {
 
-    @JsonProperty("summonId")
-    private String summonId;
+    @JsonProperty("summonDeliveryId")
+    private String summonDeliveryId;
+
+    @JsonProperty("taskNumber")
+    private String taskNumber;
 
     @JsonProperty("caseId")
     private String caseId;

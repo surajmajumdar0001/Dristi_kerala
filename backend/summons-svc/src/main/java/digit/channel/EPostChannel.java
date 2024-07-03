@@ -1,11 +1,11 @@
 package digit.channel;
 
 import digit.web.models.ChannelMessage;
-import digit.web.models.SendSummonsRequest;
+import digit.web.models.TaskRequest;
 
 public class EPostChannel implements ExternalChannel{
     @Override
-    public ChannelMessage sendSummons(SendSummonsRequest request) {
+    public ChannelMessage sendSummons(TaskRequest request) {
         return null;
     }
 }

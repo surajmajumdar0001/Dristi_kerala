@@ -25,12 +25,18 @@ public class Configuration {
     @Value("${egov.idgen.path}")
     private String idGenPath;
 
+    @Value("${summons.idgen.format}")
+    private String summonsIdFormat;
+
     //Pdf Service Config
     @Value("${summons.pdf.template.key}")
     private String summonsPdfTemplateKey;
 
     @Value("${warrant.pdf.template.key}")
     private String warrantPdfTemplateKey;
+
+    @Value("${bail.pdf.template.key}")
+    private String bailPdfTemplateKey;
 
     //MDMS
     @Value("${egov.mdms.host}")

@@ -4,15 +4,21 @@ import digit.config.Configuration;
 import digit.enrichment.SummonsDeliveryEnrichment;
 import digit.kafka.Producer;
 import digit.repository.SummonsRepository;
-import digit.util.*;
+import digit.util.ExternalChannelUtil;
+import digit.util.FileStorageUtil;
+import digit.util.PdfServiceUtil;
+import digit.util.TaskUtil;
 import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
+import org.egov.common.contract.models.Document;
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,13 +40,13 @@ public class SummonsService {
 
     private final ExternalChannelUtil externalChannelUtil;
 
-    private final TaskSummonsUtil taskSummonsUtil;
+    private final TaskUtil taskUtil;
 
     @Autowired
     public SummonsService(PdfServiceUtil pdfServiceUtil, Configuration config, Producer producer,
                           FileStorageUtil fileStorageUtil, SummonsRepository summonsRepository,
                           SummonsDeliveryEnrichment summonsDeliveryEnrichment, ExternalChannelUtil externalChannelUtil,
-                          TaskSummonsUtil taskSummonsUtil) {
+                          TaskUtil taskUtil) {
         this.pdfServiceUtil = pdfServiceUtil;
         this.config = config;
         this.producer = producer;
@@ -48,87 +54,121 @@ public class SummonsService {
         this.summonsRepository = summonsRepository;
         this.summonsDeliveryEnrichment = summonsDeliveryEnrichment;
         this.externalChannelUtil = externalChannelUtil;
-        this.taskSummonsUtil = taskSummonsUtil;
+        this.taskUtil = taskUtil;
     }
 
-    public SummonsDocument generateSummonsDocument(GenerateSummonsRequest request) {
-        String issueType = request.getTaskSummon().getSummonDetails().getDocType();
-        String pdfTemplateKey;
-        if (issueType.equalsIgnoreCase("summons")) {
-            pdfTemplateKey = config.getSummonsPdfTemplateKey();
-        } else if (issueType.equalsIgnoreCase("warrants")) {
-            pdfTemplateKey = config.getWarrantPdfTemplateKey();
-        } else {
-            throw new CustomException("INVALID_ISSUE_TYPE", "Issued Summons Type must be Valid");
-        }
-        ByteArrayResource byteArrayResource = pdfServiceUtil.generatePdfFromPdfService(request, config.getEgovStateTenantId(),
-                pdfTemplateKey);
+    public TaskResponse generateSummonsDocument(TaskRequest taskRequest) {
+        String taskType = taskRequest.getTask().getTaskType();
+        String pdfTemplateKey = getPdfTemplateKey(taskType);
+
+        ByteArrayResource byteArrayResource = pdfServiceUtil.generatePdfFromPdfService(taskRequest, config.getEgovStateTenantId(), pdfTemplateKey);
         String fileStoreId = fileStorageUtil.saveDocumentToFileStore(byteArrayResource);
-        return SummonsDocument
-                .builder().fileStoreId(fileStoreId).docType("pdf").docName(issueType).build();
+
+        Document document = createDocument(fileStoreId);
+        taskRequest.getTask().addDocumentsItem(document);
+
+        return taskUtil.callUpdateTask(taskRequest);
     }
 
-    public SummonsDelivery sendSummonsViaChannels(SendSummonsRequest request) {
-        SummonsDelivery summonsDelivery = generateSummonsDelivery(request.getTaskSummon());
-        summonsDeliveryEnrichment.enrichSummonsDelivery(summonsDelivery, request.getRequestInfo());
+    public SummonsDelivery sendSummonsViaChannels(TaskRequest request) {
+        SummonsDelivery summonsDelivery = summonsDeliveryEnrichment.generateAndEnrichSummonsDelivery(request.getTask(), request.getRequestInfo());
+
         ChannelMessage channelMessage = externalChannelUtil.sendSummonsByDeliveryChannel(request, summonsDelivery);
-        summonsDelivery.setIsAcceptedByChannel(Boolean.TRUE);
+
         if (channelMessage.getAcknowledgementStatus().equalsIgnoreCase("success")) {
-            summonsDelivery.setDeliveryStatus("SUMMONS_IN_PROGRESS");
+            summonsDelivery.setIsAcceptedByChannel(Boolean.TRUE);
+            if (summonsDelivery.getChannelName() == ChannelName.SMS || summonsDelivery.getChannelName() == ChannelName.EMAIL) {
+                summonsDelivery.setDeliveryStatus("SUMMONS_DELIVERED");
+            } else {
+                summonsDelivery.setDeliveryStatus("SUMMONS_IN_PROGRESS");
+            }
+            summonsDelivery.setChannelAcknowledgementId(channelMessage.getAcknowledgeUniqueNumber());
         }
-        summonsDelivery.setChannelAcknowledgementId(channelMessage.getAcknowledgeUniqueNumber());
-        SummonsRequest summonsRequest = SummonsRequest.builder()
-                .summonsDelivery(summonsDelivery).requestInfo(request.getRequestInfo()).build();
-        log.info("Summons Delivery: {}", summonsDelivery);
+        SummonsRequest summonsRequest = createSummonsRequest(request.getRequestInfo(), summonsDelivery);
+
         producer.push("insert-summons", summonsRequest);
         return summonsDelivery;
     }
 
-    private SummonsDelivery generateSummonsDelivery(TaskSummon taskSummon) {
-        return SummonsDelivery.builder()
-                .summonId(taskSummon.getSummonDetails().getSummonId())
-                .caseId(taskSummon.getCaseDetails().getCaseId())
-                .tenantId(config.getEgovStateTenantId())
-                .docType(taskSummon.getSummonDetails().getDocType())
-                .docSubType(taskSummon.getSummonDetails().getDocSubType())
-                .partyType(taskSummon.getSummonDetails().getPartyType())
-                .paymentFees(taskSummon.getDeliveryChannel().getPaymentFees())
-                .paymentStatus(taskSummon.getDeliveryChannel().getPaymentStatus())
-                .paymentTransactionId(taskSummon.getDeliveryChannel().getPaymentTransactionId())
-                .channelName(taskSummon.getDeliveryChannel().getChannelName())
-                .deliveryRequestDate(LocalDate.now().toString())
-                .build();
+    public List<SummonsDelivery> getSummonsDelivery(SummonsDeliverySearchRequest request) {
+        return getSummonsDeliveryFromSearchCriteria(request.getSearchCriteria());
     }
 
     public ChannelMessage updateSummonsDeliveryStatus(UpdateSummonsRequest request) {
-        ChannelReport channelReport = request.getChannelReport();
-        SummonsDeliverySearchCriteria searchCriteria = SummonsDeliverySearchCriteria
-                .builder().summonsId(channelReport.getSummonId()).build();
-        Optional<SummonsDelivery> optionalSummons = summonsRepository.getSummons(searchCriteria).stream().findFirst();
-        if (optionalSummons.isEmpty()) {
-            throw new CustomException("SUMMONS_UPDATE_STATUS_ERROR", "Update Summons api was provided with an invalid summons api");
-        }
-        SummonsDelivery summonsDelivery = optionalSummons.get();
+        SummonsDelivery summonsDelivery = fetchSummonsDelivery(request);
+
+        enrichAndUpdateSummonsDelivery(summonsDelivery, request);
+
+        SummonsRequest summonsRequest = createSummonsRequest(request.getRequestInfo(), summonsDelivery);
+        producer.push("update-summons", summonsRequest);
+
+        return createChannelMessage(summonsDelivery);
+    }
+
+    private void enrichAndUpdateSummonsDelivery(SummonsDelivery summonsDelivery, UpdateSummonsRequest request) {
         summonsDeliveryEnrichment.enrichForUpdate(summonsDelivery, request.getRequestInfo());
+        ChannelReport channelReport = request.getChannelReport();
         summonsDelivery.setDeliveryStatus(channelReport.getDeliveryStatus());
         summonsDelivery.setAdditionalFields(channelReport.getAdditionalFields());
-        SummonsRequest newRequest = SummonsRequest.builder()
-                .requestInfo(request.getRequestInfo()).summonsDelivery(summonsDelivery).build();
-        producer.push("update-summons", newRequest);
-        ChannelMessage channelMessage = ChannelMessage.builder()
-                .acknowledgeUniqueNumber(summonsDelivery.getSummonId().concat(LocalDate.now().toString()))
-                .acknowledgementStatus("SUCCESS").build();
-        return channelMessage;
     }
 
     public void processStatusAndUpdateSummonsTask(SummonsRequest request) {
-        SummonsDelivery summonsDelivery = request.getSummonsDelivery();
-        SummonsTaskStatus taskStatus = SummonsTaskStatus.builder()
-                .summonsId(summonsDelivery.getSummonId())
-                .statusTobeUpdated(summonsDelivery.getDeliveryStatus())
+        TaskCriteria taskCriteria = TaskCriteria.builder().taskNumber(request.getSummonsDelivery().getTaskNumber()).build();
+        TaskSearchRequest searchRequest = TaskSearchRequest.builder()
+                .requestInfo(request.getRequestInfo()).criteria(taskCriteria).build();
+        TaskListResponse taskListResponse = taskUtil.callSearchTask(searchRequest);
+        Task task = taskListResponse.getList().get(0);
+        task.setStatus("SUMMONSERVED");
+        TaskRequest taskRequest = TaskRequest.builder()
+                .requestInfo(request.getRequestInfo()).task(task).build();
+        taskUtil.callUpdateTask(taskRequest);
+    }
+
+    private String getPdfTemplateKey(String taskType) {
+        return switch (taskType.toLowerCase()) {
+            case "summons" -> config.getSummonsPdfTemplateKey();
+            case "warrants" -> config.getWarrantPdfTemplateKey();
+            case "bail" -> config.getBailPdfTemplateKey();
+            default -> throw new CustomException("INVALID_TASK_TYPE", "Task Type must be valid. Provided: " + taskType);
+        };
+    }
+
+    private SummonsDelivery fetchSummonsDelivery(UpdateSummonsRequest request) {
+        SummonsDeliverySearchCriteria searchCriteria = SummonsDeliverySearchCriteria.builder()
+                .summonsId(request.getChannelReport().getSummonId())
                 .build();
-        SummonsTaskUpdateRequest updateRequest = SummonsTaskUpdateRequest.builder()
-                .summonsTaskStatus(taskStatus).requestInfo(request.getRequestInfo()).build();
-        taskSummonsUtil.updateSummonsTaskStatus(updateRequest);
+        Optional<SummonsDelivery> optionalSummons = getSummonsDeliveryFromSearchCriteria(searchCriteria).stream().findFirst();
+        if (optionalSummons.isEmpty()) {
+            throw new CustomException("SUMMONS_UPDATE_ERROR", "Invalid summons delivery id was provided");
+        }
+        return optionalSummons.get();
+    }
+
+    private List<SummonsDelivery> getSummonsDeliveryFromSearchCriteria(SummonsDeliverySearchCriteria searchCriteria) {
+        return summonsRepository.getSummons(searchCriteria);
+    }
+
+    private Document createDocument(String fileStoreId) {
+        Field field = Field.builder().key("FILE_CATEGORY").value("GENERATE_SUMMONS_DOCUMENT").build();
+        AdditionalFields additionalFields = AdditionalFields.builder().fields(Collections.singletonList(field)).build();
+        return Document.builder()
+                .fileStore(fileStoreId)
+                .documentType("application/pdf")
+                .additionalDetails(additionalFields)
+                .build();
+    }
+
+    private SummonsRequest createSummonsRequest(RequestInfo requestInfo, SummonsDelivery summonsDelivery) {
+        return SummonsRequest.builder()
+                .requestInfo(requestInfo)
+                .summonsDelivery(summonsDelivery)
+                .build();
+    }
+
+    private ChannelMessage createChannelMessage(SummonsDelivery summonsDelivery) {
+        return ChannelMessage.builder()
+                .acknowledgeUniqueNumber(summonsDelivery.getTaskNumber())
+                .acknowledgementStatus("SUCCESS")
+                .build();
     }
 }

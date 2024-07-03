@@ -1,5 +1,6 @@
 CREATE TABLE summons_delivery (
-    summons_id VARCHAR(255) NOT NULL PRIMARY KEY,
+    summons_delivery_id VARCHAR(255) NOT NULL PRIMARY KEY,
+    task_number VARCHAR(255) NOT NULL,
     case_id VARCHAR(255) NOT NULL,
     tenant_id VARCHAR(255) NOT NULL,
     doc_type VARCHAR(50) NOT NULL,

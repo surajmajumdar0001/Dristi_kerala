@@ -1,13 +1,9 @@
 package digit.channel;
 
 import digit.config.Configuration;
-import digit.web.models.ChannelMessage;
-import digit.web.models.ChannelResponse;
-import digit.web.models.GenerateSummonsRequest;
-import digit.web.models.SendSummonsRequest;
+import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,7 +26,7 @@ public class ICopsChannel implements ExternalChannel {
     }
 
     @Override
-    public ChannelMessage sendSummons(SendSummonsRequest request) {
+    public ChannelMessage sendSummons(TaskRequest request) {
         StringBuilder uri = new StringBuilder();
         uri.append(config.getICopsHost())
                 .append(config.getICopsRequestEndPoint());

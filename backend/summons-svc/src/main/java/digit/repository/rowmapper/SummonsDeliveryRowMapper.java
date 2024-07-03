@@ -31,7 +31,8 @@ public class SummonsDeliveryRowMapper implements RowMapper<SummonsDelivery> {
     public SummonsDelivery mapRow(ResultSet rs, int rowNum) throws SQLException {
         SummonsDelivery summonsDelivery = new SummonsDelivery();
 
-        summonsDelivery.setSummonId(rs.getString("summons_id"));
+        summonsDelivery.setSummonDeliveryId(rs.getString("summons_id"));
+        summonsDelivery.setTaskNumber(rs.getString("task_number"));
         summonsDelivery.setCaseId(rs.getString("case_id"));
         summonsDelivery.setTenantId(rs.getString("tenant_id"));
         summonsDelivery.setDocType(rs.getString("doc_type"));

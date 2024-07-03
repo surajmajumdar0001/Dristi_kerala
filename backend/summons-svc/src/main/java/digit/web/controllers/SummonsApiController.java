@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.List;
+
 
 @jakarta.annotation.Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-05-29T13:38:04.562296+05:30[Asia/Calcutta]")
 @Controller
@@ -38,11 +40,9 @@ public class SummonsApiController {
     }
 
     @RequestMapping(value = "summons/v1/_generateSummons", method = RequestMethod.POST)
-    public ResponseEntity<GenerateSummonResponse> generateSummons(@Parameter(in = ParameterIn.DEFAULT, description = "Details for generating a summon.", required = true, schema = @Schema()) @Valid @RequestBody GenerateSummonsRequest request) {
-        SummonsDocument summonsDocument = null;
-        ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
-        GenerateSummonResponse response = GenerateSummonResponse.builder().summonsDocument(summonsDocument).responseInfo(responseInfo).build();
-        return new ResponseEntity<>(response,HttpStatus.OK);
+    public ResponseEntity<TaskResponse> generateSummons(@Parameter(in = ParameterIn.DEFAULT, description = "Details for generating a summon.", required = true, schema = @Schema()) @Valid @RequestBody TaskRequest request) {
+        TaskResponse taskResponse = summonsService.generateSummonsDocument(request);
+        return new ResponseEntity<>(taskResponse, HttpStatus.OK);
     }
 
     @RequestMapping(value = "summons/v1/_push", method = RequestMethod.POST)
@@ -52,10 +52,19 @@ public class SummonsApiController {
     }
 
     @RequestMapping(value = "summons/v1/_sendSummons", method = RequestMethod.POST)
-    public ResponseEntity<SummonsResponse> sendSummons(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the Sending Summons + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody SendSummonsRequest request) {
+    public ResponseEntity<SummonsResponse> sendSummons(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the Sending Summons + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody TaskRequest request) {
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
         SummonsDelivery summonsDelivery = summonsService.sendSummonsViaChannels(request);
         SummonsResponse response = SummonsResponse.builder().summonsDelivery(summonsDelivery).responseInfo(responseInfo).build();
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "summons/v1/_getSummons", method = RequestMethod.POST)
+    public ResponseEntity<SummonsDeliverySearchResponse> getSummons(@Parameter(in = ParameterIn.DEFAULT, description = "Details for the Searching Summons + RequestInfo meta data.", required = true, schema = @Schema()) @Valid @RequestBody SummonsDeliverySearchRequest request) {
+        ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
+        List<SummonsDelivery> summonsDeliveryList = summonsService.getSummonsDelivery(request);
+        SummonsDeliverySearchResponse response = SummonsDeliverySearchResponse.builder()
+                .summonsDeliveryList(summonsDeliveryList).responseInfo(responseInfo).build();
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
@@ -66,5 +75,4 @@ public class SummonsApiController {
         UpdateSummonsResponse response = UpdateSummonsResponse.builder().channelMessage(channelMessage).responseInfo(responseInfo).build();
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
-
 }

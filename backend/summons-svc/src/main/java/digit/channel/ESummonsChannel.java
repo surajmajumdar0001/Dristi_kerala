@@ -4,6 +4,7 @@ import digit.config.Configuration;
 import digit.web.models.ChannelMessage;
 import digit.web.models.ChannelResponse;
 import digit.web.models.SendSummonsRequest;
+import digit.web.models.TaskRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -25,7 +26,7 @@ public class ESummonsChannel implements ExternalChannel{
     private Configuration config;
 
     @Override
-    public ChannelMessage sendSummons(SendSummonsRequest request) {
+    public ChannelMessage sendSummons(TaskRequest request) {
         StringBuilder uri = new StringBuilder();
         uri.append(config.getESummonsHost()).append(config.getESummonsRequestEndPoint());
 

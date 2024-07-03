@@ -1,12 +1,17 @@
 package digit.enrichment;
 
 import digit.config.Configuration;
+import digit.util.IdgenUtil;
 import digit.web.models.SummonsDelivery;
-import jakarta.validation.Valid;
+import digit.web.models.Task;
+import digit.web.models.TaskDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.models.AuditDetails;
 import org.egov.common.contract.request.RequestInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 
 
 @Component
@@ -15,26 +20,46 @@ public class SummonsDeliveryEnrichment {
 
     private final Configuration config;
 
-    public SummonsDeliveryEnrichment(Configuration config) {
+    private final IdgenUtil idgenUtil;
+
+    @Autowired
+    public SummonsDeliveryEnrichment(Configuration config, IdgenUtil idgenUtil) {
         this.config = config;
+        this.idgenUtil = idgenUtil;
     }
 
-    public void enrichSummonsDelivery(SummonsDelivery summonsDelivery, RequestInfo requestInfo) {
-        AuditDetails auditDetails = getAuditDetails(requestInfo);
-        summonsDelivery.setAuditDetails(auditDetails);
-        summonsDelivery.setDeliveryStatus("DELIVERY_NOT_STARTED");
-        summonsDelivery.setRowVersion(1);
-    }
-
-    private AuditDetails getAuditDetails(RequestInfo requestInfo) {
-
-        return AuditDetails.builder()
-                .createdBy(requestInfo.getUserInfo().getUuid())
-                .createdTime(System.currentTimeMillis())
-                .lastModifiedBy(requestInfo.getUserInfo().getUuid())
-                .lastModifiedTime(System.currentTimeMillis())
+    public SummonsDelivery generateAndEnrichSummonsDelivery(Task task, RequestInfo requestInfo) {
+        TaskDetails taskDetails = task.getTaskDetails();
+        AuditDetails auditDetails = createAuditDetails(requestInfo);
+        String id = idgenUtil.getIdList(requestInfo, task.getTenantId(), config.getSummonsIdFormat(), null, 1).get(0);
+        return SummonsDelivery.builder()
+                .summonDeliveryId(id)
+                .taskNumber(task.getTaskNumber())
+                .caseId(taskDetails.getCaseDetails().getCaseId())
+                .tenantId(config.getEgovStateTenantId())
+                .docType(taskDetails.getSummonDetails().getDocType())
+                .docSubType(taskDetails.getSummonDetails().getDocSubType())
+                .partyType(taskDetails.getSummonDetails().getPartyType())
+                .paymentFees(taskDetails.getDeliveryChannel().getPaymentFees())
+                .paymentStatus(taskDetails.getDeliveryChannel().getPaymentStatus())
+                .paymentTransactionId(taskDetails.getDeliveryChannel().getPaymentTransactionId())
+                .channelName(taskDetails.getDeliveryChannel().getChannelName())
+                .deliveryRequestDate(LocalDate.now().toString())
+                .auditDetails(auditDetails)
+                .deliveryStatus("DELIVERY_NOT_STARTED")
+                .rowVersion(1)
                 .build();
+    }
 
+    private AuditDetails createAuditDetails(RequestInfo requestInfo) {
+        long currentTime = System.currentTimeMillis();
+        String userId = requestInfo.getUserInfo().getUuid();
+        return AuditDetails.builder()
+                .createdBy(userId)
+                .createdTime(currentTime)
+                .lastModifiedBy(userId)
+                .lastModifiedTime(currentTime)
+                .build();
     }
 
     public void enrichForUpdate(SummonsDelivery summonsDelivery, RequestInfo requestInfo) {

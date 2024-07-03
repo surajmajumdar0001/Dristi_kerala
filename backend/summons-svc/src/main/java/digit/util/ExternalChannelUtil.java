@@ -18,7 +18,7 @@ public class ExternalChannelUtil {
         this.channelFactory = channelFactory;
     }
 
-    public ChannelMessage sendSummonsByDeliveryChannel(SendSummonsRequest request, SummonsDelivery summonsDelivery) {
+    public ChannelMessage sendSummonsByDeliveryChannel(TaskRequest request, SummonsDelivery summonsDelivery) {
         ExternalChannel externalDeliveryChannel = channelFactory.getDeliveryChannel(summonsDelivery.getChannelName());
         return externalDeliveryChannel.sendSummons(request);
     }

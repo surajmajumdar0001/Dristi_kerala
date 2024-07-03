@@ -1,7 +1,8 @@
 package digit.util;
 
 import digit.config.Configuration;
-import digit.web.models.GenerateSummonsRequest;
+import digit.web.models.TaskRequest;
+import digit.web.models.TaskResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class PdfServiceUtil {
         this.config = config;
     }
 
-    public ByteArrayResource generatePdfFromPdfService(GenerateSummonsRequest generateSummonsRequest, String tenantId,
+    public ByteArrayResource generatePdfFromPdfService(TaskRequest taskRequest, String tenantId,
                                                        String pdfTemplateKey) {
         try {
             StringBuilder uri = new StringBuilder();
@@ -37,7 +38,7 @@ public class PdfServiceUtil {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<GenerateSummonsRequest> requestEntity = new HttpEntity<>(generateSummonsRequest, headers);
+            HttpEntity<TaskRequest> requestEntity = new HttpEntity<>(taskRequest, headers);
 
             ResponseEntity<ByteArrayResource> responseEntity = restTemplate.postForEntity(uri.toString(),
                     requestEntity, ByteArrayResource.class);
