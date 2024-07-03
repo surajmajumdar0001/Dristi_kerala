@@ -31,6 +31,9 @@ public class EsignController {
     private XmlSigning xmlSigning;
 
     @Autowired
+    private Producer producer;
+
+    @Autowired
     private PdfEmbedder pdfEmbedder;
     @Autowired
     private Encryption encryption;
@@ -49,6 +52,9 @@ public class EsignController {
 
     @Value("${cdac.esign.responseType}")
     private String responseType;
+
+    @Value("${email.kafka.topic}")
+    private String emailTopic;
 
     @RequestMapping(value = "/esign-its")
     public String uploadOneFileHandler(Model model) {
@@ -234,6 +240,17 @@ public class EsignController {
         } else {
 //            return "downloadPdf";
             return null;
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/sendEmail", method = RequestMethod.POST)
+    public String sendEmail(@RequestBody EmailRequest emailRequest){
+        try{
+            producer.push(emailTopic, emailRequest);
+            return "Email sent successfully";
+        } catch (Exception e){
+            return "Error sending email: " + e.getMessage();
         }
     }
 }
