@@ -1,4 +1,4 @@
-name: Scheduler Image Build workflow
+name: Individual Image Build workflow
 on:
   pull_request:
     types:
@@ -6,7 +6,7 @@ on:
     branches:
       - develop
     paths:
-      - 'backend/scheduler-svc/**'
+      - 'backend/individual/**'
   workflow_dispatch:
   workflow_call:
 
@@ -30,16 +30,16 @@ jobs:
           Merge_Commit=$(curl -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.GHUB_TOKEN }}" "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER" | jq -r '.merge_commit_sha')
           echo "Merge_Commit=$Merge_Commit" >> $GITHUB_ENV
 
-      - name: Build and Push Docker image for Scheduler-svc
+      - name: Build and Push Docker image for Individual
         run: |
-          docker build --build-arg WORK_DIR="backend/scheduler-svc" -t pucarsolutionsdev.azurecr.io/scheduler-svc:v1.0.0-${{ env.Merge_Commit }} -f build/maven/Dockerfile .
-          docker push pucarsolutionsdev.azurecr.io/scheduler-svc:v1.0.0-${{ env.Merge_Commit }}
+          docker build --build-arg WORK_DIR="backend/individual" -t pucarsolutionsdev.azurecr.io/individual:v1.0.0-${{ env.Merge_Commit }} -f build/maven/Dockerfile .
+          docker push pucarsolutionsdev.azurecr.io/individual:v1.0.0-${{ env.Merge_Commit }}
 
-      - name: Build and Push Docker image for scheduler-svc_DB
+      - name: Build and Push Docker image for Individual_DB
         run: |
-          docker build  -t pucarsolutionsdev.azurecr.io/scheduler-svc_db:v1.0.0-${{ env.Merge_Commit }} -f  Dockerfile .
-          docker push pucarsolutionsdev.azurecr.io/scheduler-svc_db:v1.0.0-${{ env.Merge_Commit }}
-        working-directory: backend/scheduler-svc/src/main/resources/db
+          docker build  -t pucarsolutionsdev.azurecr.io/individual_db:v1.0.0-${{ env.Merge_Commit }} -f  Dockerfile .
+          docker push pucarsolutionsdev.azurecr.io/individual_db:v1.0.0-${{ env.Merge_Commit }}
+        working-directory: backend/individual/src/main/resources/db
 
   Workflow_Trigger:
     runs-on: ubuntu-latest
