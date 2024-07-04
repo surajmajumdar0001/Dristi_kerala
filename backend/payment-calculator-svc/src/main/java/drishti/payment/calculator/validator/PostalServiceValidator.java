@@ -18,7 +18,7 @@ public class PostalServiceValidator {
             if (ObjectUtils.isEmpty(hub.getPincode()))
                 throw new CustomException("DK_PC_PINCODE_ERR", "pincode is mandatory for creating postal.");
 
-            if (ObjectUtils.isEmpty(hub.getPincode()))
+            if (ObjectUtils.isEmpty(hub.getDistanceKM()))
                 throw new CustomException("DK_PC_DIS_ERR", "distance is mandatory for creating postal.");
 
         });
