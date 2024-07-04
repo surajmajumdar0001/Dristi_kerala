@@ -88,4 +88,32 @@ public class Configuration {
 
     @Value("${egov.esummons.request.endpoint}")
     private String ESummonsRequestEndPoint;
+
+    //Billing Service
+
+    @Value("${egov.billingservice.host}")
+    private String billingServiceHost;
+
+    @Value("${egov.demand.create.endpoint}")
+    private String demandCreateEndpoint;
+
+    @Value("${egov.billingservice.fetch.bill}")
+    private String fetchBillEndpoint;
+
+    @Value("${task.taxhead.master.code}")
+    private String taskTaxHeadMasterCode;
+
+    @Value("${task.module.code}")
+    private String taskModuleCode;
+
+    @Value(("${task.business.service}"))
+    private String taskBusinessService;
+
+    //Payment Calculator Service
+
+    @Value("${payment.calculator.host}")
+    private String paymentCalculatorHost;
+
+    @Value("${payment.calculator.calculate.endpoint}")
+    private String paymentCalculatorCalculateEndpoint;
 }

@@ -112,7 +112,7 @@ public class SummonsService {
         summonsDelivery.setAdditionalFields(channelReport.getAdditionalFields());
     }
 
-    public void processStatusAndUpdateSummonsTask(SummonsRequest request) {
+    public void updateTaskStatus(SummonsRequest request) {
         TaskCriteria taskCriteria = TaskCriteria.builder().taskNumber(request.getSummonsDelivery().getTaskNumber()).build();
         TaskSearchRequest searchRequest = TaskSearchRequest.builder()
                 .requestInfo(request.getRequestInfo()).criteria(taskCriteria).build();
