@@ -17,7 +17,7 @@ public class SummonCalculationCriteria {
     private String channelId;
 
     @JsonProperty("receiverPincode")
-    private Integer receiverPincode;
+    private String receiverPincode;
 
     @JsonProperty("tenantId")
     private String tenantId = null;

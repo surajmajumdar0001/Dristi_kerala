@@ -27,6 +27,6 @@ public class HubSearchCriteria {
     private String name;
 
     @JsonProperty("pincode")
-    private Integer pincode;
+    private String pincode;
 
 }
