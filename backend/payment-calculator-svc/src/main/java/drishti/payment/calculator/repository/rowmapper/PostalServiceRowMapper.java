@@ -15,7 +15,7 @@ public class PostalServiceRowMapper implements RowMapper<PostalService> {
         PostalService postalService = PostalService.builder()
                 .postalHubId(rs.getString("postal_hub_id"))
                 .postalServiceId(rs.getString("postal_service_id"))
-                .pincode(rs.getInt("pincode"))
+                .pincode(rs.getString("pincode"))
                 .distanceKM(rs.getDouble("distance_km"))
                 .tenantId(rs.getString("tenant_id"))
                 .auditDetails(AuditDetails.builder()

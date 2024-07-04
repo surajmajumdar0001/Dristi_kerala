@@ -18,7 +18,7 @@ public class PostalHub {
     private String hubId;
 
     @JsonProperty("pincode")
-    private Integer pincode;
+    private String pincode;
 
     @JsonProperty("name")
     private String name;
