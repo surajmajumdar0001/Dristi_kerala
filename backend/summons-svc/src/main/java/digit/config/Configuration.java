@@ -103,6 +103,15 @@ public class Configuration {
     @Value("${task.taxhead.master.code}")
     private String taskTaxHeadMasterCode;
 
+    @Value("${egov.tax.period.to}")
+    private Long taxPeriodTo;
+
+    @Value("${egov.tax.period.from}")
+    private Long taxPeriodFrom;
+
+    @Value("${egov.tax.consumer.type}")
+    private String taxConsumerType;
+
     @Value("${task.module.code}")
     private String taskModuleCode;
 

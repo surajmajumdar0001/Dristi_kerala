@@ -69,11 +69,12 @@ public class DemandService {
                     .taxAmount(BigDecimal.valueOf(calculation.getTotalAmount()))
                     .taxHeadMasterCode(config.getTaskTaxHeadMasterCode()).build();
 
+            //TODO- should fetch all these details from mdms service
             Demand demand = Demand.builder()
                     .tenantId(calculation.getTenantId()).consumerCode(calculation.getApplicationId())
-                    .consumerType("task")
+                    .consumerType(config.getTaxConsumerType())
                     .businessService(config.getTaskModuleCode())
-                    .taxPeriodFrom(System.currentTimeMillis()).taxPeriodTo(System.currentTimeMillis())
+                    .taxPeriodFrom(config.getTaxPeriodFrom()).taxPeriodTo(config.getTaxPeriodTo())
                     .demandDetails(Collections.singletonList(demandDetail))
                     .build();
 
