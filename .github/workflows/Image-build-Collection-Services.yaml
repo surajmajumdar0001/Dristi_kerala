@@ -43,7 +43,7 @@ jobs:
 
   Workflow_Trigger:
     runs-on: ubuntu-latest
-    needs: image-build
+    needs: docker_image-build
     steps:
       - name: Trigger Deployment Pipeline for Solutions Dev
         run: |
