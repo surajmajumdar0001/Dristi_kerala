@@ -12,21 +12,28 @@ public class ChannelFactory {
 
     private final ICopsChannel iCopsChannel;
 
-    private final ESummonsChannel eSummonsChannel;
+    private final SMSChannel smsChannel;
+
+    private final EPostChannel ePostChannel;
+
+    private final EmailChannel emailChannel;
 
     @Autowired
-    public ChannelFactory(ICopsChannel iCopsChannel, ESummonsChannel eSummonsChannel) {
+    public ChannelFactory(ICopsChannel iCopsChannel, SMSChannel smsChannel, EPostChannel ePostChannel, EmailChannel emailChannel) {
         this.iCopsChannel = iCopsChannel;
-        this.eSummonsChannel = eSummonsChannel;
+        this.smsChannel = smsChannel;
+        this.ePostChannel = ePostChannel;
+        this.emailChannel = emailChannel;
     }
 
     public ExternalChannel getDeliveryChannel(ChannelName channelName) {
         return switch (channelName) {
-            case POST -> eSummonsChannel;
+            case POST -> ePostChannel;
             case POLICE -> iCopsChannel;
-            case SMS -> new ESummonsChannel();
+            case SMS -> smsChannel;
+            case EMAIL -> emailChannel;
             default ->
-                    throw new CustomException("SUMMONS_UNKNOWN_DELIVERY_CHANNEL", "Delivery Channel provided is not Valid");
+                    throw new CustomException("INVALID_DELIVERY_CHANNEL", "Delivery Channel provided is not Valid");
         };
     }
 }
