@@ -39,7 +39,7 @@ public class DemandService {
         Task task = taskRequest.getTask();
         List<Calculation> calculationList = generatePaymentDetails(taskRequest.getRequestInfo(), task);
         List<Demand> demands = generateDemands(taskRequest.getRequestInfo(), calculationList);
-        return getBill(taskRequest.getRequestInfo(), task.getTenantId(), task.getTaskNumber());
+        return getBill(taskRequest.getRequestInfo(), task);
     }
 
     public List<Calculation> generatePaymentDetails(RequestInfo requestInfo, Task task) {
@@ -91,8 +91,8 @@ public class DemandService {
         return demandResponse.getDemands();
     }
 
-    public BillResponse getBill(RequestInfo requestInfo, String tenantId, String applicationNumber) {
-        String uri = buildFetchBillURI(tenantId, applicationNumber, config.getTaskBusinessService());
+    public BillResponse getBill(RequestInfo requestInfo, Task task) {
+        String uri = buildFetchBillURI(task.getTenantId(), task.getTaskNumber(), config.getTaskBusinessService());
 
         Object response = repository.fetchResult(new StringBuilder(uri), requestInfo);
 

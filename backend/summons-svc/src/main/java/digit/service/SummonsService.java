@@ -118,7 +118,11 @@ public class SummonsService {
                 .requestInfo(request.getRequestInfo()).criteria(taskCriteria).build();
         TaskListResponse taskListResponse = taskUtil.callSearchTask(searchRequest);
         Task task = taskListResponse.getList().get(0);
-        task.setStatus("SUMMONSERVED");
+        if (task.getTaskType().equalsIgnoreCase("summons")) {
+            task.getWorkflow().setAction("SERVE");
+        } else if (task.getTaskType().equalsIgnoreCase("warrants")) {
+            task.getWorkflow().setAction("DELIVERED");
+        }
         TaskRequest taskRequest = TaskRequest.builder()
                 .requestInfo(request.getRequestInfo()).task(task).build();
         taskUtil.callUpdateTask(taskRequest);

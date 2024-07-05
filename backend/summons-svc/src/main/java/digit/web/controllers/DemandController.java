@@ -33,4 +33,10 @@ public class DemandController {
         BillResponse billResponse = demandService.fetchPaymentDetailsAndGenerateDemandAndBill(request);
         return new ResponseEntity<>(billResponse, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "demand/v1/_generateBill", method = RequestMethod.POST)
+    public ResponseEntity<BillResponse> generateBillForTask(@Parameter(in = ParameterIn.DEFAULT, description = "Details for generating a demand.", required = true, schema = @Schema()) @Valid @RequestBody TaskRequest request) {
+        BillResponse billResponse = demandService.getBill(request.getRequestInfo(), request.getTask());
+        return new ResponseEntity<>(billResponse, HttpStatus.OK);
+    }
 }
