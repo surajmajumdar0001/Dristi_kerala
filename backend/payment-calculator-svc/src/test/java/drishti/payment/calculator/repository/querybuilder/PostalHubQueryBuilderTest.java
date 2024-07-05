@@ -1,6 +1,7 @@
 package drishti.payment.calculator.repository.querybuilder;
 
 import drishti.payment.calculator.web.models.HubSearchCriteria;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,6 +18,14 @@ public class PostalHubQueryBuilderTest {
     @InjectMocks
     private PostalHubQueryBuilder postalHubQueryBuilder;
 
+    private List<Object> preparedStmtList;
+
+    @BeforeEach
+    void setUp(){
+        postalHubQueryBuilder = new PostalHubQueryBuilder();
+        preparedStmtList = new ArrayList<>();
+    }
+
     @Test
     public void testGetPostalHubQuery() {
         HubSearchCriteria criteria = new HubSearchCriteria();
@@ -30,5 +39,13 @@ public class PostalHubQueryBuilderTest {
         assertTrue(query.contains("SELECT *  FROM postal_hub ph"));
     }
 
+    @Test
+    void testGetPostalHubQuery_NoCriteria() {
+        HubSearchCriteria criteria = new HubSearchCriteria();
 
+        String query = postalHubQueryBuilder.getPostalHubQuery(criteria, preparedStmtList, 10, 0);
+
+        assertNotNull(query);
+        assertEquals(0, preparedStmtList.size());
+    }
 }

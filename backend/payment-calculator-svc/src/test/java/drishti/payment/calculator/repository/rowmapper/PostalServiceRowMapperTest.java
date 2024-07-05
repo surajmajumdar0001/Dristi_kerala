@@ -35,7 +35,7 @@ public class PostalServiceRowMapperTest {
         // Arrange
         when(resultSet.getString("postal_hub_id")).thenReturn("hub123");
         when(resultSet.getString("postal_service_id")).thenReturn("service123");
-        when(resultSet.getInt("pincode")).thenReturn(123456);
+        when(resultSet.getString("pincode")).thenReturn("123456");
         when(resultSet.getDouble("distance_km")).thenReturn(10.5);
         when(resultSet.getString("tenant_id")).thenReturn("tenant123");
         when(resultSet.getString("created_by")).thenReturn("user1");
@@ -50,7 +50,7 @@ public class PostalServiceRowMapperTest {
         // Assert
         assertEquals("hub123", postalService.getPostalHubId());
         assertEquals("service123", postalService.getPostalServiceId());
-        assertEquals(123456, postalService.getPincode());
+        assertEquals("123456", postalService.getPincode());
         assertEquals(10.5, postalService.getDistanceKM());
         assertEquals("tenant123", postalService.getTenantId());
 
@@ -65,7 +65,7 @@ public class PostalServiceRowMapperTest {
         // Verify interactions with the ResultSet
         verify(resultSet).getString("postal_hub_id");
         verify(resultSet).getString("postal_service_id");
-        verify(resultSet).getInt("pincode");
+        verify(resultSet).getString("pincode");
         verify(resultSet).getDouble("distance_km");
         verify(resultSet).getString("tenant_id");
         verify(resultSet).getString("created_by");

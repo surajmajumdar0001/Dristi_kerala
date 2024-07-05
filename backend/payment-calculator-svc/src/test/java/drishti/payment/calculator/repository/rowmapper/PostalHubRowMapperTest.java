@@ -36,7 +36,7 @@ public class PostalHubRowMapperTest {
         // Arrange
         when(resultSet.getString("hub_id")).thenReturn("hub123");
         when(resultSet.getString("name")).thenReturn("Postal Hub 1");
-        when(resultSet.getInt("pincode")).thenReturn(123456);
+        when(resultSet.getString("pincode")).thenReturn("123456");
 
         when(resultSet.getString("addressid")).thenReturn("address123");
         when(resultSet.getString("tenantid")).thenReturn("tenant123");
@@ -68,7 +68,7 @@ public class PostalHubRowMapperTest {
         // Assert
         assertEquals("hub123", postalHub.getHubId());
         assertEquals("Postal Hub 1", postalHub.getName());
-        assertEquals(123456, postalHub.getPincode());
+        assertEquals("123456", postalHub.getPincode());
 
         Address address = postalHub.getAddress();
         assertEquals("address123", address.getId());
@@ -99,7 +99,6 @@ public class PostalHubRowMapperTest {
         // Verify interactions with the ResultSet
         verify(resultSet).getString("hub_id");
         verify(resultSet).getString("name");
-        verify(resultSet).getInt("pincode");
 
         verify(resultSet).getString("addressid");
         verify(resultSet).getString("tenantid");
@@ -112,7 +111,6 @@ public class PostalHubRowMapperTest {
         verify(resultSet).getString("addressline2");
         verify(resultSet).getString("landmark");
         verify(resultSet).getString("city");
-        verify(resultSet).getString("pincode");
         verify(resultSet).getString("buildingname");
         verify(resultSet).getString("street");
 

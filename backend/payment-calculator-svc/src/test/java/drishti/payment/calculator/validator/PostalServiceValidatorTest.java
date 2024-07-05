@@ -23,7 +23,7 @@ public class PostalServiceValidatorTest {
         PostalService postalService = new PostalService();
         postalService.setTenantId("tenantId");
         postalService.setPostalHubId("postalHubId");
-        postalService.setPincode(123456);
+        postalService.setPincode("123456");
         postalService.setDistanceKM(50.0);
 
         PostalServiceRequest request = new PostalServiceRequest();
@@ -36,7 +36,7 @@ public class PostalServiceValidatorTest {
     public void testValidatePostalServiceRequest_MissingTenantId() {
         PostalService postalService = new PostalService();
         postalService.setPostalHubId("postalHubId");
-        postalService.setPincode(123456);
+        postalService.setPincode("123456");
         postalService.setDistanceKM(50.0);
 
         PostalServiceRequest request = new PostalServiceRequest();
@@ -51,7 +51,7 @@ public class PostalServiceValidatorTest {
     public void testValidatePostalServiceRequest_MissingPostalHubId() {
         PostalService postalService = new PostalService();
         postalService.setTenantId("tenantId");
-        postalService.setPincode(123456);
+        postalService.setPincode("123456");
         postalService.setDistanceKM(50.0);
 
         PostalServiceRequest request = new PostalServiceRequest();
@@ -82,7 +82,7 @@ public class PostalServiceValidatorTest {
         PostalService postalService = new PostalService();
         postalService.setTenantId("tenantId");
         postalService.setPostalHubId("postalHubId");
-        postalService.setPincode(123456);
+        postalService.setPincode("123456");
 
         PostalServiceRequest request = new PostalServiceRequest();
         request.setPostalServices(Collections.singletonList(postalService));

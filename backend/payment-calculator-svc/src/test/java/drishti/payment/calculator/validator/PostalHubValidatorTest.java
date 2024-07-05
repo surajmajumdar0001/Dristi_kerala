@@ -34,7 +34,7 @@ public class PostalHubValidatorTest {
         PostalHub postalHub = new PostalHub();
         postalHub.setTenantId("tenantId");
         postalHub.setName("name");
-        postalHub.setPincode(123456);
+        postalHub.setPincode("123456");
 
         PostalHubRequest request = new PostalHubRequest();
         request.setPostalHubs(Collections.singletonList(postalHub));
@@ -46,7 +46,7 @@ public class PostalHubValidatorTest {
     public void testValidatePostalHubRequest_MissingTenantId() {
         PostalHub postalHub = new PostalHub();
         postalHub.setName("name");
-        postalHub.setPincode(123456);
+        postalHub.setPincode("123456");
 
         PostalHubRequest request = new PostalHubRequest();
         request.setPostalHubs(Collections.singletonList(postalHub));
@@ -60,7 +60,7 @@ public class PostalHubValidatorTest {
     public void testValidatePostalHubRequest_MissingName() {
         PostalHub postalHub = new PostalHub();
         postalHub.setTenantId("tenantId");
-        postalHub.setPincode(123465);
+        postalHub.setPincode("123465");
 
         PostalHubRequest request = new PostalHubRequest();
         request.setPostalHubs(Collections.singletonList(postalHub));
