@@ -32,7 +32,7 @@ jobs:
 
       - name: Build and Push Docker image for Individual
         run: |
-          docker build --build-arg WORK_DIR="backend/individual" -t pucarsolutionsdev.azurecr.io/individual:v1.0.0-${{ env.Merge_Commit }} -f build/maven/Dockerfile .
+          docker build --build-arg WORK_DIR="backend/individual" -t pucarsolutionsdev.azurecr.io/individual:v1.0.0-${{ env.Merge_Commit }} -f build/maven-java8/Dockerfile .
           docker push pucarsolutionsdev.azurecr.io/individual:v1.0.0-${{ env.Merge_Commit }}
 
       - name: Build and Push Docker image for Individual_DB
