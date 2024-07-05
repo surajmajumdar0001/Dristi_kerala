@@ -1,5 +1,6 @@
 package org.pucar.dristi.repository;
 
+import org.egov.common.contract.models.AuditDetails;
 import org.egov.common.contract.models.Document;
 import org.egov.tracer.model.CustomException;
 import org.junit.jupiter.api.BeforeEach;
@@ -99,8 +100,10 @@ public class HearingRepositoryTest {
                 .thenThrow(RuntimeException.class);
 
         // Assert
+        LocalDate fromDate = LocalDate.now();
+        LocalDate toDate = LocalDate.now();
         assertThrows(CustomException.class, () ->
-                hearingRepository.getHearings("cnrNumber", "applicationNumber", "hearingId", "filingNumber", "tenantId", LocalDate.now(), LocalDate.now(), 10, 0, "sortBy"));
+                hearingRepository.getHearings("cnrNumber", "applicationNumber", "hearingId", "filingNumber", "tenantId", fromDate, toDate, 10, 0, "sortBy"));
     }
 
     @Test
@@ -260,5 +263,91 @@ public class HearingRepositoryTest {
         // Assert
         assertNotNull(result);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void updateTranscriptAdditionalAttendees_Success() {
+
+        AuditDetails auditDetails = new AuditDetails();
+        auditDetails.setLastModifiedBy("user1");
+        auditDetails.setLastModifiedTime(123456789L);
+
+        Hearing hearing = new Hearing();
+        hearing.setHearingId("hearing123");
+        hearing.setTenantId("tenant1");
+        hearing.setTranscript(List.of("transcript1", "transcript2"));
+        hearing.setAuditDetails(auditDetails);
+        // Arrange
+        List<Object> preparedStmtList = new ArrayList<>();
+        String hearingUpdateQuery = "UPDATE dristi_hearing SET transcript = ? , lastModifiedBy = ? , lastModifiedTime = ? WHERE hearingId = ? AND tenantId = ?";
+
+        when(queryBuilder.buildUpdateTranscriptAdditionalAttendeesQuery(preparedStmtList, hearing))
+                .thenReturn(hearingUpdateQuery);
+        when(jdbcTemplate.update(any(String.class), any(Object[].class))).thenReturn(1);
+
+        // Act
+        assertDoesNotThrow(() -> hearingRepository.updateTranscriptAdditionalAttendees(hearing));
+
+        // Assert
+        verify(queryBuilder, times(1)).buildUpdateTranscriptAdditionalAttendeesQuery(preparedStmtList, hearing);
+        verify(jdbcTemplate, times(1)).update(hearingUpdateQuery, preparedStmtList.toArray());
+    }
+
+    @Test
+    void updateTranscriptAdditionalAttendees_Failure() {
+
+        AuditDetails auditDetails = new AuditDetails();
+        auditDetails.setLastModifiedBy("user1");
+        auditDetails.setLastModifiedTime(123456789L);
+
+        Hearing hearing = new Hearing();
+        hearing.setHearingId("hearing123");
+        hearing.setTenantId("tenant1");
+        hearing.setTranscript(List.of("transcript1", "transcript2"));
+        hearing.setAuditDetails(auditDetails);
+
+        // Arrange
+        List<Object> preparedStmtList = new ArrayList<>();
+        String hearingUpdateQuery = "UPDATE dristi_hearing SET transcript = ? , lastModifiedBy = ? , lastModifiedTime = ? WHERE hearingId = ? AND tenantId = ?";
+
+        when(queryBuilder.buildUpdateTranscriptAdditionalAttendeesQuery(preparedStmtList, hearing))
+                .thenReturn(hearingUpdateQuery);
+        when(jdbcTemplate.update(any(String.class), any(Object[].class))).thenReturn(0);
+
+        // Act & Assert
+        CustomException exception = assertThrows(CustomException.class, () -> hearingRepository.updateTranscriptAdditionalAttendees(hearing));
+
+        assertEquals("Error while updating hearing", exception.getMessage());
+        verify(queryBuilder, times(1)).buildUpdateTranscriptAdditionalAttendeesQuery(preparedStmtList, hearing);
+        verify(jdbcTemplate, times(1)).update(hearingUpdateQuery, preparedStmtList.toArray());
+    }
+
+
+    @Test
+    void updateTranscriptAdditionalAttendees_Exception() {
+
+        AuditDetails auditDetails = new AuditDetails();
+        auditDetails.setLastModifiedBy("user1");
+        auditDetails.setLastModifiedTime(123456789L);
+
+        Hearing hearing = new Hearing();
+        hearing.setHearingId("hearing123");
+        hearing.setTenantId("tenant1");
+        hearing.setTranscript(List.of("transcript1", "transcript2"));
+        hearing.setAuditDetails(auditDetails);
+        // Arrange
+        List<Object> preparedStmtList = new ArrayList<>();
+        String hearingUpdateQuery = "UPDATE dristi_hearing SET transcript = ? , lastModifiedBy = ? , lastModifiedTime = ? WHERE hearingId = ? AND tenantId = ?";
+
+        when(queryBuilder.buildUpdateTranscriptAdditionalAttendeesQuery(preparedStmtList, hearing))
+                .thenReturn(hearingUpdateQuery);
+        when(jdbcTemplate.update(any(String.class), any(Object[].class))).thenThrow(new RuntimeException("Database error"));
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> hearingRepository.updateTranscriptAdditionalAttendees(hearing));
+
+        assertEquals("Database error", exception.getMessage());
+        verify(queryBuilder, times(1)).buildUpdateTranscriptAdditionalAttendeesQuery(preparedStmtList, hearing);
+        verify(jdbcTemplate, times(1)).update(hearingUpdateQuery, preparedStmtList.toArray());
     }
 }
