@@ -1,16 +1,40 @@
 name: Dristi-kerala Image Build workflow
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - develop
+#  pull_request:
+#    types:
+#      - closed
+#    branches:
+#      - develop
+#  push:
+#    branches:
+#      - develop
   workflow_dispatch:
 
 jobs:
+  Intro:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Introduction
+        run: echo "Image build for Solutions Started"
+
   image-build:
-    name: image-build
+    name: Scheduler Image Build workflow
     uses: ./.github/workflows/Image-build.yaml
+    secrets: inherit
+
+  Image-build-Advocate:
+    name: Advocate Image Build workflow
+    uses: ./.github/workflows/Image-build-Advocate.yaml
+    secrets: inherit
+
+  image-build-Digit-Ui:
+    name: Digit-UI Image Build workflow
+    uses: ./.github/workflows/image-build-Digit-Ui.yaml
+    secrets: inherit
+
+  Image-build-Payment-calculator:
+    name: Payment Calculator Image Build workflow
+    uses: ./.github/workflows/Image-build-Payment-calculator.yaml
     secrets: inherit
 
   Workflow_Trigger:
