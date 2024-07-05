@@ -23,42 +23,47 @@ import static org.pucar.dristi.config.ServiceConstants.APPLICATION_SEARCH_ERR;
 @Slf4j
 @Repository
 public class ApplicationRepository {
-    @Autowired
-    private ApplicationQueryBuilder queryBuilder;
+    private final ApplicationQueryBuilder queryBuilder;
+    private final JdbcTemplate jdbcTemplate;
+    private final ApplicationRowMapper rowMapper;
+    private final DocumentRowMapper documentRowMapper;
+    private final StatuteSectionRowMapper statuteSectionRowMapper;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    private ApplicationRowMapper rowMapper;
-
-    @Autowired
-    private DocumentRowMapper documentRowMapper;
-
-    @Autowired
-    private StatuteSectionRowMapper statuteSectionRowMapper;
+    public ApplicationRepository(
+            ApplicationQueryBuilder queryBuilder,
+            JdbcTemplate jdbcTemplate,
+            ApplicationRowMapper rowMapper,
+            DocumentRowMapper documentRowMapper,
+            StatuteSectionRowMapper statuteSectionRowMapper) {
+        this.queryBuilder = queryBuilder;
+        this.jdbcTemplate = jdbcTemplate;
+        this.rowMapper = rowMapper;
+        this.documentRowMapper = documentRowMapper;
+        this.statuteSectionRowMapper = statuteSectionRowMapper;
+    }
 
     public List<Application> getApplications(ApplicationSearchRequest applicationSearchRequest) {
 
         try {
             List<Application> applicationList = new ArrayList<>();
             List<Object> preparedStmtList = new ArrayList<>();
-            List<Object> preparedStmtListSt = new ArrayList<>();
-            List<Object> preparedStmtListDoc = new ArrayList<>();
+            List<Object> preparedStmtListSt;
+            List<Object> preparedStmtListDoc;
 
             String applicationQuery = queryBuilder.getApplicationSearchQuery(applicationSearchRequest.getCriteria().getId(), applicationSearchRequest.getCriteria().getFilingNumber(), applicationSearchRequest.getCriteria().getCnrNumber(),
                     applicationSearchRequest.getCriteria().getTenantId(), applicationSearchRequest.getCriteria().getStatus(),
-                    applicationSearchRequest.getCriteria().getApplicationNumber());
+                    applicationSearchRequest.getCriteria().getApplicationNumber(), preparedStmtList);
             log.info("Final application search query: {}", applicationQuery);
 
             if(applicationSearchRequest.getPagination() !=  null) {
-                Integer totalRecords = getTotalCountApplication(applicationQuery);
+                Integer totalRecords = getTotalCountApplication(applicationQuery, preparedStmtList);
                 log.info("Total count without pagination :: {}", totalRecords);
                 applicationSearchRequest.getPagination().setTotalCount(Double.valueOf(totalRecords));
-                applicationQuery = queryBuilder.addPaginationQuery(applicationQuery, applicationSearchRequest.getPagination());
+                applicationQuery = queryBuilder.addPaginationQuery(applicationQuery, applicationSearchRequest.getPagination(), preparedStmtList);
             }
 
-            List<Application> list = jdbcTemplate.query(applicationQuery, rowMapper);
+            List<Application> list = jdbcTemplate.query(applicationQuery, preparedStmtList.toArray(), rowMapper);
             log.info("DB application list :: {}", list);
             if (list != null) {
                 applicationList.addAll(list);
@@ -106,10 +111,10 @@ public class ApplicationRepository {
         }
     }
 
-    public Integer getTotalCountApplication(String baseQuery) {
+    public Integer getTotalCountApplication(String baseQuery, List<Object> preparedStmtList) {
         String countQuery = queryBuilder.getTotalCountQuery(baseQuery);
         log.info("Final count query :: {}", countQuery);
-        return jdbcTemplate.queryForObject(countQuery, Integer.class);
+        return jdbcTemplate.queryForObject(countQuery, preparedStmtList.toArray(), Integer.class);
     }
 
     public List<ApplicationExists> checkApplicationExists(List<ApplicationExists> applicationExistsList) {
@@ -121,9 +126,10 @@ public class ApplicationRepository {
                     {
                         applicationExist.setExists(false);
                 } else {
-                    String applicationExistQuery = queryBuilder.checkApplicationExistQuery(applicationExist.getFilingNumber(), applicationExist.getCnrNumber(), applicationExist.getApplicationNumber());
+                    List<Object> preparedStmtList = new ArrayList<>();
+                    String applicationExistQuery = queryBuilder.checkApplicationExistQuery(applicationExist.getFilingNumber(), applicationExist.getCnrNumber(), applicationExist.getApplicationNumber(), preparedStmtList);
                     log.info("Final application exist query: {}", applicationExistQuery);
-                    Integer count = jdbcTemplate.queryForObject(applicationExistQuery, Integer.class);
+                    Integer count = jdbcTemplate.queryForObject(applicationExistQuery, preparedStmtList.toArray(), Integer.class);
                     applicationExist.setExists(count != null && count > 0);
                 }
             }
