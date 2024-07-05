@@ -16,7 +16,7 @@ public class PostalHubRowMapper implements RowMapper<PostalHub> {
         PostalHub postalHub = PostalHub.builder()
                 .hubId(rs.getString("hub_id"))
                 .name(rs.getString("name"))
-                .pincode(rs.getInt("pincode"))
+                .pincode(rs.getString("pincode"))
                 .address(Address.builder()
                         .id(rs.getString("addressid"))
                         .tenantId(rs.getString("tenantid"))

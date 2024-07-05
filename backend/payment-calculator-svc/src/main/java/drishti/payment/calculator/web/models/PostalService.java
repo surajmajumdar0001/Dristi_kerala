@@ -28,7 +28,7 @@ public class PostalService {
 
     @JsonProperty("pincode")
     @Valid
-    private Integer pincode = null;
+    private String pincode = null;
 
     @JsonProperty("rowVersion")
     private Integer rowVersion = null;
