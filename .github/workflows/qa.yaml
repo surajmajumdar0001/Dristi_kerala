@@ -18,4 +18,4 @@ jobs:
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: token ${{ secrets.GHUB_TOKEN }}" \
           https://api.github.com/repos/pucardotorg/pucar-Devops/actions/workflows/solutions-qa.yaml/dispatches \
-          -d '{"ref":"Scheduler-Deploy"}'
+          -d '{"ref":"Solutions-Pipeline"}'
