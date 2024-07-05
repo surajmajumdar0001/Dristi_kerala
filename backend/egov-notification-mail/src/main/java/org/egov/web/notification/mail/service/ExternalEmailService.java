@@ -1,5 +1,6 @@
 package org.egov.web.notification.mail.service;
 
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.egov.tracer.model.CustomException;
@@ -79,6 +80,8 @@ public class ExternalEmailService implements EmailService {
 			helper.setTo(email.getEmailTo().toArray(new String[0]));
 			helper.setSubject(email.getSubject());
 			helper.setText(email.getBody(), true);
+			message.setFrom(new InternetAddress(config.getSenderEmail()));
+
 
 			if(email.getFileStoreId() != null) {
 				String tenantId = centralInstanceUtil.getStateLevelTenant(email.getTenantId());
