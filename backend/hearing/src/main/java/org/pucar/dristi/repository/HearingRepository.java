@@ -19,32 +19,38 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.pucar.dristi.config.ServiceConstants.HEARING_SEARCH_EXCEPTION;
+import static org.pucar.dristi.config.ServiceConstants.HEARING_UPDATE_EXCEPTION;
 
 
 @Slf4j
 @Repository
 public class HearingRepository {
 
-    @Autowired
     private HearingQueryBuilder queryBuilder;
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
     private HearingRowMapper rowMapper;
-    @Autowired
+
     private HearingDocumentRowMapper hearingDocumentRowMapper;
 
+    @Autowired
+    public HearingRepository(HearingQueryBuilder queryBuilder, JdbcTemplate jdbcTemplate, HearingRowMapper rowMapper, HearingDocumentRowMapper hearingDocumentRowMapper) {
+        this.queryBuilder = queryBuilder;
+        this.jdbcTemplate = jdbcTemplate;
+        this.rowMapper = rowMapper;
+        this.hearingDocumentRowMapper = hearingDocumentRowMapper;
+    }
 
-    public List<Hearing> getHearings(String cnrNumber, String applicationNumber, String hearingId, String filingNumber, String tenentId, LocalDate fromDate, LocalDate toDate, Integer limit, Integer offset, String sortBy) {
+
+    public List<Hearing> getHearings(String cnrNumber, String applicationNumber, String hearingId, String filingNumber, String tenantId, LocalDate fromDate, LocalDate toDate, Integer limit, Integer offset, String sortBy) {
 
         try {
             List<Hearing> hearingList = new ArrayList<>();
             List<Object> preparedStmtList = new ArrayList<>();
             List<Object> preparedStmtListDoc = new ArrayList<>();
             String hearingQuery;
-            hearingQuery = queryBuilder.getHearingSearchQuery(preparedStmtList, cnrNumber, applicationNumber, hearingId, filingNumber, tenentId, fromDate, toDate, limit, offset, sortBy);
+            hearingQuery = queryBuilder.getHearingSearchQuery(preparedStmtList, cnrNumber, applicationNumber, hearingId, filingNumber, tenantId, fromDate, toDate, limit, offset, sortBy);
             log.info("Final hearing list query: {}", hearingQuery);
             List<Hearing> list = jdbcTemplate.query(hearingQuery, preparedStmtList.toArray(), rowMapper);
             if (list != null) {
@@ -80,5 +86,13 @@ public class HearingRepository {
 
     public List<Hearing> getHearings(Hearing hearing) {
         return getHearings(null,null,hearing.getHearingId(),null,hearing.getTenantId(),null,null,1,0,null);
+    }
+
+    public void updateTranscriptAdditionalAttendees(Hearing hearing) {
+        List<Object> preparedStmtList = new ArrayList<>();
+        String hearingUpdateQuery = queryBuilder.buildUpdateTranscriptAdditionalAttendeesQuery(preparedStmtList, hearing);
+        log.info("Final update query: {}", hearingUpdateQuery);
+        int check = jdbcTemplate.update(hearingUpdateQuery, preparedStmtList.toArray());
+        if(check==0) throw new CustomException(HEARING_UPDATE_EXCEPTION,"Error while updating hearing");
     }
 }

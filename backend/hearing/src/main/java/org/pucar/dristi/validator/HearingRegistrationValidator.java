@@ -24,20 +24,31 @@ import static org.pucar.dristi.config.ServiceConstants.*;
 @Component
 @Slf4j
 public class HearingRegistrationValidator {
+    private final IndividualService individualService;
+    private final HearingRepository repository;
+    private final MdmsUtil mdmsUtil;
+    private final Configuration config;
+    private final ObjectMapper mapper;
+    private final CaseUtil caseUtil;
+    private final ApplicationUtil applicationUtil;
+
     @Autowired
-    private IndividualService individualService;
-    @Autowired
-    private HearingRepository repository;
-    @Autowired
-    private MdmsUtil mdmsUtil;
-    @Autowired
-    private Configuration config;
-    @Autowired
-    private ObjectMapper mapper;
-    @Autowired
-    private CaseUtil caseUtil;
-    @Autowired
-    private ApplicationUtil applicationUtil;
+    public HearingRegistrationValidator(
+            IndividualService individualService,
+            HearingRepository repository,
+            MdmsUtil mdmsUtil,
+            Configuration config,
+            ObjectMapper mapper,
+            CaseUtil caseUtil,
+            ApplicationUtil applicationUtil) {
+        this.individualService = individualService;
+        this.repository = repository;
+        this.mdmsUtil = mdmsUtil;
+        this.config = config;
+        this.mapper = mapper;
+        this.caseUtil = caseUtil;
+        this.applicationUtil = applicationUtil;
+    }
 
     /**
      * @param hearingRequest hearing application request
@@ -47,22 +58,36 @@ public class HearingRegistrationValidator {
     public void validateHearingRegistration(HearingRequest hearingRequest) throws CustomException {
         RequestInfo requestInfo = hearingRequest.getRequestInfo();
         Hearing hearing = hearingRequest.getHearing();
+
+        // Validate userInfo and tenantId
+        baseValidations(requestInfo, hearing);
+
+        // Validate individual ids
+        validateIndividualExistence(requestInfo, hearing);
+
+        // Validating Hearing Type
+        validateHearingType(requestInfo, hearing);
+
+        // Validate cnrNumbers and filingNumbers
+        validateCaseExistence(requestInfo, hearing);
+
+        // Validate applicationNumbers
+        validateApplicationExistence(requestInfo, hearing);
+
+        // TODO validate presided by judge.
+
+    }
+
+    private void baseValidations(RequestInfo requestInfo, Hearing hearing){
         if (requestInfo.getUserInfo() == null || requestInfo.getUserInfo().getTenantId() == null)
             throw new CustomException(VALIDATION_EXCEPTION, "User info not found!!!");
 
         if (ObjectUtils.isEmpty(hearing.getTenantId()) || ObjectUtils.isEmpty(hearing.getHearingType())) {
             throw new CustomException(ILLEGAL_ARGUMENT_EXCEPTION_CODE, "tenantId and hearing type are mandatory for creating hearing");
         }
-        hearing.getAttendees().forEach(attendee -> {
-            if(ObjectUtils.isEmpty(attendee.getIndividualId())){
-                throw new CustomException(ILLEGAL_ARGUMENT_EXCEPTION_CODE,"individualId is mandatory for attendee");
-            }
-            //searching individual exist or not
-            if(!individualService.searchIndividual(requestInfo,attendee.getIndividualId(), new HashMap<>()))
-                throw new CustomException(INDIVIDUAL_NOT_FOUND,"Requested Individual not found or does not exist. ID: "+ attendee.getIndividualId());
-        });
+    }
 
-        // Validating Hearing Type
+    private void validateHearingType(RequestInfo requestInfo, Hearing hearing){
         JSONArray hearingTypeList = mdmsUtil.fetchMdmsData(requestInfo,requestInfo.getUserInfo().getTenantId(),config.getMdmsHearingModuleName(),Collections.singletonList(config.getMdmsHearingTypeMasterName()))
                 .get(config.getMdmsHearingModuleName()).get(config.getMdmsHearingTypeMasterName());
 
@@ -73,8 +98,20 @@ public class HearingRegistrationValidator {
         }
         if (!validateHearingType)
             throw new CustomException(VALIDATION_EXCEPTION, "Could not validate Hearing Type!!!");
+    }
 
-        // Validate cnrNumbers and filingNumbers
+    private void validateIndividualExistence(RequestInfo requestInfo, Hearing hearing){
+        hearing.getAttendees().forEach(attendee -> {
+            if(ObjectUtils.isEmpty(attendee.getIndividualId())){
+                throw new CustomException(ILLEGAL_ARGUMENT_EXCEPTION_CODE,"individualId is mandatory for attendee");
+            }
+            //searching individual exist or not
+            if(!individualService.searchIndividual(requestInfo,attendee.getIndividualId(), new HashMap<>()))
+                throw new CustomException(INDIVIDUAL_NOT_FOUND,"Requested Individual not found or does not exist. ID: "+ attendee.getIndividualId());
+        });
+    }
+
+    private void validateCaseExistence(RequestInfo requestInfo, Hearing hearing){
         CaseExistsRequest caseExistsRequest = createCaseExistsRequest(requestInfo,hearing);
         CaseExistsResponse caseExistsResponse = caseUtil.fetchCaseDetails(caseExistsRequest);
         caseExistsResponse.getCriteria().forEach(caseExists -> {
@@ -86,8 +123,9 @@ public class HearingRegistrationValidator {
                 throw new CustomException(VALIDATION_EXCEPTION, error);
             }
         });
+    }
 
-        // Validate applicationNumbers
+    private void validateApplicationExistence(RequestInfo requestInfo, Hearing hearing){
         ApplicationExistsRequest applicationExistsRequest = createApplicationExistRequest(requestInfo,hearing);
         ApplicationExistsResponse applicationExistsResponse = applicationUtil.fetchApplicationDetails(applicationExistsRequest);
         applicationExistsResponse.getApplicationExists().forEach(applicationExists -> {
@@ -96,9 +134,6 @@ public class HearingRegistrationValidator {
                 throw new CustomException(VALIDATION_EXCEPTION, error);
             }
         });
-
-        // TODO validate presided by judge.
-
     }
 
     /**
@@ -152,4 +187,5 @@ public class HearingRegistrationValidator {
         applicationExistsRequest.setApplicationExists(criteriaList);
         return applicationExistsRequest;
     }
+
 }
