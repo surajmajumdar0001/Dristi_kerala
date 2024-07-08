@@ -58,13 +58,29 @@ public class SummonsConsumer {
         }
     }
 
+    @KafkaListener(topics = "insert-summons")
+    @Async
+    public void listenForInsertSummons(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
+        try {
+            SummonsRequest request = objectMapper.convertValue(record, SummonsRequest.class);
+            log.info(request.toString());
+            if (request.getSummonsDelivery().getDeliveryStatus().equalsIgnoreCase("SUMMONS_DELIVERED")) {
+                summonsService.updateTaskStatus(request);
+            }
+        } catch (final Exception e) {
+            log.error("Error while listening to value: {}: ", record, e);
+        }
+    }
+
     @KafkaListener(topics = "update-summons")
     @Async
     public void listenForUpdateSummons(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         try {
             SummonsRequest request = objectMapper.convertValue(record, SummonsRequest.class);
             log.info(request.toString());
-            summonsService.updateTaskStatus(request);
+            if (request.getSummonsDelivery().getDeliveryStatus().equalsIgnoreCase("SUMMONS_DELIVERED")) {
+                summonsService.updateTaskStatus(request);
+            }
         } catch (final Exception e) {
             log.error("Error while listening to value: {}: ", record, e);
         }
