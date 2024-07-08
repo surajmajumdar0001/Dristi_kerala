@@ -1,6 +1,7 @@
 package digit.channel;
 
 import digit.config.Configuration;
+import digit.kafka.Producer;
 import digit.web.models.ChannelMessage;
 import digit.web.models.ChannelResponse;
 import digit.web.models.TaskRequest;
@@ -18,25 +19,16 @@ import org.springframework.web.client.RestTemplate;
 public class SMSChannel implements ExternalChannel{
 
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final Producer producer;
 
-    @Autowired
-    private Configuration config;
+
+    public SMSChannel(Producer producer) {
+        this.producer = producer;
+    }
 
     @Override
     public ChannelMessage sendSummons(TaskRequest request) {
-        StringBuilder uri = new StringBuilder();
-        uri.append(config.getESummonsHost()).append(config.getESummonsRequestEndPoint());
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<TaskRequest> requestEntity = new HttpEntity<>(request, headers);
-
-        ResponseEntity<ChannelResponse> responseEntity = restTemplate.postForEntity(uri.toString(),
-                requestEntity, ChannelResponse.class);
-
-        return responseEntity.getBody().getChannelMessage();
+        producer.push("egov.core.notification.sms", request);
+        return ChannelMessage.builder().acknowledgementStatus("success").build();
     }
 }

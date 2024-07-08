@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class EPostChannel implements ExternalChannel{
+
     @Override
     public ChannelMessage sendSummons(TaskRequest request) {
         return null;
