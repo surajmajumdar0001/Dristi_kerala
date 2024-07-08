@@ -4,8 +4,9 @@ import { useHistory, useLocation } from "react-router-dom/cjs/react-router-dom.m
 function PaymentGatewayPage({ t }) {
   const history = useHistory();
   const location = useLocation();
+
   const html = location?.state?.state;
-  console.log(html);
+  // const html = html;
   const updatedHtmlString = html.replace(
     "ChallanGeneration.php",
     "https://www.stagingetreasury.kerala.gov.in/api/eTreasury/service/ChallanGeneration.php"
@@ -13,7 +14,7 @@ function PaymentGatewayPage({ t }) {
   console.log(updatedHtmlString);
   return (
     <React.Fragment>
-      <iframe srcdoc={updatedHtmlString} style={{ width: "100%", height: "100vh" }}></iframe>
+      <iframe srcdoc={updatedHtmlString} target="_parent" style={{ width: "100%", height: "100vh" }}></iframe>
     </React.Fragment>
   );
 }

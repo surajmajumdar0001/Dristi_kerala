@@ -86,6 +86,15 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     "dristi",
     Boolean(chequeDetails?.data?.chequeAmount)
   );
+  // function getRandomAlphabet() {
+  //   const alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+  //   return alphabets.charAt(Math.floor(Math.random() * alphabets.length));
+  // }
+
+  // function generateDepartmentId(caseDetails) {
+  //   const randomAlphabet = getRandomAlphabet();
+  //   return `${caseDetails?.filingNumber}${randomAlphabet}`;
+  // }
 
   const totalAmount = useMemo(() => {
     const totalAmount = calculationResponse?.Calculation?.[0]?.totalAmount || 0;
@@ -134,7 +143,19 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
   //   }
   // );
   // const bill = paymentDetails?.Bill ? paymentDetails?.Bill[0] : {};
+  const [apiResponse, setApiResponse] = useState("");
 
+  const handleApiResponse = (data) => {
+    setApiResponse(data);
+  };
+  console.log(apiResponse);
+  const openPopupWindow = (htmlContent) => {
+    const popup = window.open("", "Popup", "width=600,height=400");
+    window.handleApiResponse = handleApiResponse;
+    popup.document.open();
+    popup.document.write(htmlContent);
+    popup.document.close();
+  };
   const onSubmitCase = async () => {
     const handleError = (message) => {
       console.error(message);
@@ -142,37 +163,37 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     };
 
     try {
-      const demandResponse = await DRISTIService.createDemand({
-        Demands: [
-          {
-            tenantId,
-            consumerCode: caseDetails?.filingNumber,
-            consumerType: "case",
-            businessService: "case",
-            taxPeriodFrom: Date.now().toString(),
-            taxPeriodTo: Date.now().toString(),
-            demandDetails: [
-              {
-                taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
-                taxAmount: totalAmount,
-                collectionAmount: 0,
-              },
-            ],
-          },
-        ],
-      });
+      // const demandResponse = await DRISTIService.createDemand({
+      //   Demands: [
+      //     {
+      //       tenantId,
+      //       consumerCode: caseDetails?.filingNumber,
+      //       consumerType: "case",
+      //       businessService: "case",
+      //       taxPeriodFrom: Date.now().toString(),
+      //       taxPeriodTo: Date.now().toString(),
+      //       demandDetails: [
+      //         {
+      //           taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
+      //           taxAmount: totalAmount,
+      //           collectionAmount: 0,
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // });
 
       // if (!demandResponse) {
       //   handleError("Error creating demand.");
       //   return;
       // }
 
-      const bill = await DRISTIService.callFetchBill({}, { consumerCode: caseDetails?.filingNumber, tenantId, businessService: "case" });
+      // const bill = await DRISTIService.callFetchBill({}, { consumerCode: caseDetails?.filingNumber, tenantId, businessService: "case" });
 
-      if (!bill) {
-        history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox`);
-        return;
-      }
+      // if (!bill) {
+      //   history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox`);
+      //   return;
+      // }
 
       const gateway = await DRISTIService.callETreasury(
         {
@@ -189,7 +210,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
             ],
             CHALLAN_AMOUNT: "2",
             PARTY_NAME: "arun",
-            DEPARTMENT_ID: "16DSBTE20200614100505",
+            DEPARTMENT_ID: `${caseDetails?.filingNumber}Kfj`,
             TSB_RECEIPTS: "N",
           },
         },
@@ -197,10 +218,15 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
       );
 
       if (gateway) {
-        console.log(gateway?.htmlPage?.htmlString);
-        history.push(`${path}/e-filing-payment-gateway`, {
-          state: gateway?.htmlPage?.htmlString,
-        });
+        // // console.log(gateway?.htmlPage?.htmlString);
+        // history.push(`${path}/e-filing-payment-gateway`, {
+        //   state: gateway?.htmlPage?.htmlString,
+        // });
+        const updatedHtmlString = gateway?.htmlPage?.htmlString.replace(
+          "ChallanGeneration.php",
+          "https://www.stagingetreasury.kerala.gov.in/api/eTreasury/service/ChallanGeneration.php"
+        );
+        openPopupWindow(updatedHtmlString);
       } else {
         handleError("Error calling e-Treasury.");
       }
@@ -267,7 +293,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
             actionSaveOnSubmit={() => onSubmitCase()}
             headerBarMain={<Heading label={t("CS_PAY_TO_FILE_CASE")} />}
           >
-            <div className="payment-due-wrapper" style={{ display: "flex", flexDirection: "column" }}>
+            <div className="payment-due-wrapper" style={{ display: "flex", flexDirection: "column", maxHeight: "200px !important" }}>
               <div className="payment-due-text" style={{ fontSize: "18px" }}>
                 {`${t("CS_DUE_PAYMENT")} `}
                 <span style={{ fontWeight: 700 }}>Rs {totalAmount}/-.</span>

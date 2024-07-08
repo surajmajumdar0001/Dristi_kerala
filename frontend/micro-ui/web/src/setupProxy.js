@@ -32,6 +32,7 @@ module.exports = function (app) {
     "/hearing",
     "/order",
     "/payment",
-    "/etreasury"
+    "/etreasury",
+    "/payment-calculator"
   ].forEach((location) => app.use(location, createProxy));
 };
