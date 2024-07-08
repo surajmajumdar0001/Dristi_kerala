@@ -171,7 +171,7 @@ public class SummonsService {
 
     private ChannelMessage createChannelMessage(SummonsDelivery summonsDelivery) {
         return ChannelMessage.builder()
-                .acknowledgeUniqueNumber(summonsDelivery.getTaskNumber())
+                .acknowledgeUniqueNumber(summonsDelivery.getSummonDeliveryId())
                 .acknowledgementStatus("SUCCESS")
                 .build();
     }
