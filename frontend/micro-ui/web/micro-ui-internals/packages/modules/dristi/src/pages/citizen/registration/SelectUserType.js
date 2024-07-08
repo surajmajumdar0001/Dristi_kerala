@@ -100,11 +100,10 @@ const SelectUserType = ({ config, t, params = {}, setParams = () => {}, pathOnRe
     const identifierId = uploadedDocument ? uploadedDocument?.filedata?.files?.[0]?.fileStoreId : data?.adhaarNumber;
     const identifierIdDetails = uploadedDocument
       ? {
-          fileStoreId: identifierId,
-          filename: uploadedDocument?.filename,
-        }
+        fileStoreId: identifierId,
+        filename: uploadedDocument?.filename,
+      }
       : {};
-    console.log(uploadedDocument);
     const identifierType = uploadedDocument ? uploadedDocument?.IdType?.code : "AADHAR";
     setParams({ ...params, userType });
     let Individual = {
@@ -119,24 +118,24 @@ const SelectUserType = ({ config, t, params = {}, setParams = () => {}, pathOnRe
           username: Digit.UserService.getUser()?.info?.userName,
           roles: userType?.clientDetails?.selectUserType?.role
             ? [
-                {
-                  code: "CITIZEN",
-                  name: "Citizen",
-                  tenantId: tenantId,
-                },
-                ...userType?.clientDetails?.selectUserType?.role?.map((role) => ({
-                  code: role,
-                  name: role,
-                  tenantId: tenantId,
-                })),
-              ]
+              {
+                code: "CITIZEN",
+                name: "Citizen",
+                tenantId: tenantId,
+              },
+              ...userType?.clientDetails?.selectUserType?.role?.map((role) => ({
+                code: role,
+                name: role,
+                tenantId: tenantId,
+              })),
+            ]
             : [
-                {
-                  code: "CITIZEN",
-                  name: "Citizen",
-                  tenantId: tenantId,
-                },
-              ],
+              {
+                code: "CITIZEN",
+                name: "Citizen",
+                tenantId: tenantId,
+              },
+            ],
           type: Digit.UserService.getUser()?.info?.type,
         },
         userUuid: Digit.UserService.getUser()?.info?.uuid,
@@ -146,12 +145,15 @@ const SelectUserType = ({ config, t, params = {}, setParams = () => {}, pathOnRe
           {
             tenantId: tenantId,
             type: "PERMANENT",
-            doorNo: data?.address?.addressDetails?.doorNo,
             latitude: data?.address?.addressDetails?.coordinates?.latitude,
             longitude: data?.address?.addressDetails?.coordinates?.longitude,
             city: data?.address?.addressDetails?.city,
             pincode: data?.address?.addressDetails?.pincode,
-            district: data?.address?.addressDetails?.district,
+            addressLine1: data?.address?.addressDetails?.state,
+            addressLine2: data?.address?.addressDetails?.district,
+            street: data?.address?.addressDetails?.locality,
+            doorNo: data?.address?.addressDetails?.doorNo,
+            buildingName: data?.address?.addressDetails?.buildingName,
           },
         ],
         identifiers: [
@@ -184,7 +186,6 @@ const SelectUserType = ({ config, t, params = {}, setParams = () => {}, pathOnRe
         ...userType,
       },
     });
-    console.log(data);
     if ((userTypeSelcted === "LITIGANT" || userTypeSelcted === "ADVOCATE_CLERK") && !data?.Individual?.[0]?.individualId) {
       Digit.DRISTIService.postIndividualService(Individual, tenantId)
         .then((result) => {

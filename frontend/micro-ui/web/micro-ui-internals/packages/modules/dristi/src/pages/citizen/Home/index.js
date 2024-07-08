@@ -6,6 +6,7 @@ import TakeUserToRegistration from "./TakeUserToRegistration";
 import { userTypeOptions } from "../registration/config";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { CaseInProgressIcon, ClosedCasesIcon, FileCaseIcon, JoinCaseIcon, MyHearingsIcon, PendingActionsIcon } from "../../../icons/svgIndex";
+import Home from "./litigantHome";
 
 function CitizenHome({ tenantId, setHideBack }) {
   const Digit = window?.Digit || {};
@@ -76,7 +77,6 @@ function CitizenHome({ tenantId, setHideBack }) {
       searchResult?.[0]?.status !== "INACTIVE"
     );
   }, [searchResult, userType]);
-
   const isRejected = useMemo(() => {
     return (
       userType !== "LITIGANT" &&
@@ -94,40 +94,48 @@ function CitizenHome({ tenantId, setHideBack }) {
     return () => {
       setHideBack(false);
     };
-  }, [userHasIncompleteRegistration, registrationIsDoneApprovalIsPending]);
+  }, [userHasIncompleteRegistration, registrationIsDoneApprovalIsPending, setHideBack]);
 
   useEffect(() => {
     setHideBack(userHasIncompleteRegistration || registrationIsDoneApprovalIsPending);
     return () => {
       setHideBack(false);
     };
-  }, [userHasIncompleteRegistration, registrationIsDoneApprovalIsPending]);
+  }, [userHasIncompleteRegistration, registrationIsDoneApprovalIsPending, setHideBack]);
 
   if (isLoading || isSearchLoading || isFetching || isFetchingAdvoacte) {
     return <Loader />;
   }
 
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "30px", cursor: "pointer", justifyContent: "space-evenly" }}>
-      {individualId &&
-        !isApprovalPending &&
-        !isRejected &&
-        cardIcons.map((card, index) => {
-          return (
-            <CustomCard
-              key={index}
-              label={card.label}
-              Icon={card.Icon}
-              style={{ width: "400px", height: "150px" }}
-              onClick={() => {
-                if (card.label === "File a Case") {
-                  history.push(card.path);
-                }
-              }}
-            ></CustomCard>
-          );
-        })}
-
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "30px",
+        cursor: "pointer",
+        justifyContent: "space-evenly",
+        width: "100%",
+      }}
+    >
+      {individualId && !isApprovalPending && !isRejected && (
+        // cardIcons.map((card, index) => {
+        //   return (
+        //     <CustomCard
+        //       key={index}
+        //       label={card.label}
+        //       Icon={card.Icon}
+        //       style={{ width: "400px", height: "150px" }}
+        //       onClick={() => {
+        //         if (card.label === "File a Case") {
+        //           history.push(card.path);
+        //         }
+        //       }}
+        //     ></CustomCard>
+        //   );
+        // })}
+        <Home />
+      )}
       {registrationIsDoneApprovalIsPending && <ApplicationAwaitingPage individualId={individualId} />}
       {userHasIncompleteRegistration && (
         <TakeUserToRegistration

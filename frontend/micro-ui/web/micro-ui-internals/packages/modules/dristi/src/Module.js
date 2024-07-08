@@ -3,12 +3,15 @@ import React from "react";
 import { useRouteMatch } from "react-router-dom";
 import AddressComponent from "./components/AddressComponent";
 import SelectComponents from "./components/SelectComponents";
-import CitizenApp from "./pages/citizen";
 
+import SelectUserTypeComponent from "./components/SelectUserTypeComponent";
+import CustomRadioCard from "./components/CustomRadioCard";
 import AdhaarInput from "./components/AdhaarInput";
 import AdvocateDetailComponent from "./components/AdvocateDetailComponent";
-import CustomRadioCard from "./components/CustomRadioCard";
-import SelectUserTypeComponent from "./components/SelectUserTypeComponent";
+
+import Registration from "./pages/citizen/registration";
+import EmployeeApp from "./pages/employee";
+import CitizenApp from "./pages/citizen";
 
 import CustomInput from "./components/CustomInput";
 import DRISTICard from "./components/DRISTICard";
@@ -26,29 +29,46 @@ import { ToastProvider } from "./components/Toast/useToast";
 import VerificationComponent from "./components/VerificationComponent";
 import VerifyPhoneNumber from "./components/VerifyPhoneNumber";
 import { UICustomizations } from "./configs/UICustomizations";
+import SelectEmptyComponent from "./components/SelectEmptyComponent";
+import ScrutinyInfo from "./components/ScrutinyInfo";
+import AdvocateNameDetails from "./components/AdvocateNameDetails";
 import { CustomizedHooks } from "./hooks";
 import FileCase from "./pages/citizen/FileCase";
 import Login from "./pages/citizen/Login";
-import Registration from "./pages/citizen/registration";
 import AdvocateClerkAdditionalDetail from "./pages/citizen/registration/AdvocateClerkAdditionalDetail";
 import CitizenResponse from "./pages/citizen/registration/Response";
-import EmployeeApp from "./pages/employee";
 import Inbox from "./pages/employee/Inbox";
-const Digit = window?.Digit || {};
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import CustomRadioInfoComponent from "./components/CustomRadioInfoComponent";
+import Modal from "./components/Modal";
+import CustomCaseInfoDiv from "./components/CustomCaseInfoDiv";
+import DocViewerWrapper from "./pages/employee/docViewerWrapper";
+import CustomSortComponent from "./components/CustomSortComponent";
+import CustomErrorTooltip from "./components/CustomErrorTooltip";
+import MultiUploadWrapper from "./components/MultiUploadWrapper";
 
 export const DRISTIModule = ({ stateCode, userType, tenants }) => {
   const { path } = useRouteMatch();
-  const moduleCode = "DRISTI";
+  const history = useHistory();
+  const moduleCode = ["DRISTI", "CASE"];
   const tenantID = tenants?.[0]?.code?.split(".")?.[0];
   const language = Digit.StoreData.getCurrentLanguage();
   const { isLoading } = Digit.Services.useStore({ stateCode, moduleCode, language });
+  const userInfo = JSON.parse(window.localStorage.getItem("user-info"));
   if (isLoading) {
     return <Loader />;
   }
   Digit.SessionStorage.set("DRISTI_TENANTS", tenants);
 
-  if (userType === "citizen") {
-    return <CitizenApp path={path} stateCode={stateCode} userType={userType} tenants={tenants} tenantId={tenantID} />;
+  if (userType === "citizen" && userInfo?.type !== "EMPLOYEE") {
+    return (
+      <ToastProvider>
+        <CitizenApp path={path} stateCode={stateCode} userType={userType} tenants={tenants} tenantId={tenantID} />
+      </ToastProvider>
+    );
+  }
+  if (path?.includes(`/${window?.contextPath}/citizen`)) {
+    history.push(`/${window?.contextPath}/employee`);
   }
   return (
     <ToastProvider>
@@ -85,6 +105,17 @@ const componentsToRegister = {
   AdvocateDetailComponent,
   SelectUploadFiles,
   SelectUploadDocWithName,
+  SelectEmptyComponent,
+  ScrutinyInfo,
+  AdvocateNameDetails,
+  CustomRadioInfoComponent,
+  MODAL: Modal,
+  CUSTOMCASEINFODIV: CustomCaseInfoDiv,
+  DOCVIEWERWRAPPER: DocViewerWrapper,
+  CUSTOMERRORTOOLTIP: CustomErrorTooltip,
+  CustomSortComponent,
+  DocViewerWrapper,
+  MultiUploadWrapper,
 };
 
 const overrideHooks = () => {

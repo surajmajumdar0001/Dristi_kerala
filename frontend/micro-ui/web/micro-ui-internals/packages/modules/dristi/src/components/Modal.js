@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
-import ButtonSelector from "./ButtonSelector";
 import { HeaderBar, PopUp, Toast } from "@egovernments/digit-ui-react-components";
+import ButtonSelector from "./ButtonSelector";
 
 const Modal = ({
   headerBarMain,
@@ -22,7 +22,7 @@ const Modal = ({
   headerBarMainStyle,
   isOBPSFlow = false,
   popupModuleActionBarStyles = {},
-  submitTextClassName = {},
+  submitTextClassName = "",
   className
 }) => {
   /**
@@ -38,7 +38,7 @@ const Modal = ({
   return (
     <PopUp>
       <div className={`popup-module ${className}`} style={popupStyles}>
-        <HeaderBar main={headerBarMain} end={headerBarEnd} style={headerBarMainStyle ? headerBarMainStyle : {}} />
+        {headerBarMain && <HeaderBar main={headerBarMain} end={headerBarEnd} style={headerBarMainStyle ? headerBarMainStyle : {}} />}
         <div className="popup-module-main" style={popupModuleMianStyles ? popupModuleMianStyles : {}}>
           {children}
           <div
@@ -52,11 +52,13 @@ const Modal = ({
             }
           >
             {actionCancelLabel ? (
-              <ButtonSelector textStyles={{ margin: "0px" }} theme="border" label={actionCancelLabel} onSubmit={actionCancelOnSubmit} style={style} />
+              <ButtonSelector textStyles={{ margin: "0px", color: 'red' }} theme="border" label={actionCancelLabel} onSubmit={actionCancelOnSubmit} 
+              style={{border: '1px solid red'}}
+              />
             ) : (
               <div></div>
             )}
-            {!hideSubmit ? (
+            {actionSaveLabel && !hideSubmit ? (
               <ButtonSelector
                 textStyles={{ margin: "0px" }}
                 label={actionSaveLabel}

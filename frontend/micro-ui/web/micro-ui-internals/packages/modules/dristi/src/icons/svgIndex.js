@@ -189,6 +189,20 @@ const CustomArrowDownIcon = () => (
   </svg>
 );
 
+const CustomArrowOut = () => (
+  <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_2520_70201)">
+      <path d="M4.33203 12L12.332 4" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M5.83203 4H12.332V10.5" stroke="#231F20" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+    <defs>
+      <clipPath id="clip0_2520_70201">
+        <rect width="16" height="16" fill="white" transform="translate(0.332031)" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+
 const CustomSchedule = () => (
   <svg width="10" height="11" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
@@ -220,7 +234,7 @@ const CloseIconWhite = () => (
   </svg>
 );
 
-const ComplaintDetailsIcon = () => (
+const ComplainantDetailsIcon = () => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect width="32" height="32" rx="4" fill="#F8EBE3" />
     <g clip-path="url(#clip0_553_65638)">
@@ -325,9 +339,12 @@ const PrayerSwornIcon = () => (
 
 const FileIcon = () => (
   <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M10 0H2C0.9 0 0.0100002 0.9 0.0100002 2L0 18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM12 16H4V14H12V16ZM12 12H4V10H12V12ZM9 7V1.5L14.5 7H9Z" fill="#3D3C3C" />
+    <path
+      d="M10 0H2C0.9 0 0.0100002 0.9 0.0100002 2L0 18C0 19.1 0.89 20 1.99 20H14C15.1 20 16 19.1 16 18V6L10 0ZM12 16H4V14H12V16ZM12 12H4V10H12V12ZM9 7V1.5L14.5 7H9Z"
+      fill="#3D3C3C"
+    />
   </svg>
-)
+);
 
 const FileUploadIcon = () => (
   <svg width="15" height="17" viewBox="0 0 15 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -371,9 +388,12 @@ const LitigentIcon = () => (
 
 const InfoIconRed = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6.9987 0.333374C3.3187 0.333374 0.332031 3.32004 0.332031 7.00004C0.332031 10.68 3.3187 13.6667 6.9987 13.6667C10.6787 13.6667 13.6654 10.68 13.6654 7.00004C13.6654 3.32004 10.6787 0.333374 6.9987 0.333374ZM7.66536 10.3334H6.33203V6.33337H7.66536V10.3334ZM7.66536 5.00004H6.33203V3.66671H7.66536V5.00004Z" fill="#BB2C2F" />
+    <path
+      d="M6.9987 0.333374C3.3187 0.333374 0.332031 3.32004 0.332031 7.00004C0.332031 10.68 3.3187 13.6667 6.9987 13.6667C10.6787 13.6667 13.6654 10.68 13.6654 7.00004C13.6654 3.32004 10.6787 0.333374 6.9987 0.333374ZM7.66536 10.3334H6.33203V6.33337H7.66536V10.3334ZM7.66536 5.00004H6.33203V3.66671H7.66536V5.00004Z"
+      fill="#BB2C2F"
+    />
   </svg>
-)
+);
 
 const ErrorInfoIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -392,7 +412,7 @@ const ErrorInfoIcon = () => (
 );
 
 const FlagIcon = ({ isError }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M3 3V4V14V21H5V14H12.3828L13.3828 16H21V5H14.6172L13.6172 3H3ZM5 5H12.3828L13.3828 7H14H19V14H14.6172L13.6172 12H5V5Z"
       fill={isError ? "#BB2C2F" : "#3D3C3C"}
@@ -621,39 +641,141 @@ const WaitIcon = () => (
     />
   </svg>
 );
+
+const FSOErrorIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_4178_3003)">
+      <path
+        d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"
+        fill="#BB2C2F"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_4178_3003">
+        <rect width="24" height="24" fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+const CopyIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M4 2.85714H2.4C1.7632 2.85714 1.1528 3.08286 0.703198 3.485C0.252798 3.88643 0 4.43143 0 5C0 7.98857 0 14.8686 0 17.8571C0 18.4257 0.252798 18.9707 0.703198 19.3721C1.1528 19.7743 1.7632 20 2.4 20C5.1704 20 10.8296 20 13.6 20C14.2368 20 14.8472 19.7743 15.2968 19.3721C15.7472 18.9707 16 18.4257 16 17.8571V17.1429H17.6C18.2368 17.1429 18.8472 16.9171 19.2968 16.515C19.7472 16.1136 20 15.5686 20 15C20 12.0114 20 5.13143 20 2.14286C20 1.57429 19.7472 1.02928 19.2968 0.627856C18.8472 0.225713 18.2368 0 17.6 0C14.8296 0 9.1704 0 6.4 0C5.7632 0 5.1528 0.225713 4.7032 0.627856C4.2528 1.02928 4 1.57429 4 2.14286V2.85714ZM16 15.7143H17.6C17.812 15.7143 18.016 15.6393 18.1656 15.505C18.316 15.3714 18.4 15.1893 18.4 15V2.14286C18.4 1.95357 18.316 1.77143 18.1656 1.63786C18.016 1.50357 17.812 1.42857 17.6 1.42857H6.4C6.188 1.42857 5.984 1.50357 5.8344 1.63786C5.684 1.77143 5.6 1.95357 5.6 2.14286V2.85714H13.6C14.2368 2.85714 14.8472 3.08286 15.2968 3.485C15.7472 3.88643 16 4.43143 16 5V15.7143Z"
+      fill="#007E7E"
+    />
+  </svg>
+);
+const RightArrow = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z" fill="white" />
+  </svg>
+);
+
+const LeftArrow = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 7H3.83L9.42 1.41L8 0L0 8L8 16L9.41 14.59L3.83 9H16V7Z" fill="white" />
+  </svg>
+);
+
+const FileDownloadIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g clip-path="url(#clip0_2134_14200)">
+      <path d="M12.6693 6H10.0026V2H6.0026V6H3.33594L8.0026 10.6667L12.6693 6ZM3.33594 12V13.3333H12.6693V12H3.33594Z" fill="#9E400A" />
+    </g>
+    <defs>
+      <clipPath id="clip0_2134_14200">
+        <rect width="16" height="16" fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+const CalendarLeftArrow = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 15L7 10L12 5" stroke="#1F2937" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+);
+const CalendarRightArrow = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M7 5L12 10L7 15" stroke="#1F2937" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+);
+const WhiteRightArrow = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 0L6.59 1.41L12.17 7H0V9H12.17L6.59 14.59L8 16L16 8L8 0Z" fill="white" />
+  </svg>
+);
+const FactCheckIcon = () => (
+  <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M2 18C1.45 18 0.979167 17.8042 0.5875 17.4125C0.195833 17.0208 0 16.55 0 16V2C0 1.45 0.195833 0.979167 0.5875 0.5875C0.979167 0.195833 1.45 0 2 0H18C18.55 0 19.0208 0.195833 19.4125 0.5875C19.8042 0.979167 20 1.45 20 2V16C20 16.55 19.8042 17.0208 19.4125 17.4125C19.0208 17.8042 18.55 18 18 18H2ZM2 16H18V2H2V16ZM3 14H8V12H3V14ZM12.55 12L17.5 7.05L16.075 5.625L12.55 9.175L11.125 7.75L9.725 9.175L12.55 12ZM3 10H8V8H3V10ZM3 6H8V4H3V6Z"
+      fill="#007E7E"
+    />
+  </svg>
+);
+
+const InfoToolTipIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM11 15H9V9H11V15ZM11 7H9V5H11V7Z"
+      fill="#0F3B8C"
+    />
+  </svg>
+);
+
+
+const InfoIcon = () => (
+  <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M7.7085 4.04171H9.29183V5.62504H7.7085V4.04171ZM7.7085 7.20837H9.29183V11.9584H7.7085V7.20837ZM8.50016 0.083374C4.13016 0.083374 0.583496 3.63004 0.583496 8.00004C0.583496 12.37 4.13016 15.9167 8.50016 15.9167C12.8702 15.9167 16.4168 12.37 16.4168 8.00004C16.4168 3.63004 12.8702 0.083374 8.50016 0.083374ZM8.50016 14.3334C5.00891 14.3334 2.16683 11.4913 2.16683 8.00004C2.16683 4.50879 5.00891 1.66671 8.50016 1.66671C11.9914 1.66671 14.8335 4.50879 14.8335 8.00004C14.8335 11.4913 11.9914 14.3334 8.50016 14.3334Z"
+      fill="#505A5F"
+    />
+  </svg>
+);
+
 export {
-  RegisterIcon,
-  LoginIcon,
-  RegistrationRequestIcon,
-  CasesIcon,
-  FileCaseIcon,
+  AdvocateIcon,
+  CalendarLeftArrow,
+  CalendarRightArrow,
   CaseInProgressIcon,
-  MyHearingsIcon,
-  JoinCaseIcon,
-  ClosedCasesIcon,
-  PendingActionsIcon,
-  CustomDeleteIcon,
-  CustomAddIcon,
-  CustomArrowDownIcon,
-  CustomArrowUpIcon,
-  CustomSchedule,
-  CustomCompleteIcon,
+  CasesIcon,
+  ChequeDetailsIcon,
   CloseIcon,
   CloseIconWhite,
-  ComplaintDetailsIcon,
-  RespondentDetailsIcon,
-  ChequeDetailsIcon,
+  ClosedCasesIcon,
+  ComplainantDetailsIcon,
+  CopyIcon,
+  CustomAddIcon,
+  CustomArrowDownIcon,
+  CustomArrowOut,
+  CustomArrowUpIcon,
+  CustomCompleteIcon,
+  CustomDeleteIcon,
+  CustomSchedule,
   DebtLiabilityIcon,
   DemandDetailsNoticeIcon,
-  PrayerSwornIcon,
+  ErrorInfoIcon,
+  FSOErrorIcon,
+  FactCheckIcon,
+  FileCaseIcon,
+  FileDownloadIcon,
   FileIcon,
   FileUploadIcon,
-  AdvocateIcon,
+  FlagIcon, InfoIcon, InfoIconRed, InfoToolTipIcon, JoinCaseIcon,
+  LeftArrow,
   LitigentIcon,
-  ErrorInfoIcon,
-  FlagIcon,
+  LoginIcon,
+  MyHearingsIcon,
+  PendingActionsIcon,
+  PrayerSwornIcon,
+  RegisterIcon,
+  RegistrationRequestIcon,
+  RespondentDetailsIcon,
+  RightArrow,
   SuccessIcon,
   UploadIcon,
   WaitIcon,
-  InfoIconRed,
+  WhiteRightArrow
 };
+

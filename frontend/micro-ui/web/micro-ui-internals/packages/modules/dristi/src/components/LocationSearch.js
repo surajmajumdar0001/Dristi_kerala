@@ -225,10 +225,12 @@ const setLocationText = (location, onChange, isPlaceRequired = false, index) => 
         if (results[0]) {
           let pincode = GetPinCode(results[0]);
           const infoWindowContent = document.getElementById("pac-input-" + index);
-          infoWindowContent.value = getName(results[0]);
-          if (onChange) {
-            if (isPlaceRequired) onChange(pincode, results[0], { longitude: location.lng, latitude: location.lat }, infoWindowContent.value);
-            else onChange(pincode, results[0], { longitude: location.lng, latitude: location.lat });
+          if (infoWindowContent) {
+            infoWindowContent.value = getName(results[0]);
+            if (onChange) {
+              if (isPlaceRequired) onChange(pincode, results[0], { longitude: location.lng, latitude: location.lat }, infoWindowContent.value);
+              else onChange(pincode, results[0], { longitude: location.lng, latitude: location.lat });
+            }
           }
         }
       }
@@ -378,11 +380,11 @@ const LocationSearch = (props) => {
       loadGoogleMaps(initMaps);
     }
     mapScriptCall();
-    setCoordinateData({ callback: setCoordinates });
+    setCoordinateData({ callbackFunc: setCoordinates });
   }, [coordinates]);
 
   return (
-    <div className="map-wrap" style={props?.locationStyle}>
+    <div className={`map-wrap${props?.disable ? "-disable" : ""}`} style={props?.locationStyle}>
       <div className="map-search-bar-wrap">
         {/* <img src={searchicon} className="map-search-bar-icon" alt=""/> */}
         <SearchIconSvg className="map-search-bar-icon" />

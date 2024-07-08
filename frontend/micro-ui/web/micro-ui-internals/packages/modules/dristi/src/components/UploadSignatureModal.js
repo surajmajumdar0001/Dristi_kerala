@@ -1,8 +1,11 @@
-import { CloseSvg, Modal } from "@egovernments/digit-ui-react-components";
+import { CloseSvg } from "@egovernments/digit-ui-react-components";
 import React from "react";
 import SelectCustomDragDrop from "./SelectCustomDragDrop";
+import Modal from "./Modal";
+import { useToast } from "./Toast/useToast";
 
 function UploadSignatureModal({ t, setOpenUploadSignatureModal, config, onSelect, formData, name }) {
+  const toast = useToast();
   function setValue(value, input) {
     if (Array.isArray(input)) {
       onSelect(config.key, {
@@ -28,6 +31,7 @@ function UploadSignatureModal({ t, setOpenUploadSignatureModal, config, onSelect
   };
 
   const onSubmit = () => {
+    toast.success(t("CS_E_SIGN_VERIFIED"));
     setOpenUploadSignatureModal(false);
   };
 
@@ -35,17 +39,20 @@ function UploadSignatureModal({ t, setOpenUploadSignatureModal, config, onSelect
     setValue(null, name);
     setOpenUploadSignatureModal(false);
   };
-
   return (
     <Modal
       headerBarEnd={<CloseBtn onClick={onCancel} />}
       actionSaveLabel={t("CS_SUBMIT_SIGNATURE")}
       actionSaveOnSubmit={onSubmit}
       formId="modal-action"
+      isDisabled={!formData?.[config.key]}
       headerBarMain={<Heading label={t("CS_UPLOAD_SIGNATURE")} />}
-      className="case-types"
+      className="upload-signature-modal"
+      submitTextClassName="upload-signature-button"
     >
-      <SelectCustomDragDrop config={config} t={t} onSelect={onSelect} formData={formData} />
+      <div className="upload-signature-modal-main">
+        <SelectCustomDragDrop config={config} t={t} onSelect={onSelect} formData={formData} />
+      </div>
     </Modal>
   );
 }

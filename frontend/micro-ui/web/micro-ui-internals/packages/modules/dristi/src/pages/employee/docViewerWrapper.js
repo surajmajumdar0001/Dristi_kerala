@@ -29,9 +29,13 @@ const DocViewerWrapper = ({
   fileStoreId,
   tenantId,
   displayFilename,
+  documentName,
   selectedDocs = [],
   docViewerCardClassName,
   showDownloadOption = true,
+  docWidth = "262px",
+  docHeight = "206px",
+  preview,
 }) => {
   const Digit = window?.Digit || {};
   const { t } = useTranslation();
@@ -44,7 +48,6 @@ const DocViewerWrapper = ({
         uri: window.URL.createObjectURL(file),
         fileName: file?.name || fileName,
       }));
-
   return (
     <div className="docviewer-wrapper" id="docviewer-id">
       <Card className={docViewerCardClassName}>
@@ -54,7 +57,7 @@ const DocViewerWrapper = ({
               className="docViewer-image"
               documents={documents}
               pluginRenderers={DocViewerRenderers}
-              style={{ width: 262, height: 206, ...style }}
+              style={{ width: docWidth, height: docHeight, ...style }}
               theme={{
                 primary: "#F47738",
                 secondary: "#feefe7",
@@ -75,7 +78,7 @@ const DocViewerWrapper = ({
                   defaultZoom: 1.1, // 1 as default,
                   zoomJump: 0.2, // 0.1 as default,
                 },
-                pdfVerticalScrollByDefault: true, // false as default
+                pdfVerticalScrollByDefault: !preview, // false as default
               }}
             />{" "}
           </>
@@ -96,8 +99,24 @@ const DocViewerWrapper = ({
             textOverflow: "ellipsis",
           }}
         >
-          {displayFilename || t("CS_CLICK_TO_DOWNLOAD")}
+          {t(displayFilename) || t("CS_CLICK_TO_DOWNLOAD")}
         </a>
+      )}
+      {documentName && (
+        <p
+          style={{
+            display: "flex",
+            color: "#505A5F",
+            textDecoration: "none",
+            width: 250,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            margin: 8,
+          }}
+        >
+          {t(documentName)}
+        </p>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 const witnessFormConfig = [
   {
-    head: "CS_RESPONDENT_NAME",
+    head: "CS_WITNESS_NAME",
     body: [
       {
         type: "text",
@@ -8,11 +8,11 @@ const witnessFormConfig = [
         isMandatory: true,
         populators: {
           name: "firstName",
-          error: "CORE_REQUIRED_FIELD_ERROR",
+          error: "FIRST_LAST_NAME_MANDATORY_MESSAGE",
           validation: {
             pattern: {
               message: "CORE_COMMON_APPLICANT_NAME_INVALID",
-              value: /^[^{0-9}^\$\"<>?\\\\~!@#$%^()+={}\[\]*,/_:;“”‘’]{1,50}$/i,
+              value: /^[^{0-9}^\$\"<>?\\\\~!@#$%^()+={}\[\]*,/_:;“”‘’]{1,100}$/i,
             },
             minLength: 2,
             title: "",
@@ -23,12 +23,13 @@ const witnessFormConfig = [
       {
         type: "text",
         label: "MIDDLE_NAME",
+        labelChildren: "optional",
         populators: {
           name: "middleName",
           validation: {
             pattern: {
               message: "CORE_COMMON_APPLICANT_NAME_INVALID",
-              value: /^[^{0-9}^\$\"<>?\\\\~!@#$%^()+={}\[\]*,/_:;“”‘’]{1,50}$/i,
+              value: /^[^{0-9}^\$\"<>?\\\\~!@#$%^()+={}\[\]*,/_:;“”‘’]{1,100}$/i,
             },
             title: "",
             patternType: "Name",
@@ -41,11 +42,11 @@ const witnessFormConfig = [
         isMandatory: true,
         populators: {
           name: "lastName",
-          error: "CORE_REQUIRED_FIELD_ERROR",
+          error: "FIRST_LAST_NAME_MANDATORY_MESSAGE",
           validation: {
             pattern: {
               message: "CORE_COMMON_APPLICANT_NAME_INVALID",
-              value: /^[^{0-9}^\$\"<>?\\\\~!@#$%^()+={}\[\]*,/_:;“”‘’]{1,50}$/i,
+              value: /^[^{0-9}^\$\"<>?\\\\~!@#$%^()+={}\[\]*,/_:;“”‘’]{1,100}$/i,
             },
             minLength: 2,
             title: "",
@@ -56,7 +57,8 @@ const witnessFormConfig = [
     ],
   },
   {
-    head: "CS_RESPONDENT_PHONE",
+    head: "CS_WITNESS_CONTACT_DETAILS",
+    subHead: "CS_WITNESS_NOTE",
     body: [
       {
         type: "component",
@@ -76,6 +78,7 @@ const witnessFormConfig = [
                 minLength: 10,
                 maxLength: 10,
                 pattern: /^[6-9]\d{9}$/,
+                isNumber: true,
               },
               className: "mobile-number",
             },
@@ -86,7 +89,7 @@ const witnessFormConfig = [
     ],
   },
   {
-    head: "CS_RESPONDENT_EMAIL",
+    head: " ",
     body: [
       {
         type: "component",
@@ -102,7 +105,7 @@ const witnessFormConfig = [
               error: "ERR_HRMS_INVALID_MOB_NO",
               validation: {
                 required: true,
-                pattern: /\S+@\S+\.\S+/,
+                pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
               },
               className: "email-address",
             },
@@ -118,8 +121,9 @@ const witnessFormConfig = [
         type: "component",
         component: "SelectComponentsMulti",
         key: "addressDetails",
+        formType: "Witness",
         withoutLabel: true,
-        error: "sample required message",
+        error: "CORE_REQUIRED_FIELD_ERROR",
         required: false,
         isMandatory: true,
         populators: {
@@ -184,9 +188,11 @@ const witnessFormConfig = [
         populators: {
           inputs: [
             {
-              textAreaHeader: "CS_TEXTAREA_WITNESS_ADDITIONAL_DETAIL",
-              placeholder: "CS_TEXTAREA_PLACEHOLDER_WITNESS_ADDITIONAL_DETAIL",
-              headerClassName: "dristi-font-bold",
+              isOptional: true,
+              name: "text",
+              textAreaSubHeader: "CS_TEXTAREA_WITNESS_ADDITIONAL_DETAIL",
+              placeholder: "CS_TEXTAREA_PLACEHOLDER_ADDITIONAL_DETAIL",
+              subHeaderClassName: "dristi-font-bold",
               type: "TextAreaComponent",
             },
           ],
@@ -202,5 +208,7 @@ export const witnessConfig = {
   subtext: "CS_WITNESS_DETAIL_SUBTEXT",
   isOptional: false,
   addFormText: "ADD_WITNESS",
-  formItemName: "Witness",
+  formItemName: "CS_WITNESS",
+  className: "witness-details",
+  showOptionalInHeader: true,
 };

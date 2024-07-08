@@ -1,10 +1,30 @@
 import { Button, ErrorIcon } from "@egovernments/digit-ui-react-components";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ReactComponent as DeleteFileIcon } from "../images/delete.svg";
 import { FileUploader } from "react-drag-drop-files";
 import { ReactComponent as UploadFileIcon } from "../images/upload.svg";
 import { CloseIconWhite, FileIcon } from "../icons/svgIndex";
-function RenderFileCard({ handleChange, handleDeleteFile, fileData, t, input, index, uploadErrorInfo, isDisabled = false }) {
+function RenderFileCard({
+  handleChange,
+  handleDeleteFile,
+  fileData,
+  t,
+  input,
+  index,
+  uploadErrorInfo,
+  isDisabled = false,
+  disableUploadDelete = false,
+}) {
+  const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    if (fileData.fileStore) {
+      const draftFile = new File(["draft content"], fileData.documentName, {
+        type: fileData.documentType,
+      });
+      setFile(draftFile);
+    }
+  }, [fileData]);
   return (
     <div className={`uploaded-file-div-main upload-${!!uploadErrorInfo ? "error" : "successful"}`}>
       <div className={`uploaded-file-div-sub ${!!uploadErrorInfo ? "error" : ""}`}>
@@ -12,11 +32,9 @@ function RenderFileCard({ handleChange, handleDeleteFile, fileData, t, input, in
           <div className="uploaded-file-icon">
             <FileIcon />
           </div>
-          <h3>{fileData?.name}</h3>
+          <h3>{fileData.fileStore ? file?.name : fileData?.name}</h3>
         </div>
         <div className="reupload-or-delete-div">
-
-
           <div>
             <FileUploader
               handleChange={(data) => {
@@ -27,6 +45,7 @@ function RenderFileCard({ handleChange, handleDeleteFile, fileData, t, input, in
               disabled={isDisabled}
               children={
                 <Button
+                  isDisabled={disableUploadDelete}
                   onButtonClick={() => {
                     if (isDisabled) handleChange(input, index);
                   }}
@@ -43,9 +62,11 @@ function RenderFileCard({ handleChange, handleDeleteFile, fileData, t, input, in
             />
           </div>
           <Button
+            isDisabled={disableUploadDelete}
             onButtonClick={() => {
               handleDeleteFile(input, index);
             }}
+            key={`Delete-${input.name}`}
             icon={
               <div>
                 <DeleteFileIcon />{" "}
@@ -71,7 +92,14 @@ function RenderFileCard({ handleChange, handleDeleteFile, fileData, t, input, in
 
       <div className={`uploaded-file-div-sub-mobile`}>
         <img src="https://picsum.photos/200" alt="Description" className="image" />
-        <div className="close-button" onClick={() => { handleDeleteFile(input, index); }}><CloseIconWhite /></div>
+        <div
+          className="close-button"
+          onClick={() => {
+            handleDeleteFile(input, index);
+          }}
+        >
+          <CloseIconWhite />
+        </div>
       </div>
       {!!uploadErrorInfo && (
         <div className="upload-error-div-main">

@@ -1,8 +1,11 @@
-import { CloseSvg, Modal, TextInput } from "@egovernments/digit-ui-react-components";
+import { CloseSvg, TextInput } from "@egovernments/digit-ui-react-components";
 import React, { useMemo, useState } from "react";
 import { ErrorInfoIcon } from "../icons/svgIndex";
+import Modal from "./Modal";
+import { useToast } from "./Toast/useToast";
 
 function EsignAdharModal({ t, setOpenAadharModal, name, onSelect, config, formData }) {
+  const toast = useToast();
   function setValue(value, input) {
     if (Array.isArray(input)) {
       onSelect(config.key, {
@@ -40,6 +43,7 @@ function EsignAdharModal({ t, setOpenAadharModal, name, onSelect, config, formDa
       setValue(["aadharsignature"], name);
       setOpenAadharModal(false);
     }
+    toast.success(t("CS_E_SIGN_VERIFIED"));
   };
 
   const onCancel = () => {
@@ -71,7 +75,7 @@ function EsignAdharModal({ t, setOpenAadharModal, name, onSelect, config, formDa
   }, [page, errorMessage]);
 
   const isDisabled = useMemo(() => {
-    return (page === 0 && aadharNumber < minLength) || errorMessage || (page === 1 && otp.length < minLength) ? true : false;
+    return (page === 0 && aadharNumber.length < minLength) || errorMessage || (page === 1 && otp.length < minLength) ? true : false;
   }, [aadharNumber, errorMessage, minLength, otp.length, page]);
 
   return (
@@ -81,11 +85,12 @@ function EsignAdharModal({ t, setOpenAadharModal, name, onSelect, config, formDa
       actionSaveOnSubmit={onSubmit}
       formId="modal-action"
       headerBarMain={<Heading label={t("CS_ESIGN_AADHAR")} />}
-      className="case-types"
+      className="e-sign-aadhar-modal"
       isDisabled={isDisabled}
+      submitTextClassName="e-sign-aadhar-button"
     >
-      <div>
-        <div>{textfieldTitle}</div>
+      <div className="e-sign-aadhar-main">
+        <h3 className="e-sign-aadhar-title">{textfieldTitle}</h3>
         <div style={{ width: "100%" }}>
           <TextInput
             value={page === 0 ? aadharNumber : otp}
@@ -98,10 +103,10 @@ function EsignAdharModal({ t, setOpenAadharModal, name, onSelect, config, formDa
             minlength={minLength}
             maxlength={maxLength}
           />
-          <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: "3px", paddingBottom: "5px" }}>
+          <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center", gap: "3px" }}>
             {errorMessage && <ErrorInfoIcon />}
             <div style={{ color: errorMessage ? "#BB2C2F" : "black" }}>{bottomText}</div>
-            {page === 1 && <div style={{ borderBottom: "1px", color: "#007E7E" }}>Resend</div>}
+            {page === 1 && <div style={{ borderBottom: "1px", color: "#007E7E", textDecoration: "underline", cursor: "pointer" }}>Resend</div>}
           </div>
         </div>
       </div>

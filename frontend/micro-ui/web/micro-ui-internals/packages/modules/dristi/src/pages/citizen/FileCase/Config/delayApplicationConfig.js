@@ -3,14 +3,14 @@ const delayApplicationFormConfig = [
     body: [
       {
         type: "radio",
-        key: "delayApplicationType",
-        label: "CS_DELAY_APPLICATION_TYPE",
+        key: "delayCondonationType",
+        label: "CS_QUESTION_DELAY_APPLICATION",
         isMandatory: true,
         populators: {
-          label: "CS_DELAY_APPLICATION_TYPE",
+          label: "CS_QUESTION_DELAY_APPLICATION",
           type: "radioButton",
           optionsKey: "name",
-          error: "sample required message",
+          error: "CORE_REQUIRED_FIELD_ERROR",
           required: false,
           isMandatory: true,
           isDependent: true,
@@ -36,7 +36,7 @@ const delayApplicationFormConfig = [
     ],
   },
   {
-    dependentKey: { delayApplicationType: ["showForm"] },
+    dependentKey: { delayCondonationType: ["showForm"] },
     body: [
       {
         type: "component",
@@ -46,6 +46,7 @@ const delayApplicationFormConfig = [
         populators: {
           inputs: [
             {
+              name: "reasonForDelay",
               textAreaHeader: "CS_TEXTAREA_HEADER_DELAY_REASON",
               type: "TextAreaComponent",
               headerClassName: "text-area-header",
@@ -56,7 +57,7 @@ const delayApplicationFormConfig = [
     ],
   },
   {
-    dependentKey: { delayApplicationType: ["showForm"] },
+    dependentKey: { delayCondonationType: ["showForm"] },
     body: [
       {
         type: "component",
@@ -67,8 +68,8 @@ const delayApplicationFormConfig = [
           inputs: [
             {
               infoHeader: "CS_COMMON_NOTE",
-              infoText: "CS_NOTETEXT_RESPONDENT_ADDRESS",
-              infoTooltipMessage: "CS_NOTETOOLTIP_RESPONDENT_ADDRESS",
+              infoText: "CS_NOTE_DELAY_APPLICATION",
+              infoTooltipMessage: "Tooltip",
               type: "InfoComponent",
             },
           ],
@@ -77,7 +78,7 @@ const delayApplicationFormConfig = [
     ],
   },
   {
-    dependentKey: { delayApplicationType: ["showForm"] },
+    dependentKey: { delayCondonationType: ["showForm"] },
     body: [
       {
         type: "component",
@@ -88,14 +89,13 @@ const delayApplicationFormConfig = [
           inputs: [
             {
               name: "document",
-              documentHeader: "Aadhar",
-              isOptional: "optional",
+              documentHeader: "CS_DELAY_CONDONATION_APPLICATION",
               infoTooltipMessage: "Tooltip",
               type: "DragDropComponent",
-              uploadGuidelines: "Upload .png",
+              uploadGuidelines: "UPLOAD_DOC_50",
               maxFileSize: 50,
               maxFileErrorMessage: "CS_FILE_LIMIT_1_MB",
-              fileTypes: ["JPG", "PNG", "PDF"],
+              fileTypes: ["JPG", "PDF"],
             },
           ],
         },
@@ -109,4 +109,7 @@ export const delayApplicationConfig = {
   header: "CS_RESPONDENT_DELAY_APPLICATION_HEADING",
   subtext: "CS_RESPONDENT_DELAY_APPLICATION_SUBTEXT",
   className: "delay-application",
+  selectDocumentName: {
+    condonationFileUpload: "CS_DELAY_CONDONATION_APPLICATION",
+  },
 };
