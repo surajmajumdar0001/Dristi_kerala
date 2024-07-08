@@ -2,8 +2,12 @@ package org.pucar.dristi.config;
 
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class ServiceConstants {
+	private ServiceConstants() {
+	}
 
 	public static final String EXTERNAL_SERVICE_EXCEPTION = "External Service threw an Exception: ";
 	public static final String SEARCHER_SERVICE_EXCEPTION = "Exception while fetching from searcher: ";
@@ -47,6 +51,7 @@ public class ServiceConstants {
 	public static final String BUSINESS_SERVICES = "&businessServices=";
 	public static final String INDIVIDUAL_NOT_FOUND = "INDIVIDUAL_NOT_FOUND";
 	public static final String ERROR_WHILE_FETCHING_FROM_ADVOCATE = "ERROR_WHILE_FETCHING_FROM_ADVOCATE";
+	public static final String ERROR_WHILE_CREATING_DEMAND_FOR_CASE = "ERROR_WHILE_CREATING_DEMAND_FOR_CASE";
 	public static final String CREATE_CASE_ERR = "CREATE_CASE_ERR";
 	public static final String SEARCH_CASE_ERR = "CASE_NOT_FOUND";
 	public static final String UPDATE_CASE_ERR = "UPDATE_CASE_ERR";
@@ -55,6 +60,7 @@ public class ServiceConstants {
 	public static final String SEARCH_WITNESS_ERR = "WITNESS_NOT_FOUND";
 	public static final String UPDATE_WITNESS_ERR = "UPDATE_WITNESS_ERR";
 	public static final String VALIDATION_ERR = "VALIDATION_EXCEPTION";
+	public static final String JOIN_CASE_ERR = "JOIN_CASE_ERR";
 	public static final String ENRICHMENT_EXCEPTION = "ENRICHMENT_EXCEPTION";
 	public static final String WORKFLOW_SERVICE_EXCEPTION = "WORKFLOW_SERVICE_EXCEPTION";
 	public static final String INDIVIDUAL_SERVICE_EXCEPTION = "INDIVIDUAL_SERVICE_EXCEPTION";
@@ -82,5 +88,20 @@ public class ServiceConstants {
 	public static final String SAVE_DRAFT_CASE_WORKFLOW_ACTION = "SAVE_DRAFT";
 	public static final String SUBMIT_CASE_WORKFLOW_ACTION = "SUBMIT_CASE";
 	public static final String DELETE_DRAFT_WORKFLOW_ACTION = "DELETE_DRAFT";
+	public static final Long TAX_PERIOD_FROM = 1680287400000l;
+	public static final Long TAX_PERIOD_TO = 1711909799000l;
+	public static final BigDecimal TAX_AMOUNT = BigDecimal.valueOf(2000.00);
+	public static final String TAX_HEADMASTER_CODE = "CASE_ADVANCE_CARRYFORWARD";
+	public static final String CREATE_DEMAND_STATUS = "PAYMENT_PENDING";
+	public static final String CASE_ADMIT_STATUS = "CASE_ADMITTED";
+	public static final int ACCESSCODE_LENGTH = 6;
+	public static final String STATE = "KL";
+	public static final String DISTRICT = "JL";
+	public static final String ESTABLISHMENT_CODE = "01";
 
+	//error logs constants
+	public static final String JOIN_CASE_INVALID_REQUEST = "Invalid request for joining a case";
+	public static final String INVALID_COMPLAINANT_DETAILS = "Invalid complainant details";
+	public static final String INVALID_DOCUMENT_DETAILS = "Invalid document details";
+	public static final String INVALID_ADVOCATE_DETAILS = "Invalid advocate details";
 }

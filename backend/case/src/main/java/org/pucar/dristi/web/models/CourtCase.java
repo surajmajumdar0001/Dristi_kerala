@@ -16,8 +16,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -65,7 +63,7 @@ public class CourtCase {
 
 	@JsonProperty("courtCaseNumber")
 	//@Size(min=10,max=24)
-	private String courCaseNumber = null;
+	private String courtCaseNumber = null;
 
 	@JsonProperty("caseNumber")
 
@@ -101,6 +99,10 @@ public class CourtCase {
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate registrationDate = null;
 
+	@JsonProperty("judgementDate")
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private LocalDate judgementDate = null;
+
 	@JsonProperty("caseDetails")
 	private Object caseDetails = null;
 
@@ -108,6 +110,15 @@ public class CourtCase {
 	//@NotNull
 	//@Size(min = 2, max = 64)
 	private String caseCategory = null;
+
+	@JsonProperty("judgeId")
+	private String judgeId = null;
+
+	@JsonProperty("stage")
+	private String stage = null;
+
+	@JsonProperty("substage")
+	private String substage = null;
 
 	@JsonProperty("natureOfPleading")
 	//@Size(min = 2, max = 64)
