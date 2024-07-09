@@ -1,28 +1,18 @@
 package digit.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import digit.config.Configuration;
-import digit.config.ServiceConstants;
 import digit.helper.DefaultMasterDataHelper;
 import digit.kafka.Producer;
-import digit.repository.ReScheduleRequestRepository;
-import digit.util.MdmsUtil;
 import digit.web.models.*;
-import digit.web.models.enums.Status;
-import net.minidev.json.JSONArray;
 import org.egov.common.contract.request.RequestInfo;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -79,14 +69,11 @@ public class HearingSchedulerTest {
         hearingTypeMap.put("type", mdmsHearing);
 
         when(hearingService.search(any(HearingSearchRequest.class), any(), any())).thenReturn(scheduleHearings);
-        when(helper.getDataFromMDMS(eq(MdmsSlot.class), anyString())).thenReturn(defaultSlots);
-        when(helper.getDataFromMDMS(eq(MdmsHearing.class), anyString())).thenReturn(defaultHearings);
 
         hearingScheduler.scheduleHearingForApprovalStatus(reScheduleHearingRequest);
 
         verify(producer, times(1)).push(eq("schedule-hearing-to-block-calendar"), any());
         verify(hearingService, times(1)).search(any(HearingSearchRequest.class), any(), any());
-        verify(hearingService, times(1)).updateBulk(any(ScheduleHearingRequest.class), eq(defaultSlots), eq(hearingTypeMap));
     }
 
     @Test

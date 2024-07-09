@@ -62,7 +62,7 @@ public class WorkflowService {
             return response.getProcessInstances().get(0).getState();
     }
 
-    private ProcessInstance getProcessInstanceForHearingReScheduler(ReScheduleHearing application, RequestInfo requestInfo) {
+    ProcessInstance getProcessInstanceForHearingReScheduler(ReScheduleHearing application, RequestInfo requestInfo) {
 
         log.info("operation= getProcessInstanceForHearingReScheduler, result=IN_PROGRESS, tenantId={}", application.getTenantId());
         Workflow workflow = application.getWorkflow();
