@@ -54,6 +54,7 @@ public class PdfEmbedder {
                 PdfDictionary dic2 = new PdfDictionary();
                 dic2.put(PdfName.CONTENTS,
                         new PdfString(paddedSig).setHexWriting(true));
+                appearance.preClose();
                 appearance.close(dic2);
             } else {
                 // handle error case
