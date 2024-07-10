@@ -59,11 +59,13 @@ export const DRISTIModule = ({ stateCode, userType, tenants }) => {
     return <Loader />;
   }
   Digit.SessionStorage.set("DRISTI_TENANTS", tenants);
-
+  const urlParams = new URLSearchParams(window.location.search);
+  const result = urlParams.get("result");
+  console.log(result, "result");
   if (userType === "citizen" && userInfo?.type !== "EMPLOYEE") {
     return (
       <ToastProvider>
-        <CitizenApp path={path} stateCode={stateCode} userType={userType} tenants={tenants} tenantId={tenantID} />
+        <CitizenApp path={path} stateCode={stateCode} userType={userType} tenants={tenants} tenantId={tenantID} result={result} />
       </ToastProvider>
     );
   }

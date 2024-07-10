@@ -10,7 +10,7 @@ import CitizenHome from "./Home";
 import LandingPage from "./Home/LandingPage";
 import { userTypeOptions } from "./registration/config";
 
-const App = ({ stateCode, tenantId }) => {
+const App = ({ stateCode, tenantId, result }) => {
   const [hideBack, setHideBack] = useState(false);
   const { toastMessage, toastType, closeToast } = useToast();
   const Digit = window?.Digit || {};
@@ -115,9 +115,10 @@ const App = ({ stateCode, tenantId }) => {
   if (isUserLoggedIn && registerScreenRoute.includes(location.pathname)) {
     history.push(`${path}/home/registration/user-name`);
   }
-  const urlParams = new URLSearchParams(window.location.search);
-  const result = urlParams.get("result");
-  console.log(result, "result");
+  if (result) {
+    console.log(result);
+  }
+
   // if (isUserLoggedIn && eSign && locationEsign && locationEsign.includes("addSignature")) {
   //   console.log("sifn");
   //   history.replace(locationEsign);
