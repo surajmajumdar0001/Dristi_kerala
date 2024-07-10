@@ -31,6 +31,7 @@ export const Urls = {
     ordersSearch: "/order/order/v1/search",
     submissionsSearch: "/application/application/v1/search",
     submissionsUpdate: "/application/application/v1/update",
+    eSign: "/e-sign-svc/v1/_esign",
   },
   FileFetchById: "/filestore/v1/files/id",
 };
