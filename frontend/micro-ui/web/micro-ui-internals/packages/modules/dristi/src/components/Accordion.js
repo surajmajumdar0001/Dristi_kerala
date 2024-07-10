@@ -1,18 +1,59 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { CustomArrowDownIcon, CustomCompleteIcon, CustomSchedule } from "../icons/svgIndex";
 
-function Accordion({ t, title, handlePageChange, handleAccordionClick, children, parentIndex, isOpen, showConfirmModal }) {
+function Accordion({
+  t,
+  title,
+  handlePageChange,
+  handleAccordionClick,
+  children,
+  parentIndex,
+  isOpen,
+  showConfirmModal,
+  errorCount,
+  isCaseReAssigned,
+  isDraftInProgress,
+}) {
+  const getTime = useMemo(() => {
+    switch (parentIndex) {
+      case 0: {
+        return "04m";
+      }
+      case 1: {
+        return "15m";
+      }
+      case 2: {
+        return "10m";
+      }
+      case 3: {
+        return "05m";
+      }
+      default:
+        return;
+    }
+  }, [parentIndex]);
+
   return (
     <div key={parentIndex} className="accordion-wrapper">
       <div className={`accordion-title ${isOpen ? "open" : ""}`} onClick={handleAccordionClick}>
         <span>{`${parentIndex + 1}. ${t(title)}`}</span>
-        <div className="icon">
-          <CustomSchedule />
-          <span style={{ paddingRight: "8px" }}>4m</span>
-          <span className="reverse-arrow">
-            <CustomArrowDownIcon />
-          </span>
-        </div>
+        {isCaseReAssigned && (
+          <div className="icon">
+            <span>{`${errorCount || 0} ${t("CS_ERRORS")}`}</span>
+            <span className="reverse-arrow">
+              <CustomArrowDownIcon />
+            </span>
+          </div>
+        )}
+        {isDraftInProgress && (
+          <div className="icon">
+            <CustomSchedule />
+            <span style={{ paddingRight: "8px" }}>{getTime}</span>
+            <span className="reverse-arrow">
+              <CustomArrowDownIcon />
+            </span>
+          </div>
+        )}
       </div>
       <div className={`accordion-item ${!isOpen ? "collapsed" : ""}`}>
         <div className="accordion-content">
@@ -24,7 +65,7 @@ function Accordion({ t, title, handlePageChange, handleAccordionClick, children,
                 handlePageChange(item.key, !showConfirmModal);
               }}
             >
-              {item.isCompleted ? (
+              {item.isCompleted && !item?.checked ? (
                 <CustomCompleteIcon />
               ) : (
                 <span className="radio-btn-wrap">

@@ -1,15 +1,28 @@
-import { ButtonSelector, CitizenInfoLabel, Close, CloseSvg, DownloadIcon } from "@egovernments/digit-ui-react-components";
-import React, { useMemo, useState } from "react";
-import CustomDetailsCard from "../../../components/CustomDetailsCard";
-import { useHistory, useRouteMatch } from "react-router-dom/cjs/react-router-dom.min";
-import Modal from "../../../components/Modal";
-import Button from "../../../components/Button";
-import { ReactComponent as FileDownload } from "../../../icons/file_download.svg";
-import { DRISTIService } from "../../../services";
 import { Loader } from "@egovernments/digit-ui-components";
+import { CitizenInfoLabel, CloseSvg } from "@egovernments/digit-ui-react-components";
+import React, { useMemo, useState } from "react";
+import { useHistory, useRouteMatch } from "react-router-dom/cjs/react-router-dom.min";
+import Button from "../../../components/Button";
+import CustomDetailsCard from "../../../components/CustomDetailsCard";
+import Modal from "../../../components/Modal";
+import { FileDownloadIcon } from "../../../icons/svgIndex";
+import { DRISTIService } from "../../../services";
 import { userTypeOptions } from "../registration/config";
+import SelectCustomNote from "../../../components/SelectCustomNote";
 
-const formatDate = (date) => {
+const customNoteConfig = {
+  populators: {
+    inputs: [
+      {
+        infoHeader: "CS_COMMON_NOTE",
+        infoText: "ES_BANNER_LABEL",
+        infoTooltipMessage: "CS_NOTE_TOOLTIP_CASE_TYPE",
+      },
+    ],
+  },
+};
+
+export const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
@@ -57,6 +70,25 @@ function CaseType({ t }) {
     );
     const individualId = individualData?.Individual?.[0]?.individualId;
 
+    const addressLine1 = individualData?.Individual?.[0]?.address[0]?.addressLine1 || "Telangana";
+    const addressLine2 = individualData?.Individual?.[0]?.address[0]?.addressLine2 || "Rangareddy";
+    const buildingName = individualData?.Individual?.[0]?.address[0]?.buildingName || "";
+    const street = individualData?.Individual?.[0]?.address[0]?.street || "";
+    const city = individualData?.Individual?.[0]?.address[0]?.city || "";
+    const pincode = individualData?.Individual?.[0]?.address[0]?.pincode || "";
+    const latitude = individualData?.Individual?.[0]?.address[0]?.latitude || "";
+    const longitude = individualData?.Individual?.[0]?.address[0]?.longitude || "";
+    const doorNo = individualData?.Individual?.[0]?.address[0]?.doorNo || "";
+    const idType = individualData?.Individual?.[0]?.identifiers[0]?.identifierType || "";
+    const identifierIdDetails = JSON.parse(
+      individualData?.Individual?.[0]?.additionalFields?.fields?.find((obj) => obj.key === "identifierIdDetails")?.value || "{}"
+    );
+    const address = `${doorNo ? doorNo + "," : ""} ${buildingName ? buildingName + "," : ""} ${street}`.trim();
+
+    const givenName = individualData?.Individual?.[0]?.name?.givenName || "";
+    const otherNames = individualData?.Individual?.[0]?.name?.otherNames || "";
+    const familyName = individualData?.Individual?.[0]?.name?.familyName || "";
+
     const userType = useMemo(() => individualData?.Individual?.[0]?.additionalFields?.fields?.find((obj) => obj.key === "userType")?.value, [
       individualData?.Individual,
     ]);
@@ -69,32 +101,36 @@ function CaseType({ t }) {
       {},
       individualId,
       userType,
-      userType === "ADVOCATE" ? "/advocate/advocate/v1/_search" : "/advocate/clerk/v1/_search"
+      "/advocate/advocate/v1/_search"
     );
+
+    if (userType === "ADVOCATE" && searchData) {
+      const advocateBarRegNumber = searchData?.advocates?.[0]?.responseList?.[0]?.barRegistrationNumber;
+      if (advocateBarRegNumber) {
+        window?.Digit.SessionStorage.set("isAdvocateAndApproved", true);
+      } else {
+        window?.Digit.SessionStorage.set("isAdvocateAndApproved", false);
+      }
+    }
 
     const userTypeDetail = useMemo(() => {
       return userTypeOptions.find((item) => item.code === userType) || {};
     }, [userType]);
 
     const searchResult = useMemo(() => {
-      return searchData?.[userTypeDetail?.apiDetails?.requestKey];
+      return searchData?.[`${userTypeDetail?.apiDetails?.requestKey}s`];
     }, [searchData, userTypeDetail?.apiDetails?.requestKey]);
 
     const advocateId = useMemo(() => {
-      return searchResult?.[0]?.id;
+      return searchResult?.[0]?.responseList?.[0]?.id;
     }, [searchResult]);
 
     if (isLoading || isFetching || isSearchLoading) {
       return <Loader />;
     }
-
     return (
       <div className="submit-bar-div">
-        <Button
-          icon={<FileDownload />}
-          className="download-button"
-          label={t("CS_COMMON_DOWNLOAD")}
-        />
+        <Button icon={<FileDownloadIcon />} className="download-button" label={t("CS_COMMON_DOWNLOAD")} />
         <div className="right-div">
           <Button
             className="cancel-button"
@@ -106,7 +142,7 @@ function CaseType({ t }) {
           <Button
             className="start-filling-button"
             label={t("CS_START_FILLING")}
-            isDisabled={false}
+            isDisabled={isDisabled}
             onButtonClick={() => {
               setIsDisabled(true);
               const cases = {
@@ -121,31 +157,21 @@ function CaseType({ t }) {
                   {
                     tenantId,
                     statute: "Statute",
-                    sections: ["Negotiable Instruments Act", "02."],
+                    sections: ["Negotiable Instrument Act", "02."],
                     subsections: ["138", "03."],
                   },
                 ],
-                litigants: [
-                  {
-                    tenantId,
-                    partyCategory: "INDIVIDUAL",
-                  },
-                ],
-                representatives: [
-                  {
-                    advocateId: advocateId,
-                    tenantId,
-                    representing: [],
-                  },
-                ],
-                documents: [
-                  {
-                    documentType: null,
-                    fileStore: null,
-                    documentUid: "",
-                    additionalDetails: {},
-                  },
-                ],
+                litigants: [],
+                representatives: advocateId
+                  ? [
+                      {
+                        advocateId: advocateId,
+                        tenantId,
+                        representing: [],
+                      },
+                    ]
+                  : [],
+                documents: [],
                 workflow: {
                   action: "SAVE_DRAFT",
                   comments: null,
@@ -159,7 +185,101 @@ function CaseType({ t }) {
                     },
                   ],
                 },
-                additionalDetails: {},
+                additionalDetails: {
+                  payerMobileNo: individualData?.Individual?.[0]?.mobileNumber,
+                  payerName: `${givenName} ${familyName}`,
+                  ...(advocateId
+                    ? {
+                        advocateDetails: {
+                          formdata: [
+                            {
+                              isenabled: true,
+                              displayindex: 0,
+                              data: {
+                                isAdvocateRepresenting: {
+                                  code: "YES",
+                                  name: "Yes",
+                                  showForm: true,
+                                  isEnabled: true,
+                                },
+                              },
+                            },
+                          ],
+                        },
+                      }
+                    : {
+                        complainantDetails: {
+                          formdata: [
+                            {
+                              isenabled: true,
+                              data: {
+                                complainantType: {
+                                  code: "INDIVIDUAL",
+                                  name: "Individual",
+                                  showCompanyDetails: false,
+                                  complainantLocation: true,
+                                  commonFields: true,
+                                  isEnabled: true,
+                                  isIndividual: true,
+                                },
+                                "addressDetails-select": {
+                                  pincode: pincode,
+                                  district: addressLine2,
+                                  city: city,
+                                  state: addressLine1,
+                                  locality: address,
+                                },
+                                complainantId: { complainantId: true },
+                                firstName: givenName,
+                                middleName: otherNames,
+                                lastName: familyName,
+                                complainantVerification: {
+                                  mobileNumber: userInfo?.userName,
+                                  otpNumber: "123456",
+                                  individualDetails: {
+                                    individualId: individualId,
+                                    document: identifierIdDetails?.fileStoreId
+                                      ? [{ name: idType, fileStore: identifierIdDetails?.fileStoreId, documentName: identifierIdDetails?.filename }]
+                                      : null,
+                                    "addressDetails-select": {
+                                      pincode: pincode,
+                                      district: addressLine2,
+                                      city: city,
+                                      state: addressLine1,
+                                      locality: address,
+                                    },
+                                    addressDetails: {
+                                      pincode: pincode,
+                                      district: addressLine2,
+                                      city: city,
+                                      state: addressLine1,
+                                      coordinates: {
+                                        longitude: latitude,
+                                        latitude: longitude,
+                                      },
+                                      locality: address,
+                                    },
+                                  },
+                                  isUserVerified: true,
+                                },
+                                addressDetails: {
+                                  pincode: pincode,
+                                  district: addressLine2,
+                                  city: city,
+                                  state: addressLine1,
+                                  coordinates: {
+                                    longitude: latitude,
+                                    latitude: longitude,
+                                  },
+                                  locality: address,
+                                },
+                              },
+                              displayindex: 0,
+                            },
+                          ],
+                        },
+                      }),
+                },
               };
               DRISTIService.caseCreateService({ cases, tenantId })
                 .then((res) => {
@@ -168,12 +288,6 @@ function CaseType({ t }) {
                 .finally(() => setIsDisabled(false));
             }}
           />
-          {/* <ButtonSelector
-            label={t("CS_START_FILLING")}
-            onSubmit={() => {
-              history.push(`${path}/case`);
-            }}
-          /> */}
         </div>
       </div>
     );
@@ -181,13 +295,12 @@ function CaseType({ t }) {
 
   const detailsCardList = useMemo(() => {
     const caseTypeDetails = [
-      { header: "Case Category", subtext: "Criminal", serialNumber: "01." },
+      { header: "Case Category", subtext: "Criminal" },
       {
         header: "Status / Act",
-        subtext: "Negotiable Instruments Act",
-        serialNumber: "02.",
+        subtext: "Negotiable Instrument Act",
       },
-      { header: "Section", subtext: "138", serialNumber: "03." },
+      { header: "Section", subtext: "138" },
     ];
     const listDocumentDetails = [
       {
@@ -209,7 +322,7 @@ function CaseType({ t }) {
         serialNumber: "03.",
       },
       {
-        header: "Proof od Debt/ Liability",
+        header: "Proof of Debt/ Liability",
         subtext: "Anything to prove some sort of agreement between you and the respondent",
         subnote: "Upload .pdf or .jpg. Maximum upload size of 50MB",
         serialNumber: "04.",
@@ -247,17 +360,17 @@ function CaseType({ t }) {
     >
       <div className="case-types-main-div">
         {detailsCardList.map((item) => (
-          <CustomDetailsCard header={item.header} subtext={item.subtext} serialNumber={item.serialNumber} style={{ width: "100%" }} />
+          <CustomDetailsCard
+            header={item.header}
+            subtext={item.subtext}
+            serialNumber={item.serialNumber}
+            subnote={item.subnote}
+            style={{ width: "100%" }}
+          />
         ))}
+        {page === 0 && <SelectCustomNote t={t} config={customNoteConfig}></SelectCustomNote>}
       </div>
-      {page === 0 && (
-        <CitizenInfoLabel
-          style={{ maxWidth: "100%", padding: "8px", borderRadius: "4px" }}
-          info={t("ES_COMMON_NOTE")}
-          text={t("ES_BANNER_LABEL")}
-          className="doc-banner"
-        ></CitizenInfoLabel>
-      )}
+
       {page === 1 && <Submitbar />}
     </Modal>
   );

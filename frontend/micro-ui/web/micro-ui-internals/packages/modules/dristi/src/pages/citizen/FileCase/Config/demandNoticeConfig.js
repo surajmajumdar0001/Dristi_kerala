@@ -4,7 +4,7 @@ const demandNoticeFormConfig = [
       {
         type: "component",
         component: "SelectUserTypeComponent",
-        key: "SelectUserTypeComponent",
+        key: "modeOfDispatchType",
         isMandatory: true,
         withoutLabel: true,
         populators: {
@@ -14,7 +14,7 @@ const demandNoticeFormConfig = [
               type: "dropdown",
               name: "modeOfDispatchType",
               optionsKey: "name",
-              error: "sample required message",
+              error: "CORE_REQUIRED_FIELD_ERROR",
               required: false,
               isMandatory: true,
               options: [
@@ -34,27 +34,39 @@ const demandNoticeFormConfig = [
   {
     body: [
       {
-        type: "component",
-        component: "SelectUserTypeComponent",
-        key: "SelectUserTypeComponent",
-        withoutLabel: true,
+        type: "date",
+        label: "CS_DATE_OF_ISSUANCE_LDN",
+        labelChildren: "OutlinedInfoIcon",
+        isMandatory: true,
         populators: {
-          inputs: [
-            {
-              label: "CS_DATE_OF_DISPATCH_LDN",
-              type: "date",
-              name: "dateOfDispatch",
-              inputFieldClassName: "user-details-form-style",
-              validation: {
-                errMsg: "CORE_COMMON_APPLICANT_NAME_INVALID",
-                title: "",
-                patternType: "date",
-                isRequired: true,
-              },
-              isMandatory: true,
+          name: "dateOfIssuance",
+          validation: {
+            max: {
+              patternType: "date",
+              masterName: "commonUiConfig",
+              moduleName: "maxDateValidation",
             },
-          ],
-          validation: {},
+          },
+        },
+      },
+    ],
+  },
+  {
+    body: [
+      {
+        type: "date",
+        label: "CS_DATE_OF_DISPATCH_LDN",
+        labelChildren: "OutlinedInfoIcon",
+        isMandatory: true,
+        populators: {
+          name: "dateOfDispatch",
+          validation: {
+            max: {
+              patternType: "date",
+              masterName: "commonUiConfig",
+              moduleName: "maxDateValidation",
+            },
+          },
         },
       },
     ],
@@ -64,15 +76,15 @@ const demandNoticeFormConfig = [
       {
         type: "component",
         component: "SelectCustomDragDrop",
-        key: "SelectCustomDragDrop",
+        key: "legalDemandNoticeFileUpload",
         withoutLabel: true,
         populators: {
           inputs: [
             {
-              name: "legalDemandNotice",
+              name: "document",
               documentHeader: "LEGAL_DEMAND_NOTICE",
               type: "DragDropComponent",
-              uploadGuidelines: "Upload .pdf or .jpg",
+              uploadGuidelines: "UPLOAD_DOC_50",
               maxFileSize: 50,
               maxFileErrorMessage: "CS_FILE_LIMIT_50_MB",
               fileTypes: ["JPG", "PDF"],
@@ -88,15 +100,15 @@ const demandNoticeFormConfig = [
       {
         type: "component",
         component: "SelectCustomDragDrop",
-        key: "SelectCustomDragDrop",
+        key: "proofOfDispatchFileUpload",
         withoutLabel: true,
         populators: {
           inputs: [
             {
-              name: "proofOfDispatch",
+              name: "document",
               documentHeader: "PROOF_OF_DISPATCH_LDN",
               type: "DragDropComponent",
-              uploadGuidelines: "Upload .pdf or .jpg",
+              uploadGuidelines: "UPLOAD_DOC_50",
               maxFileSize: 50,
               maxFileErrorMessage: "CS_FILE_LIMIT_50_MB",
               fileTypes: ["JPG", "PDF"],
@@ -115,14 +127,20 @@ const demandNoticeFormConfig = [
         label: "CS_DELAY_APPLICATION_TYPE",
         isMandatory: true,
         populators: {
+          name: "proofOfService",
           label: "CS_DELAY_APPLICATION_TYPE",
           type: "radioButton",
           optionsKey: "name",
-          error: "sample required message",
+          error: "CORE_REQUIRED_FIELD_ERROR",
           required: false,
           isMandatory: true,
           isDependent: true,
-          clearFields: { stateOfRegistration: "", barRegistrationNumber: "", barCouncilId: [], stateRegnNumber: "" },
+          clearFields: {
+            stateOfRegistration: "",
+            barRegistrationNumber: "",
+            barCouncilId: [],
+            stateRegnNumber: "",
+          },
           options: [
             {
               code: "YES",
@@ -144,52 +162,44 @@ const demandNoticeFormConfig = [
     ],
   },
   {
-    dependentKey: { proofOfService: ["showProofOfAcknowledgment"] },
     body: [
       {
-        type: "component",
-        component: "SelectUserTypeComponent",
-        key: "SelectUserTypeComponent",
-        withoutLabel: true,
+        type: "date",
+        label: "CS_DATE_OF_SERVICE_LDN",
+        isMandatory: true,
         populators: {
-          inputs: [
-            {
-              label: "CS_DATE_OF_SERVICE_LDN",
-              type: "date",
-              name: "dateOfService",
-              inputFieldClassName: "user-details-form-style",
-              validation: {
-                errMsg: "CORE_COMMON_APPLICANT_NAME_INVALID",
-                title: "",
-                patternType: "date",
-                isRequired: true,
-              },
-              isMandatory: true,
+          name: "dateOfService",
+          validation: {
+            max: {
+              patternType: "date",
+              masterName: "commonUiConfig",
+              moduleName: "maxDateValidation",
             },
-          ],
-          validation: {},
+          },
         },
       },
     ],
   },
   {
-    dependentKey: { proofOfService: ["showProofOfAcknowledgment"] },
     body: [
       {
         type: "component",
         component: "SelectCustomDragDrop",
-        key: "SelectCustomDragDrop",
+        key: "proofOfAcknowledgmentFileUpload",
+        isDocDependentOn: "proofOfService",
+        isDocDependentKey: "showProofOfAcknowledgment",
         populators: {
           inputs: [
             {
-              name: "legalDemandNotice",
-              documentHeader: "LEGAL_DEMAND_NOTICE",
+              name: "document",
+              documentHeader: "PROOF_LEGAL_DEMAND_NOTICE",
               type: "DragDropComponent",
-              uploadGuidelines: "Upload .pdf or .jpg",
+              uploadGuidelines: "UPLOAD_DOC_50",
               maxFileSize: 50,
               maxFileErrorMessage: "CS_FILE_LIMIT_50_MB",
               fileTypes: ["JPG", "PDF"],
               isMultipleUpload: false,
+              documentHeaderStyle: { textAlign: "left" },
             },
           ],
         },
@@ -201,17 +211,23 @@ const demandNoticeFormConfig = [
       {
         type: "radio",
         key: "proofOfReply",
-        label: "CS_DELAY_APPLICATION_TYPE",
+        label: "CS_REPLY_NOTICE",
         isMandatory: true,
         populators: {
-          label: "CS_DELAY_APPLICATION_TYPE",
+          name: "proofOfReply",
+          label: "CS_REPLY_NOTICE",
           type: "radioButton",
           optionsKey: "name",
-          error: "sample required message",
+          error: "CORE_REQUIRED_FIELD_ERROR",
           required: false,
           isMandatory: true,
           isDependent: true,
-          clearFields: { stateOfRegistration: "", barRegistrationNumber: "", barCouncilId: [], stateRegnNumber: "" },
+          clearFields: {
+            stateOfRegistration: "",
+            barRegistrationNumber: "",
+            barCouncilId: [],
+            stateRegnNumber: "",
+          },
           options: [
             {
               code: "YES",
@@ -233,48 +249,42 @@ const demandNoticeFormConfig = [
     ],
   },
   {
-    dependentKey: { proofOfReply: ["showProofOfReply"] },
+    dependentKey: {
+      proofOfReply: ["showProofOfReply"],
+    },
     body: [
       {
-        type: "component",
-        component: "SelectUserTypeComponent",
-        key: "SelectUserTypeComponent",
-        withoutLabel: true,
+        type: "date",
+        label: "CS_DATE_OF_REPLY_LDN",
+        isMandatory: true,
         populators: {
-          inputs: [
-            {
-              label: "CS_DATE_OF_DISPATCH_LDN",
-              type: "date",
-              name: "dateOfDispatch",
-              inputFieldClassName: "user-details-form-style",
-              validation: {
-                errMsg: "CORE_COMMON_APPLICANT_NAME_INVALID",
-                title: "",
-                patternType: "date",
-                isRequired: true,
-              },
-              isMandatory: true,
+          name: "dateOfReply",
+          validation: {
+            max: {
+              patternType: "date",
+              masterName: "commonUiConfig",
+              moduleName: "maxDateValidation",
             },
-          ],
-          validation: {},
+          },
         },
       },
     ],
   },
   {
-    dependentKey: { proofOfReply: ["showProofOfReply"] },
     body: [
       {
         type: "component",
         component: "SelectCustomDragDrop",
-        key: "SelectCustomDragDrop",
+        key: "proofOfReplyFileUpload",
+        isDocDependentOn: "proofOfReply",
+        isDocDependentKey: "showProofOfReply",
         populators: {
           inputs: [
             {
-              name: "legalDemandNotice",
-              documentHeader: "LEGAL_DEMAND_NOTICE",
+              name: "document",
+              documentHeader: "CS_PROOF_TO_REPLY_DEMAND_NOTICE",
               type: "DragDropComponent",
-              uploadGuidelines: "Upload .pdf or .jpg",
+              uploadGuidelines: "UPLOAD_DOC_50",
               maxFileSize: 50,
               maxFileErrorMessage: "CS_FILE_LIMIT_50_MB",
               fileTypes: ["JPG", "PDF"],
@@ -288,27 +298,19 @@ const demandNoticeFormConfig = [
   {
     body: [
       {
-        type: "component",
-        component: "SelectUserTypeComponent",
-        key: "SelectUserTypeComponent",
-        withoutLabel: true,
+        type: "date",
+        label: "CS_DATE_OF_ACCRUAL_LDN",
+        labelChildren: "OutlinedInfoIcon",
+        isMandatory: true,
         populators: {
-          inputs: [
-            {
-              label: "CS_DATE_OF_DISPATCH_LDN",
-              type: "date",
-              name: "dateOfDispatch",
-              inputFieldClassName: "user-details-form-style",
-              validation: {
-                errMsg: "CORE_COMMON_APPLICANT_NAME_INVALID",
-                title: "",
-                patternType: "date",
-                isRequired: true,
-              },
-              isMandatory: true,
+          name: "dateOfAccrual",
+          validation: {
+            max: {
+              patternType: "date",
+              masterName: "commonUiConfig",
+              moduleName: "maxDateValidation",
             },
-          ],
-          validation: {},
+          },
         },
       },
     ],
@@ -318,17 +320,23 @@ const demandNoticeFormConfig = [
       {
         type: "radio",
         key: "delayApplicationType",
-        label: "CS_DELAY_APPLICATION_TYPE",
+        label: "CS_PAYER_FAIL_TO_PAY",
         isMandatory: true,
         populators: {
-          label: "CS_DELAY_APPLICATION_TYPE",
+          name: "delayApplicationType",
+          label: "CS_PAYER_FAIL_TO_PAY",
           type: "radioButton",
           optionsKey: "name",
-          error: "sample required message",
+          error: "CORE_REQUIRED_FIELD_ERROR",
           required: false,
           isMandatory: true,
           isDependent: true,
-          clearFields: { stateOfRegistration: "", barRegistrationNumber: "", barCouncilId: [], stateRegnNumber: "" },
+          clearFields: {
+            stateOfRegistration: "",
+            barRegistrationNumber: "",
+            barCouncilId: [],
+            stateRegnNumber: "",
+          },
           options: [
             {
               code: "YES",
@@ -353,10 +361,15 @@ const demandNoticeFormConfig = [
 
 export const demandNoticeConfig = {
   formconfig: demandNoticeFormConfig,
-  header: "CS_RESPONDENT_DETAIL_HEADING",
-  subtext: "CS_RESPONDENT_DETAIL_SUBTEXT",
+  header: "CS_DEMAND_NOTICE_HEADING",
+  subtext: "CS_DEMAND_NOTICE_SUBTEXT",
   isOptional: false,
   addFormText: "ADD_DEMAND_NOTICE",
-  formItemName: "Respondent",
+  formItemName: "CS_DEMAND_NOTICE",
   className: "demand-notice",
+  selectDocumentName: {
+    proofOfDispatchFileUpload: "PROOF_OF_DISPATCH_LDN",
+    proofOfAcknowledgmentFileUpload: "PROOF_LEGAL_DEMAND_NOTICE",
+    proofOfReplyFileUpload: "CS_PROOF_TO_REPLY_DEMAND_NOTICE",
+  },
 };

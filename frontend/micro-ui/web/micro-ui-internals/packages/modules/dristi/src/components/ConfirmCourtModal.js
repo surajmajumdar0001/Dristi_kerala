@@ -1,21 +1,24 @@
-import React from "react";
 import { CloseSvg, FormComposerV2, Modal } from "@egovernments/digit-ui-react-components";
+import { isEqual } from "lodash";
+import React, { useState } from "react";
+
+const CloseBtn = (props) => {
+  return (
+    <div onClick={props?.onClick} style={{ height: "100%", display: "flex", alignItems: "center", paddingRight: "20px", cursor: "pointer" }}>
+      <CloseSvg />
+    </div>
+  );
+};
+
+const Heading = (props) => {
+  return <h1 className="heading-m">{props.label}</h1>;
+};
+
 function ConfirmCourtModal({ t, setOpenConfirmCourtModal, onSubmitCase }) {
-  const CloseBtn = (props) => {
-    return (
-      <div onClick={props?.onClick} style={{ height: "100%", display: "flex", alignItems: "center", paddingRight: "20px", cursor: "pointer" }}>
-        <CloseSvg />
-      </div>
-    );
-  };
-
-  const Heading = (props) => {
-    return <h1 className="heading-m">{props.label}</h1>;
-  };
-
   const onCancel = () => {
     setOpenConfirmCourtModal(false);
   };
+  const [courtFormData, setCourtFormData] = useState({});
 
   const config = [
     {
@@ -39,13 +42,13 @@ function ConfirmCourtModal({ t, setOpenConfirmCourtModal, onSubmitCase }) {
         {
           type: "dropdown",
           key: "state",
-          label: "CS_BAR_REGISTRATION",
+          label: "STATE",
           isMandatory: true,
           populators: {
             label: "SELECT_RESPONDENT_TYPE",
             type: "radioButton",
             optionsKey: "name",
-            error: "sample required message",
+            error: "CORE_REQUIRED_FIELD_ERROR",
             required: false,
             isMandatory: true,
             clearFields: { stateOfRegistration: "", barRegistrationNumber: "", barCouncilId: [], stateRegnNumber: "" },
@@ -61,13 +64,13 @@ function ConfirmCourtModal({ t, setOpenConfirmCourtModal, onSubmitCase }) {
         {
           type: "dropdown",
           key: "district",
-          label: "CS_BAR_REGISTRATION",
+          label: "DISTRICT",
           isMandatory: true,
           populators: {
             label: "SELECT_RESPONDENT_TYPE",
             type: "radioButton",
             optionsKey: "name",
-            error: "sample required message",
+            error: "CORE_REQUIRED_FIELD_ERROR",
             required: false,
             isMandatory: true,
             clearFields: { stateOfRegistration: "", barRegistrationNumber: "", barCouncilId: [], stateRegnNumber: "" },
@@ -83,13 +86,13 @@ function ConfirmCourtModal({ t, setOpenConfirmCourtModal, onSubmitCase }) {
         {
           type: "dropdown",
           key: "court",
-          label: "CS_BAR_REGISTRATION",
+          label: "CS_COURT",
           isMandatory: true,
           populators: {
             label: "SELECT_RESPONDENT_TYPE",
             type: "radioButton",
             optionsKey: "name",
-            error: "sample required message",
+            error: "CORE_REQUIRED_FIELD_ERROR",
             required: false,
             isMandatory: true,
             clearFields: { stateOfRegistration: "", barRegistrationNumber: "", barCouncilId: [], stateRegnNumber: "" },
@@ -111,6 +114,22 @@ function ConfirmCourtModal({ t, setOpenConfirmCourtModal, onSubmitCase }) {
     },
   ];
 
+  const onFormValueChange = (setValue, formData, formState) => {
+    if (formData.court && !isEqual(courtFormData, formData)) {
+      setCourtFormData(formData);
+      setValue("state", {
+        code: "Kerala",
+        name: "Kerala",
+        isEnabled: true,
+      });
+      setValue("district", {
+        code: "Kollam",
+        name: "Kollam",
+        isEnabled: true,
+      });
+    }
+  };
+
   return (
     <Modal
       headerBarEnd={<CloseBtn onClick={onCancel} />}
@@ -123,8 +142,20 @@ function ConfirmCourtModal({ t, setOpenConfirmCourtModal, onSubmitCase }) {
         label={t("CS_COMMON_CONFIRM")}
         config={config}
         onSubmit={onSubmitCase}
-        defaultValues={{}}
+        defaultValues={{
+          state: {
+            code: "Kerala",
+            name: "Kerala",
+            isEnabled: true,
+          },
+          district: {
+            code: "Kollam",
+            name: "Kollam",
+            isEnabled: true,
+          },
+        }}
         cardStyle={{ minWidth: "100%" }}
+        onFormValueChange={onFormValueChange}
         submitInForm={true}
       ></FormComposerV2>
     </Modal>

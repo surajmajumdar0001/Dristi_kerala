@@ -90,7 +90,15 @@ module.exports = function (app) {
     "/advocate",
     "/clerk",
     "/case",
+    "/evidence",
     "/project-factory/v1/data/_autoGenerateBoundaryCode",
+    "/application",
+    "/case",
+    "/order",
+    "/hearing",
+    "/order",
+    "/application",
+    "/e-sign-svc",
   ].forEach((location) => app.use(location, createProxy));
   ["/pb-egov-assets"].forEach((location) => app.use(location, assetsProxy));
   ["/mdms-v2/v2/_create"].forEach((location) => app.use(location, mdmsProxy));

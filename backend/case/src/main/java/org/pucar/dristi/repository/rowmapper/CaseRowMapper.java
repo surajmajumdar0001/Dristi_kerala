@@ -26,7 +26,7 @@ public class CaseRowMapper implements ResultSetExtractor<List<CourtCase>> {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             while (rs.next()) {
-                String uuid = rs.getString("casenumber");
+                String uuid = rs.getString("id");
                 CourtCase courtCase = caseMap.get(uuid);
 
                 if (courtCase == null) {
@@ -50,10 +50,16 @@ public class CaseRowMapper implements ResultSetExtractor<List<CourtCase>> {
                             .caseDescription(rs.getString("casedescription"))
                             .filingNumber(rs.getString("filingnumber"))
                             .caseNumber(rs.getString("caseNumber"))
+                            .cnrNumber(rs.getString("cnrnumber"))
+                            .courtCaseNumber(rs.getString("courtcaseNumber"))
                             .accessCode(rs.getString("accesscode"))
                             .courtId(rs.getString("courtid"))
                             .benchId(rs.getString("benchid"))
+                            .judgeId(rs.getString("judgeid"))
+                            .stage(rs.getString("stage"))
+                            .substage(rs.getString("substage"))
                             .filingDate(stringToLocalDate(rs.getString("filingdate")))
+                            .judgementDate(stringToLocalDate(rs.getString("judgementdate")))
                             .registrationDate(stringToLocalDate(rs.getString("registrationdate")))
                             .caseCategory(rs.getString("casecategory"))
                             .natureOfPleading(rs.getString("natureofpleading"))
@@ -64,31 +70,34 @@ public class CaseRowMapper implements ResultSetExtractor<List<CourtCase>> {
                 }
 
                 PGobject pgObject = (PGobject) rs.getObject("additionalDetails");
-                if(pgObject!=null)
+                if (pgObject != null)
                     courtCase.setAdditionalDetails(objectMapper.readTree(pgObject.getValue()));
                 PGobject caseDetailsObject = (PGobject) rs.getObject("casedetails");
-                if(caseDetailsObject!=null)
+                if (caseDetailsObject != null)
                     courtCase.setCaseDetails(objectMapper.readTree(caseDetailsObject.getValue()));
 
                 caseMap.put(uuid, courtCase);
             }
-        } catch(CustomException e){
+        } catch (CustomException e) {
             throw e;
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Error occurred while processing Case ResultSet :: {}", e.toString());
-            throw new CustomException(ROW_MAPPER_EXCEPTION,"Exception occurred while processing Case ResultSet: "+ e.getMessage());
+            throw new CustomException(ROW_MAPPER_EXCEPTION, "Exception occurred while processing Case ResultSet: " + e.getMessage());
         }
         return new ArrayList<>(caseMap.values());
     }
 
-    private LocalDate stringToLocalDate(String str){
+    private LocalDate stringToLocalDate(String str) {
         LocalDate localDate = null;
-        if(str!=null)
         try {
-            DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            localDate = LocalDate.parse(str, pattern);
-        } catch (DateTimeParseException e) {}
-
+            if (str != null) {
+                DateTimeFormatter pattern = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                localDate = LocalDate.parse(str, pattern);
+            }
+        } catch (DateTimeParseException e) {
+            log.error("Date parsing failed for input: {}", str, e);
+            throw new CustomException("DATE_PARSING_FAILED", "Failed to parse date: " + str);
+        }
         return localDate;
     }
 }

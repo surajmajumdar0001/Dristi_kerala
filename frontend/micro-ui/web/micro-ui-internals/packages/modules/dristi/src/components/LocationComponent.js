@@ -10,13 +10,13 @@ const getLocation = (places, code) => {
   })?.long_name;
   return location ? location : null;
 };
-const LocationComponent = ({ t, config, onLocationSelect, locationFormData, errors, mapIndex }) => {
-  const [coordinateData, setCoordinateData] = useState({ callbackFunc: () => { } });
+const LocationComponent = ({ t, config, onLocationSelect, locationFormData, errors, mapIndex, disable = false }) => {
+  const [coordinateData, setCoordinateData] = useState({ callbackFunc: () => {} });
   const inputs = useMemo(
     () =>
       config?.populators?.inputs || [
         {
-          label: "CS_PIN_LOCATION",
+          label: "CS_LOCATION",
           type: "LocationSearch",
           name: [],
         },
@@ -121,13 +121,13 @@ const LocationComponent = ({ t, config, onLocationSelect, locationFormData, erro
         return (
           <React.Fragment key={input.label}>
             {errors[input.name] && <CardLabelError>{t(input.error)}</CardLabelError>}
-            <LabelFieldPair style={{ width: "100%", display: "flex" }}>
+            <LabelFieldPair>
               <CardLabel className="card-label-smaller">
                 {t(input.label)}
-                {input.isMandatory ? <span style={{ color: "#FF0000" }}>{" * "}</span> : null}
+                <span>{input?.showOptional && ` ${t("CS_IS_OPTIONAL")}`}</span>
               </CardLabel>
               <div className="field">
-                {input?.type === "LocationSearch" ? (
+                {input?.type === "LocationSearch" && mapIndex ? (
                   <LocationSearch
                     locationStyle={{}}
                     position={locationFormData?.[config.key]?.coordinates || {}}
@@ -156,25 +156,26 @@ const LocationComponent = ({ t, config, onLocationSelect, locationFormData, erro
                             isFirstRender && locationFormData?.[config.key]
                               ? locationFormData[config.key]["locality"]
                               : (() => {
-                                const plusCode = getLocation(location, "plus_code");
-                                const neighborhood = getLocation(location, "neighborhood");
-                                const sublocality_level_1 = getLocation(location, "sublocality_level_1");
-                                const sublocality_level_2 = getLocation(location, "sublocality_level_2");
-                                return [plusCode, neighborhood, sublocality_level_1, sublocality_level_2]
-                                  .reduce((result, current) => {
-                                    if (current) {
-                                      result.push(current);
-                                    }
-                                    return result;
-                                  }, [])
-                                  .join(", ");
-                              })(),
+                                  const plusCode = getLocation(location, "plus_code");
+                                  const neighborhood = getLocation(location, "neighborhood");
+                                  const sublocality_level_1 = getLocation(location, "sublocality_level_1");
+                                  const sublocality_level_2 = getLocation(location, "sublocality_level_2");
+                                  return [plusCode, neighborhood, sublocality_level_1, sublocality_level_2]
+                                    .reduce((result, current) => {
+                                      if (current) {
+                                        result.push(current);
+                                      }
+                                      return result;
+                                    }, [])
+                                    .join(", ");
+                                })(),
                           coordinates,
                         },
                         input.name
                       );
                       isFirstRender = false;
                     }}
+                    disable={input.isDisabled || disable}
                   />
                 ) : (
                   <TextInput
@@ -183,7 +184,7 @@ const LocationComponent = ({ t, config, onLocationSelect, locationFormData, erro
                     onChange={(e) => {
                       setValue(e.target.value, input.name);
                     }}
-                    disable={input.isDisabled}
+                    disable={input.isDisabled || disable}
                     defaultValue={undefined}
                     {...input.validation}
                   />

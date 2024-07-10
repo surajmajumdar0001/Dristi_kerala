@@ -9,7 +9,14 @@ import com.pucar.drishti.web.models.SignDocRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import java.util.LinkedHashMap;
 
 @Service
 @Slf4j
@@ -28,10 +35,11 @@ public class InterceptorService {
 
     public String process(String response, String espId) {
 
+        String token = oAuthForDristi();
         String tenantId = espId.substring(0, 2); ///fixme: length might be change check other way
         String fileStoreId = espId.substring(2);   /// length might be change check other way
         util.fetchFileStoreObjectById(fileStoreId, tenantId); // validation of transaction
-        SignDocRequest request = getSignDocRequest(response, fileStoreId, tenantId);
+        SignDocRequest request = getSignDocRequest(token,response, fileStoreId, tenantId);
 
         StringBuilder uri = new StringBuilder();
         uri.append(configs.getESignHost()).append(configs.getESignEndPoint());
@@ -43,9 +51,9 @@ public class InterceptorService {
 
     }
 
-    private SignDocRequest getSignDocRequest(String response, String fileStoreId, String tenantId) {
+    private SignDocRequest getSignDocRequest(String token,String response, String fileStoreId, String tenantId) {
 
-        RequestInfo requestInfo = RequestInfo.builder().build();  //fixme: update user for this
+        RequestInfo requestInfo = RequestInfo.builder().authToken(token).build();  //fixme: update user for this
 
         SignDocParameter parameter = SignDocParameter.builder()
                 .fileStoreId(fileStoreId).response(response).tenantId(tenantId).build();
@@ -53,5 +61,30 @@ public class InterceptorService {
         SignDocRequest request = SignDocRequest.builder().requestInfo(requestInfo)
                 .eSignParameter(parameter).build();
         return request;
+    }
+
+    private String oAuthForDristi() {
+
+        StringBuilder uri = new StringBuilder("https://dristi-kerala-dev.pucar.org/user/oauth/token?_=1713357247536");
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("username", "esigninterceptor");
+        map.add("password", "Beehyv@123");
+        map.add("tenantId", "kl");
+        map.add("userType", "EMPLOYEE");
+        map.add("scope", "read");
+        map.add("grant_type", "password");
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setCacheControl("no-cache");
+        headers.setConnection("keep-alive");
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add("Authorization", "Basic ZWdvdi11c2VyLWNsaWVudDo=");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+        Object response = restCall.fetchResult(uri, request);
+        String accessToken= ((LinkedHashMap) response).get("access_token").toString();
+        return accessToken;
     }
 }

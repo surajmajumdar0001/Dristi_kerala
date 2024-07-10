@@ -91,7 +91,7 @@ const TopBar = ({
         cityOfCitizenShownBesideLogo={t(CitizenHomePageTenantId)}
         onNotificationIconClick={onNotificationIconClick}
         hideNotificationIconOnSomeUrlsWhenNotLoggedIn={true}
-        hideChangeLangOnSomeUrlsWhenNotLoggedIn={location.pathname.includes("/select-language") ? true : false}
+        hideChangeLangOnSomeUrlsWhenNotLoggedIn={pathname.includes("/select-language") ? true : false}
         changeLanguage={
           !mobileView ? (
             <ChangeLanguage
@@ -141,7 +141,13 @@ const TopBar = ({
   }
   return (
     <div className="topbar">
-      <div className="hambuger-back-wrapper">
+      <div
+        className="hambuger-back-wrapper"
+        onClick={() => {
+          const homePageRedirect = pathname.split("/").slice(0, 3).join("/");
+          history.push(homePageRedirect);
+        }}
+      >
         {mobileView ? <Hamburger handleClick={toggleSidebar} color="#9E9E9E" /> : null}
 
         <img
@@ -197,7 +203,7 @@ const TopBar = ({
                   showArrow={true}
                   freeze={true}
                   style={mobileView ? { right: 0 } : {}}
-                  optionCardStyles={{ overflow: "revert", display: "table", marginRight: '50px' }}
+                  optionCardStyles={{ overflow: "revert", display: "table", marginRight: "50px" }}
                   topbarOptionsClassName={"topbarOptionsClassName"}
                   customSelector={
                     profilePic == null ? (
