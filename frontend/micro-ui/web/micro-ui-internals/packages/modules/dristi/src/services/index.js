@@ -144,4 +144,13 @@ export const DRISTIService = {
       data,
       params,
     }),
+  eSignService: (data, params) => {
+    return Request({
+      url: Urls.dristi.eSign,
+      useCache: false,
+      userService: false,
+      data,
+      params,
+    });
+  },
 };
