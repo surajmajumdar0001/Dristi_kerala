@@ -16,9 +16,9 @@ import java.util.List;
 @Slf4j
 public class AsyncSubmissionEnrichment {
 
-    private IdgenUtil idGenUtil;
+    private final IdgenUtil idGenUtil;
 
-    private Configuration config;
+    private final Configuration config;
 
     @Autowired
     public AsyncSubmissionEnrichment(IdgenUtil idgenUtil, Configuration config) {
@@ -28,8 +28,7 @@ public class AsyncSubmissionEnrichment {
 
     public void enrichAsyncSubmissions(RequestInfo requestInfo, AsyncSubmission asyncSubmission) {
 
-        log.info("starting update method for schedule hearing enrichment");
-        log.info("generating IDs for schedule hearing enrichment using IdGenService");
+        log.info("generating IDs for async submission enrichment using IdGenService");
         List<String> idList = idGenUtil.getIdList(requestInfo,
                 config.getEgovStateTenantId(),
                 config.getAsyncSubmissionIdFormat(), null, 1);

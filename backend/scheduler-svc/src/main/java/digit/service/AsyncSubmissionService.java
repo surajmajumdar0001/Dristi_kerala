@@ -22,30 +22,26 @@ import java.util.List;
 @Slf4j
 public class AsyncSubmissionService {
 
-    private AsyncSubmissionRepository repository;
+    private final AsyncSubmissionRepository repository;
 
-    private Producer producer;
+    private final Producer producer;
 
-    private Configuration config;
+    private final Configuration config;
 
-    private WorkflowService workflowService;
+    private final AsyncSubmissionEnrichment enrichment;
 
-    private AsyncSubmissionEnrichment enrichment;
-
-    private AsyncSubmissionValidator validator;
+    private final AsyncSubmissionValidator validator;
 
     @Autowired
     public AsyncSubmissionService(AsyncSubmissionRepository repository, Producer producer,
-                                  Configuration config, WorkflowService workflowService,
-                                  AsyncSubmissionEnrichment enrichment, AsyncSubmissionValidator validator) {
+                                  Configuration config, AsyncSubmissionEnrichment enrichment,
+                                  AsyncSubmissionValidator validator) {
         this.repository = repository;
         this.producer = producer;
         this.config = config;
-        this.workflowService = workflowService;
         this.enrichment = enrichment;
         this.validator = validator;
     }
-
 
     public AsyncSubmission getDueDates(AsyncSubmissionRequest submissionRequest) {
         log.info("operation = getDueDates, result = IN_PROGRESS");
@@ -79,7 +75,7 @@ public class AsyncSubmissionService {
     public AsyncSubmissionResponse updateAsyncSubmissions(AsyncSubmissionRequest request) {
         log.info("operation = updateAsyncSubmissions, result = IN_PROGRESS");
         AsyncSubmission asyncSubmission = request.getAsyncSubmission();
-        if (StringUtils.isEmpty(asyncSubmission.getSubmissionId())) {
+        if (!StringUtils.hasText(asyncSubmission.getSubmissionId())) {
             throw new CustomException("DK_AS_APP_ERR", "async submission id should not be null");
         }
         AsyncSubmissionSearchCriteria searchCriteria = AsyncSubmissionSearchCriteria.builder()

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -21,10 +20,10 @@ import java.util.Optional;
 @Slf4j
 public class AsyncSubmissionValidator {
 
-    private HearingRepository repository;
+    private final HearingRepository repository;
 
 
-    private Configuration config;
+    private final Configuration config;
 
     @Autowired
     public AsyncSubmissionValidator(HearingRepository repository, Configuration config) {
@@ -33,7 +32,7 @@ public class AsyncSubmissionValidator {
     }
 
     public void validateSubmissionDates(AsyncSubmission asyncSubmission) {
-        // Check if tenant Id is null or does not match the defined tenant ID
+        // Check if tenant id is null or does not match the defined tenant ID
         if (asyncSubmission.getTenantId() == null || !config.getEgovStateTenantId().equalsIgnoreCase(asyncSubmission.getTenantId())) {
             throw new CustomException("DK_ASH_APP_ERR", "Tenant id is either null or invalid");
         }
@@ -47,7 +46,7 @@ public class AsyncSubmissionValidator {
 
         // Find the latest hearing by start time
         Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);
-        // Proceed only if a latest hearing is found
+        // Proceed only if latest hearing is found
         if (latestHearing.isPresent()) {
             // Check if the response date is after the latest hearing date
             if (LocalDate.parse(asyncSubmission.getResponseDate()).isAfter(latestHearing.get().getDate())) {
@@ -81,7 +80,7 @@ public class AsyncSubmissionValidator {
 
 
     public void validateDates(AsyncSubmission asyncSubmission) {
-        // Build search criteria using case Id and retrieve list of scheduled hearings
+        // Build search criteria using case id and retrieve list of scheduled hearings
         HearingSearchCriteria searchCriteria = HearingSearchCriteria.builder()
                 .caseId(asyncSubmission.getCaseId()).build();
         List<ScheduleHearing> scheduleHearingList = repository.getHearings(searchCriteria,null,null);
@@ -89,25 +88,21 @@ public class AsyncSubmissionValidator {
         // Find the latest hearing by start time
         Optional<ScheduleHearing> latestHearing = findLatestHearingByHearingDate(scheduleHearingList);
 
-        // Proceed only if a latest hearing is found
+        // Proceed only if latest hearing is found
         if (latestHearing.isPresent()) {
-            ScheduleHearing hearing = latestHearing.get();
-            LocalDate hearingDate = hearing.getDate();
-            LocalDate responseDate = LocalDate.parse(asyncSubmission.getResponseDate());
-            LocalDate currentDate = LocalDate.now();
+            LocalDate hearingDate = latestHearing.get().getDate();
+            LocalDate proposedResponseDate = LocalDate.parse(asyncSubmission.getResponseDate());
+            LocalDate proposedSubmissionDate = LocalDate.parse(asyncSubmission.getSubmissionDate());
 
-            // Adjust response date if it is after the latest hearing date
-            if (responseDate.isAfter(hearingDate)) {
-                asyncSubmission.setResponseDate(hearingDate.minusDays(1).toString());
+            if (proposedResponseDate.isAfter(hearingDate)) {
+                proposedResponseDate = hearingDate.minusDays(1);
+                asyncSubmission.setResponseDate(proposedResponseDate.toString());
+                if (proposedSubmissionDate.isAfter(proposedResponseDate)) {
+                    proposedSubmissionDate = proposedResponseDate.minusDays(1);
+                    asyncSubmission.setSubmissionDate(proposedSubmissionDate.toString());
+                }
             }
 
-            // Calculate no of days till latest hearing and set submission dates
-            long daysUntilHearing = ChronoUnit.DAYS.between(currentDate, hearingDate);
-            if (daysUntilHearing > 6) {
-                asyncSubmission.setSubmissionDate(hearingDate.minusDays(6).toString());
-            } else {
-                asyncSubmission.setSubmissionDate(currentDate.plusDays(1).toString());
-            }
         }
     }
 }
