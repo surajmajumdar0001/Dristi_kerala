@@ -49,6 +49,7 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey })
           authType: "6546",
           fileStoreId: "2aefb901-edc6-4a45-95f8-3ea383a513f5",
           tenantId: "kl",
+          pageModule: "ci",
         },
       });
       if (eSignResponse) {
