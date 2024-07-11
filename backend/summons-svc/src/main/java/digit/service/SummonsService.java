@@ -133,8 +133,8 @@ public class SummonsService {
 
     private String getPdfTemplateKey(String taskType) {
         return switch (taskType.toLowerCase()) {
-            case "summons" -> config.getSummonsPdfTemplateKey();
-            case "warrants" -> config.getWarrantPdfTemplateKey();
+            case "summon" -> config.getSummonsPdfTemplateKey();
+            case "warrant" -> config.getWarrantPdfTemplateKey();
             case "bail" -> config.getBailPdfTemplateKey();
             default -> throw new CustomException("INVALID_TASK_TYPE", "Task Type must be valid. Provided: " + taskType);
         };
