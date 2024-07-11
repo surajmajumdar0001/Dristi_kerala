@@ -1,29 +1,10 @@
-package org.pucar.dristi.util;
+package org.pucar.dristi.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.pucar.dristi.config.ServiceConstants.BUSINESS_SERVICE_NOT_FOUND;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.egov.common.contract.models.RequestInfoWrapper;
 import org.egov.common.contract.models.Workflow;
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.common.contract.workflow.BusinessService;
-import org.egov.common.contract.workflow.BusinessServiceResponse;
-import org.egov.common.contract.workflow.ProcessInstance;
-import org.egov.common.contract.workflow.ProcessInstanceResponse;
-import org.egov.common.contract.workflow.State;
+import org.egov.common.contract.workflow.*;
 import org.egov.tracer.model.CustomException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,8 +14,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pucar.dristi.config.Configuration;
 import org.pucar.dristi.repository.ServiceRequestRepository;
+import org.pucar.dristi.util.WorkflowUtil;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.pucar.dristi.config.ServiceConstants.BUSINESS_SERVICE_NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 public class WorkflowUtilTest {
