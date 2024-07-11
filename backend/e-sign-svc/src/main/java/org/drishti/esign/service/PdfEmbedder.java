@@ -9,10 +9,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
 import java.util.HashMap;
+import java.util.List;
 
 
 @Component
@@ -46,6 +50,16 @@ public class PdfEmbedder {
             int contentEstimated = 8192;
             String errorCode = response.substring(response.indexOf("errCode"), response.indexOf("errMsg"));
             errorCode = errorCode.trim();
+
+            String certString = response.substring(response.indexOf("<UserX509Certificate>"), response.indexOf("</UserX509Certificate>"))
+                    .replaceAll("<UserX509Certificate>", "").replaceAll("</UserX509Certificate>", "");
+            byte[] certBytes = Base64.decodeBase64(certString);
+            ByteArrayInputStream stream = new ByteArrayInputStream(certBytes);
+            CertificateFactory factory = CertificateFactory.getInstance("X.509");
+            Certificate cert = factory.generateCertificate(stream);
+            List<Certificate> certificates = List.of(cert);
+            appearance.setCrypto(null, certificates.toArray(new Certificate[0]), null, null);
+
             if (errorCode.contains("NA")) {
                 String pkcsResponse = new XmlSigning().parseXml(response.trim());
                 byte[] sigbytes = Base64.decodeBase64(pkcsResponse);
@@ -54,13 +68,13 @@ public class PdfEmbedder {
                 PdfDictionary dic2 = new PdfDictionary();
                 dic2.put(PdfName.CONTENTS,
                         new PdfString(paddedSig).setHexWriting(true));
-                appearance.preClose();
+                appearance.preClose(exc);
                 appearance.close(dic2);
             } else {
                 // handle error case
             }
 
-            stamper.close();
+//            stamper.close();
             bos.close();
 
             return new ByteArrayMultipartFile("signedDoc", bos.toByteArray());
