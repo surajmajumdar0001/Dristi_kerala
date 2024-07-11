@@ -54,6 +54,8 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey })
       if (eSignResponse) {
         // debugger;
         // Create and submit the form programmatically
+        localStorage.setItem("esignProcess", true);
+
         const form = document.createElement("form");
         form.method = "POST";
         form.action = "https://es-staging.cdac.in/esignlevel1/2.1/form/signdoc";

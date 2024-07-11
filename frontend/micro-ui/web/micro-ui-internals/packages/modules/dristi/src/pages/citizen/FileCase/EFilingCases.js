@@ -545,7 +545,10 @@ function EFilingCases({ path }) {
     });
     return result;
   }, [formConfig]);
-
+  if (selected === "addSignature") {
+    const currentLocation = window.location.href;
+    localStorage.setItem("windowLocation", currentLocation);
+  }
   const modifiedFormConfig = useMemo(() => {
     let modifiedFormData = formdata;
     if (!isDependentEnabled) {

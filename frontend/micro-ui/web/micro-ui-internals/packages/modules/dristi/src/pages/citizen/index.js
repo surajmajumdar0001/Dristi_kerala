@@ -10,7 +10,7 @@ import CitizenHome from "./Home";
 import LandingPage from "./Home/LandingPage";
 import { userTypeOptions } from "./registration/config";
 
-const App = ({ stateCode, tenantId }) => {
+const App = ({ stateCode, tenantId, result }) => {
   const [hideBack, setHideBack] = useState(false);
   const { toastMessage, toastType, closeToast } = useToast();
   const Digit = window?.Digit || {};
@@ -98,7 +98,10 @@ const App = ({ stateCode, tenantId }) => {
     `${path}/home/application-details`,
   ];
   const registerScreenRoute = [`${path}/home/login`, `${path}/home/registration/mobile-number`, `${path}/home/registration/otp`];
+  const locationEsign = localStorage.getItem("windowLocation");
+  const esignProcess = localStorage.getItem("esignProcess");
 
+  console.log(locationEsign, "location");
   if (!isUserLoggedIn && !whiteListedRoutes.includes(location.pathname)) {
     history.push(`${path}/home/login`);
   }
@@ -112,6 +115,14 @@ const App = ({ stateCode, tenantId }) => {
   if (isUserLoggedIn && registerScreenRoute.includes(location.pathname)) {
     history.push(`${path}/home/registration/user-name`);
   }
+  if (result) {
+    console.log(result);
+  }
+
+  // if (isUserLoggedIn && eSign && locationEsign && locationEsign.includes("addSignature")) {
+  //   console.log("sifn");
+  //   history.replace(locationEsign);
+  // }
   if (isLoading) {
     return <Loader />;
   }
