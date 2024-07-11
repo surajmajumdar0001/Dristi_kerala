@@ -11,6 +11,7 @@ import digit.util.TaskUtil;
 import digit.web.models.*;
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.models.Document;
+import org.egov.common.contract.models.Workflow;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,9 +120,11 @@ public class SummonsService {
         TaskListResponse taskListResponse = taskUtil.callSearchTask(searchRequest);
         Task task = taskListResponse.getList().get(0);
         if (task.getTaskType().equalsIgnoreCase("summons")) {
-            task.getWorkflow().setAction("SERVE");
+            Workflow workflow = Workflow.builder().action("SERVE").build();
+            task.setWorkflow(workflow);
         } else if (task.getTaskType().equalsIgnoreCase("warrants")) {
-            task.getWorkflow().setAction("DELIVERED");
+            Workflow workflow = Workflow.builder().action("DELIVERED").build();
+            task.setWorkflow(workflow);
         }
         TaskRequest taskRequest = TaskRequest.builder()
                 .requestInfo(request.getRequestInfo()).task(task).build();
