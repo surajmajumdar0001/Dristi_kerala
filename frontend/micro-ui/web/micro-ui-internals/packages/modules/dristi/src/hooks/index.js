@@ -11,6 +11,7 @@ import useGetOrders from "./dristi/useGetOrders";
 import useGetSubmissions from "./dristi/useGetSubmissions";
 import useInboxCustomHook from "./dristi/useInboxCustomHook";
 import useSearchCaseService from "./dristi/useSearchCaseService";
+import usePaymentCalculator from "./dristi/usePaymentCalculator";
 
 export const Urls = {
   Authenticate: "/user/oauth/token",
@@ -32,6 +33,11 @@ export const Urls = {
     submissionsSearch: "/application/application/v1/search",
     submissionsUpdate: "/application/application/v1/update",
     eSign: "/e-sign-svc/v1/_esign",
+    paymentCalculator: "/payment-calculator/v1/case/fees/_calculate",
+    fetchBill: "/billing-service/bill/v2/_fetchbill",
+    searchBill: "/billing-service/bill/v2/_search",
+
+    eTreasury: "/etreasury/payment/v1/_processChallan",
   },
   FileFetchById: "/filestore/v1/files/id",
 };
@@ -45,6 +51,7 @@ const dristi = {
   useInboxCustomHook,
   useSearchCaseService,
   useGetHearings,
+  usePaymentCalculator,
   useGetEvidence,
   useGetOrders,
   useGetSubmissions,
