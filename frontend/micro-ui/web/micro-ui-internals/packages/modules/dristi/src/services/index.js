@@ -153,4 +153,44 @@ export const DRISTIService = {
       params,
     });
   },
+  createDemand: (data, params) =>
+    Request({
+      url: Urls.dristi.demandCreate,
+      useCache: false,
+      userService: true,
+      data,
+      params,
+    }),
+  getPaymentBreakup: (data, params) =>
+    Request({
+      url: Urls.dristi.paymentCalculator,
+      useCache: false,
+      userService: false,
+      data,
+      params,
+    }),
+  callFetchBill: (data, params) =>
+    Request({
+      url: Urls.dristi.fetchBill,
+      useCache: false,
+      userService: true,
+      data,
+      params,
+    }),
+  callETreasury: (data, params) =>
+    Request({
+      url: Urls.dristi.eTreasury,
+      useCache: false,
+      userService: true,
+      data,
+      params,
+    }),
+  callSearchBill: (data, params) =>
+    Request({
+      url: Urls.dristi.searchBill,
+      useCache: false,
+      userService: true,
+      data,
+      params,
+    }),
 };
