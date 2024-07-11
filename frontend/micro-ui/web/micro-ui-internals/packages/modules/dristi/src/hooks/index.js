@@ -28,7 +28,9 @@ export const Urls = {
     demandCreate: "/billing-service/demand/_create",
     paymentCalculator: "/payment-calculator/v1/case/fees/_calculate",
     fetchBill: "/billing-service/bill/v2/_fetchbill",
-    eTreasury: "/etreasury/payment/v1/_processPayment",
+    searchBill: "/billing-service/bill/v2/_search",
+
+    eTreasury: "/etreasury/payment/v1/_processChallan",
   },
   FileFetchById: "/filestore/v1/files/id",
 };

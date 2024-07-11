@@ -133,4 +133,12 @@ export const DRISTIService = {
       data,
       params,
     }),
+  callSearchBill: (data, params) =>
+    Request({
+      url: Urls.dristi.searchBill,
+      useCache: false,
+      userService: true,
+      data,
+      params,
+    }),
 };

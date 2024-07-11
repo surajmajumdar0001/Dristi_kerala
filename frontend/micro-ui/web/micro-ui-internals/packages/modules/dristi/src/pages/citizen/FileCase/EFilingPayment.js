@@ -6,7 +6,6 @@ import { Link, useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import CustomCaseInfoDiv from "../../../components/CustomCaseInfoDiv";
 import useSearchCaseService from "../../../hooks/dristi/useSearchCaseService";
 import { useToast } from "../../../components/Toast/useToast";
-import useGetHearings from "../../../hooks/dristi/useGetHearings";
 import usePaymentCalculator from "../../../hooks/dristi/usePaymentCalculator";
 import { DRISTIService } from "../../../services";
 
@@ -44,6 +43,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
   const tenantId = window?.Digit.ULBService.getCurrentTenantId();
   const { caseId } = window?.Digit.Hooks.useQueryParams();
   const toast = useToast();
+  const [paymentLoader, setPaymentLoader] = useState(false);
 
   const { data: caseData, isLoading } = useSearchCaseService(
     {
@@ -86,15 +86,6 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     "dristi",
     Boolean(chequeDetails?.data?.chequeAmount)
   );
-  // function getRandomAlphabet() {
-  //   const alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-  //   return alphabets.charAt(Math.floor(Math.random() * alphabets.length));
-  // }
-
-  // function generateDepartmentId(caseDetails) {
-  //   const randomAlphabet = getRandomAlphabet();
-  //   return `${caseDetails?.filingNumber}${randomAlphabet}`;
-  // }
 
   const totalAmount = useMemo(() => {
     const totalAmount = calculationResponse?.Calculation?.[0]?.totalAmount || 0;
@@ -132,109 +123,154 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
       showCopytext: true,
     };
   }, [caseDetails?.filingNumber]);
-  // const { data: paymentDetails, isLoading: isFetchBillLoading } = Digit.Hooks.useFetchBillsForBuissnessService(
-  //   {
-  //     tenantId: tenantId,
-  //     consumerCode: caseDetails?.filingNumber,
-  //     businessService: "case",
-  //   },
-  //   {
-  //     enabled: Boolean(tenantId && caseDetails?.filingNumber),
-  //   }
-  // );
-  // const bill = paymentDetails?.Bill ? paymentDetails?.Bill[0] : {};
-  const [apiResponse, setApiResponse] = useState("");
 
-  const handleApiResponse = (data) => {
-    setApiResponse(data);
-  };
-  console.log(apiResponse);
   const openPopupWindow = (htmlContent) => {
-    const popup = window.open("", "Popup", "width=600,height=400");
-    window.handleApiResponse = handleApiResponse;
+    const popup = window.open("", "Popup", "width=1000,height=1000");
+
     popup.document.open();
     popup.document.write(htmlContent);
+    setPaymentLoader(true);
     popup.document.close();
+    const checkPopupClosed = setInterval(async () => {
+      if (popup.closed) {
+        setPaymentLoader(false);
+        const billAfterPayment = await DRISTIService.callSearchBill({}, { tenantId, consumerCode: caseDetails?.filingNumber, service: "case" });
+        console.log(billAfterPayment?.ResposneInfo?.status);
+        if (billAfterPayment?.ResposneInfo?.status === "200 OK") {
+          history.push(`${path}/e-filing-payment-response`, {
+            state: {
+              success: true,
+              receiptData: {
+                ...mockSubmitModalInfo,
+                caseInfo: [
+                  {
+                    key: "Mode of Payment",
+                    value: "Online",
+                    copyData: false,
+                  },
+                  {
+                    key: "Amount",
+                    value: totalAmount,
+                    copyData: false,
+                  },
+                  {
+                    key: "Transaction ID",
+                    value: caseDetails?.filingNumber,
+                    copyData: true,
+                  },
+                ],
+                isArrow: false,
+                showTable: true,
+                showCopytext: true,
+              },
+            },
+          });
+        } else {
+          history.push(`${path}/e-filing-payment-response`, {
+            state: {
+              success: false,
+              receiptData: {
+                ...mockSubmitModalInfo,
+                caseInfo: [
+                  {
+                    key: "Mode of Payment",
+                    value: "Online",
+                    copyData: false,
+                  },
+                  {
+                    key: "Amount",
+                    value: totalAmount,
+                    copyData: false,
+                  },
+                  {
+                    key: "Transaction ID",
+                    value: caseDetails?.filingNumber,
+                    copyData: true,
+                  },
+                ],
+                isArrow: false,
+                showTable: true,
+                showCopytext: true,
+              },
+            },
+          });
+        }
+        clearInterval(checkPopupClosed);
+      }
+    }, 1000);
+    setShowPaymentModal(false);
   };
   const onSubmitCase = async () => {
-    const handleError = (message) => {
-      console.error(message);
-      history.push(`/${path}/e-filing-payment-response`, { state: { success: false } });
-    };
-
     try {
-      // const demandResponse = await DRISTIService.createDemand({
-      //   Demands: [
-      //     {
-      //       tenantId,
-      //       consumerCode: caseDetails?.filingNumber,
-      //       consumerType: "case",
-      //       businessService: "case",
-      //       taxPeriodFrom: Date.now().toString(),
-      //       taxPeriodTo: Date.now().toString(),
-      //       demandDetails: [
-      //         {
-      //           taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
-      //           taxAmount: totalAmount,
-      //           collectionAmount: 0,
-      //         },
-      //       ],
-      //     },
-      //   ],
-      // });
-
-      // if (!demandResponse) {
-      //   handleError("Error creating demand.");
-      //   return;
-      // }
-
-      // const bill = await DRISTIService.callFetchBill({}, { consumerCode: caseDetails?.filingNumber, tenantId, businessService: "case" });
-
-      // if (!bill) {
-      //   history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox`);
-      //   return;
-      // }
-
-      const gateway = await DRISTIService.callETreasury(
-        {
-          PaymentDetails: {
-            FROM_DATE: "26/02/2020",
-            TO_DATE: "26/02/2020",
-            PAYMENT_MODE: "E",
-            NO_OF_HEADS: "1",
-            HEADS_DET: [
+      const demandResponse = await DRISTIService.createDemand({
+        Demands: [
+          {
+            tenantId,
+            consumerCode: caseDetails?.filingNumber,
+            consumerType: "case",
+            businessService: "case",
+            taxPeriodFrom: Date.now().toString(),
+            taxPeriodTo: Date.now().toString(),
+            demandDetails: [
               {
-                AMOUNT: "2",
-                HEADID: "00374",
+                taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
+                taxAmount: totalAmount,
+                collectionAmount: 0,
               },
             ],
-            CHALLAN_AMOUNT: "2",
-            PARTY_NAME: "arun",
-            DEPARTMENT_ID: `${caseDetails?.filingNumber}Kfj`,
-            TSB_RECEIPTS: "N",
           },
-        },
-        {}
-      );
+        ],
+      });
 
-      if (gateway) {
-        // // console.log(gateway?.htmlPage?.htmlString);
-        // history.push(`${path}/e-filing-payment-gateway`, {
-        //   state: gateway?.htmlPage?.htmlString,
-        // });
-        const updatedHtmlString = gateway?.htmlPage?.htmlString.replace(
-          "ChallanGeneration.php",
-          "https://www.stagingetreasury.kerala.gov.in/api/eTreasury/service/ChallanGeneration.php"
+      const bill = await DRISTIService.callFetchBill({}, { consumerCode: caseDetails?.filingNumber, tenantId, businessService: "case" });
+
+      if (bill) {
+        const gateway = await DRISTIService.callETreasury(
+          {
+            ChallanData: {
+              ChallanDetails: {
+                FROM_DATE: "26/02/2020",
+                TO_DATE: "26/02/2020",
+                PAYMENT_MODE: "E",
+                NO_OF_HEADS: "1",
+                HEADS_DET: [
+                  {
+                    AMOUNT: "2",
+                    HEADID: "00374",
+                  },
+                ],
+                CHALLAN_AMOUNT: "2",
+                PARTY_NAME: caseDetails?.additionalDetails?.payerName,
+                DEPARTMENT_ID: `${caseDetails?.filingNumber}`,
+                TSB_RECEIPTS: "N",
+              },
+              billId: bill?.Bill?.[0]?.billDetails?.[0]?.id,
+              serviceNumber: "TASK12345",
+              businessService: "case",
+              totalDue: totalAmount,
+              mobileNumber: "9876543210",
+              paidBy: "COMMON_OWNER",
+            },
+          },
+          {}
         );
-        openPopupWindow(updatedHtmlString);
-      } else {
-        handleError("Error calling e-Treasury.");
+
+        if (gateway) {
+          const updatedHtmlString = gateway?.htmlPage?.htmlString.replace(
+            "ChallanGeneration.php",
+            "https://www.stagingetreasury.kerala.gov.in/api/eTreasury/service/ChallanGeneration.php"
+          );
+          openPopupWindow(updatedHtmlString);
+        } else {
+          handleError("Error calling e-Treasury.");
+        }
       }
     } catch (error) {
       handleError(`Error in onSubmitCase: ${error.message}`);
     }
   };
-  if (isLoading || isPaymentLoading) {
+
+  if (isLoading || isPaymentLoading || paymentLoader) {
     return <Loader />;
   }
   return (
