@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -33,9 +34,23 @@ public class InterceptorApiController {
         this.configs = configs;
     }
 
+    @RequestMapping(value = "/v1/redirect", method = RequestMethod.GET)
+    public ResponseEntity<?> redirectHandler(@RequestParam("result") String result, @RequestParam("filestoreId") String filestoreId, @RequestParam("userType") String userType) {
+
+
+        // Construct the final redirect URL
+        String redirectUri = configs.getRedirectUrl() + userType + "/dristi";
+        redirectUri += "?result=" + result + "&filestoreId=" + filestoreId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(redirectUri));
+        return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);
+    }
+
+
 
     @RequestMapping(value = "/v1/_intercept", method = RequestMethod.POST)
-    public ResponseEntity<?> eSignV1Interceptor(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId) {
+    public ModelAndView eSignV1Interceptor(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId) {
         String filestoreId = "";
         String result = "error";
 
@@ -63,30 +78,37 @@ public class InterceptorApiController {
         } else {
             throw new RuntimeException("Invalid pageModule: " + pageModule);
         }
+
+        // Redirect to the GET handler with parameters
+        ModelAndView modelAndView = new ModelAndView("redirect:/v1/redirect");
+        modelAndView.addObject("result", result);
+        modelAndView.addObject("filestoreId", filestoreId);
+        modelAndView.addObject("userType", userType);
         // fixme : send filestore id in custom header, discuss with suresh first
-        HttpHeaders headers = new HttpHeaders();
-        String redirectUri = configs.getRedirectUrl();
-        redirectUri = redirectUri + userType + "/dristi";
-
-        HashMap<String, String> map = new HashMap<>();
-        map.put("result", result);
-        map.put("filestoreId", filestoreId);
-
-        StringBuilder params = new StringBuilder();
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            params.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-        }
-
-        redirectUri += "?" + params;
-        redirectUri = redirectUri.endsWith("&") ? redirectUri.substring(0, redirectUri.length() - 1) : redirectUri;
-
-
 //        HttpHeaders headers = new HttpHeaders();
 //        String redirectUri = configs.getRedirectUrl();
-//        redirectUri = redirectUri + userType + "/dristi?result=" + result + "filestoreId=" + filestoreId;
-
-        headers.setLocation(URI.create(redirectUri));
-        return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);
+//        redirectUri = redirectUri + userType + "/dristi";
+//
+//        HashMap<String, String> map = new HashMap<>();
+//        map.put("result", result);
+//        map.put("filestoreId", filestoreId);
+//
+//        StringBuilder params = new StringBuilder();
+//        for (Map.Entry<String, String> entry : map.entrySet()) {
+//            params.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+//        }
+//
+//        redirectUri += "?" + params;
+//        redirectUri = redirectUri.endsWith("&") ? redirectUri.substring(0, redirectUri.length() - 1) : redirectUri;
+//
+//
+////        HttpHeaders headers = new HttpHeaders();
+////        String redirectUri = configs.getRedirectUrl();
+////        redirectUri = redirectUri + userType + "/dristi?result=" + result + "filestoreId=" + filestoreId;
+//
+//        headers.setLocation(URI.create(redirectUri));
+//        return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);
+        return modelAndView;
 
     }
 
