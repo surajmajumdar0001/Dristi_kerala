@@ -1,7 +1,6 @@
 package digit.web.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.UUID;
 
 import org.egov.common.contract.request.RequestInfo;
 
@@ -23,17 +22,11 @@ import lombok.Builder;
 @Builder
 public class TaskRequest   {
 
-        @JsonProperty("orderId")
-        @Valid
-        private UUID orderId = null;
-
         @JsonProperty("RequestInfo")
         @Valid
         private RequestInfo requestInfo = null;
 
-        @JsonProperty("task")
+        @JsonProperty("Task")
         @Valid
         private Task task = null;
-
-
 }
