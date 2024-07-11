@@ -7,6 +7,7 @@ import com.pucar.drishti.util.FileStoreUtil;
 import com.pucar.drishti.web.models.SignDocParameter;
 import com.pucar.drishti.web.models.SignDocRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.protocol.types.Field;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -33,11 +34,11 @@ public class InterceptorService {
         this.configs = configs;
     }
 
-    public String process(String response, String espId) {
+    public String process(String response, String espId, String tenantId, String fileStoreId) {
 
         String token = oAuthForDristi();
-        String tenantId = espId.substring(0, 2); ///fixme: length might be change check other way
-        String fileStoreId = espId.substring(2);   /// length might be change check other way
+
+
         util.fetchFileStoreObjectById(fileStoreId, tenantId); // validation of transaction
         SignDocRequest request = getSignDocRequest(token,response, fileStoreId, tenantId);
 
