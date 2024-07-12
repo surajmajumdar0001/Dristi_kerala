@@ -73,7 +73,7 @@ public class PdfEmbedder {
             appearance.setCrypto(null, certificates.toArray(new Certificate[0]), null, null);
 
 
-            appearance.preClose();
+
 
             int contentEstimated = 8192;
             String errorCode = response.substring(response.indexOf("errCode"), response.indexOf("errMsg"));
@@ -86,16 +86,16 @@ public class PdfEmbedder {
                 PdfDictionary dic2 = new PdfDictionary();
                 dic2.put(PdfName.CONTENTS,
                         new PdfString(paddedSig).setHexWriting(true));
-
+                appearance.preClose(exc);
                 appearance.close(dic2);
             } else {
                 // handle error case
             }
 
-            stamper.close();
+//            stamper.close();
             bos.close();
 
-            return new ByteArrayMultipartFile("signedDoc", bos.toByteArray());
+            return new ByteArrayMultipartFile("signedDoc.pdf", bos.toByteArray());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
