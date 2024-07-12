@@ -7,7 +7,6 @@ import com.pucar.drishti.util.FileStoreUtil;
 import com.pucar.drishti.web.models.SignDocParameter;
 import com.pucar.drishti.web.models.SignDocRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.egov.common.contract.request.RequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -35,15 +34,15 @@ public class InterceptorService {
     }
 
     public String process(String response, String espId, String tenantId, String fileStoreId) {
-
+        log.info("generating token for created user");
         String token = oAuthForDristi();
-
-
+        log.info ("validating by calling filestore id");
         util.fetchFileStoreObjectById(fileStoreId, tenantId); // validation of transaction
-        SignDocRequest request = getSignDocRequest(token,response, fileStoreId, tenantId);
+        SignDocRequest request = getSignDocRequest(token, response, fileStoreId, tenantId);
 
         StringBuilder uri = new StringBuilder();
         uri.append(configs.getESignHost()).append(configs.getESignEndPoint());
+
         Object result = restCall.fetchResult(uri, request);
 
         log.info("signed fileStore id {} :", result.toString());
@@ -52,7 +51,7 @@ public class InterceptorService {
 
     }
 
-    private SignDocRequest getSignDocRequest(String token,String response, String fileStoreId, String tenantId) {
+    private SignDocRequest getSignDocRequest(String token, String response, String fileStoreId, String tenantId) {
 
         RequestInfo requestInfo = RequestInfo.builder().authToken(token).build();  //fixme: update user for this
 
@@ -85,7 +84,7 @@ public class InterceptorService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
         Object response = restCall.fetchResult(uri, request);
-        String accessToken= ((LinkedHashMap) response).get("access_token").toString();
+        String accessToken = ((LinkedHashMap) response).get("access_token").toString();
         return accessToken;
     }
 }
