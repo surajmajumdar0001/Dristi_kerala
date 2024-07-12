@@ -102,6 +102,10 @@ const App = ({ stateCode, tenantId, result }) => {
   const eSignWindowObject = localStorage.getItem("eSignWindowObject");
   const retrievedObject = JSON.parse(eSignWindowObject);
   console.log(eSignWindowObject, "obj");
+  const locationEsign = localStorage.getItem("windowLocation");
+  const esignProcess = localStorage.getItem("esignProcess");
+  const splitUrl = locationEsign?.split("/home/")[1];
+  console.log(splitUrl);
   if (!isUserLoggedIn && !whiteListedRoutes.includes(location.pathname)) {
     history.push(`${path}/home/login`);
   }
@@ -119,11 +123,13 @@ const App = ({ stateCode, tenantId, result }) => {
     console.log(result);
   }
   console.log(retrievedObject, "retrievedObject");
-  if (isUserLoggedIn && retrievedObject) {
+  if (isUserLoggedIn && splitUrl) {
     console.log("Esign");
-    history.push(`${retrievedObject?.path}${retrievedObject?.param}}`, { state: { isSignSuccess: result } });
-    localStorage.removeItem("eSignWindowObject");
+    history.push(`${path}/home/${splitUrl}`, { state: { isSignSuccess: result } });
+    localStorage.removeItem("esignProcess");
+    localStorage.removeItem("windowLocation");
   }
+
   if (isLoading) {
     return <Loader />;
   }

@@ -29,7 +29,8 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
       });
     } else onSelect(config.key, { ...formData[config.key], [input]: value });
   }
-  // const location = useLocation();
+  const location = useLocation();
+  console.log(location);
   // const isSignSuccess = location?.state?.state?.isSignSuccess ?? false;
   // console.log(isSignSuccess);
   // useEffect(() => {
@@ -60,6 +61,8 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
         };
         localStorage.setItem("eSignWindowObject", JSON.stringify(eSignData));
         localStorage.setItem("esignProcess", true);
+        localStorage.setItem("eSignWindowObject", window.location.href);
+
         const form = document.createElement("form");
         form.method = "POST";
         form.action = "https://es-staging.cdac.in/esignlevel1/2.1/form/signdoc";
