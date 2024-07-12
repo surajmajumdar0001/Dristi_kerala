@@ -98,8 +98,10 @@ const App = ({ stateCode, tenantId, result }) => {
     `${path}/home/application-details`,
   ];
   const registerScreenRoute = [`${path}/home/login`, `${path}/home/registration/mobile-number`, `${path}/home/registration/otp`];
-  const eSignWindowObject = localStorage.getItem("eSignWindowObject");
 
+  const eSignWindowObject = localStorage.getItem("eSignWindowObject");
+  const retrievedObject = JSON.parse(eSignWindowObject);
+  console.log(eSignWindowObject, "obj");
   if (!isUserLoggedIn && !whiteListedRoutes.includes(location.pathname)) {
     history.push(`${path}/home/login`);
   }
@@ -116,10 +118,10 @@ const App = ({ stateCode, tenantId, result }) => {
   if (result) {
     console.log(result);
   }
-
-  if (isUserLoggedIn && eSignWindowObject) {
-    console.log("Esign");
-    history.push(`/${eSignWindowObject?.path}${eSignWindowObject?.param}}`, { state: { isSignSuccess: result } });
+  console.log(retrievedObject, "retrievedObject");
+  if (isUserLoggedIn && retrievedObject) {
+    console.log("Esign", `${retrievedObject?.path}${retrievedObject?.param}`);
+    history.push(`${retrievedObject?.path}${retrievedObject?.param}`, { state: { isSignSuccess: result } });
     localStorage.removeItem("eSignWindowObject");
   }
   if (isLoading) {
