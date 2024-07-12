@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+
 
 @Generated(value = "org.egov.codegen.SpringBootCodegen", date = "2024-07-02T12:37:46.343081666+05:30[Asia/Kolkata]")
 @RestController
@@ -36,7 +35,7 @@ public class InterceptorApiController {
 
     @RequestMapping(value = "/v1/redirect", method = RequestMethod.GET)
     public ResponseEntity<?> redirectHandler(@RequestParam("result") String result, @RequestParam("filestoreId") String filestoreId, @RequestParam("userType") String userType) {
-
+        log.info("redirecting through get method");
 
         // Construct the final redirect URL
         String redirectUri = configs.getRedirectUrl() + userType + "/dristi";
@@ -44,31 +43,39 @@ public class InterceptorApiController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUri));
+        log.info("redirectUri {}", redirectUri);
         return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);
     }
 
 
-
     @RequestMapping(value = "/v1/_intercept", method = RequestMethod.POST)
     public ModelAndView eSignV1Interceptor(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId) {
+
+        log.info(response);
+        log.info(espId);
+
+
         String filestoreId = "";
         String result = "error";
 
         int firstHyphenIndex = espId.indexOf("-");
         int secondHyphenIndex = espId.indexOf("-", firstHyphenIndex + 1);
-
+        log.info("calculating tenantId,pageModule,fileStore id");
         String tenantId = espId.substring(0, firstHyphenIndex);
         String pageModule = espId.substring(firstHyphenIndex + 1, secondHyphenIndex);
         String fileStoreId = espId.substring(secondHyphenIndex + 1);
-
+        log.info("tenantId {} ,pageModule {} , fileStoreId {}", tenantId, pageModule, fileStoreId);
         try {
-
+            log.info("sending response to sign doc");
             filestoreId = service.process(response, espId, tenantId, fileStoreId);
             result = "success";
+            log.info("successfully sign doc");
         } catch (Exception e) {
             log.error("Error Occured While signing the doc");
 
         }
+
+        log.info("generating uri to redirect");
 
         String userType;
         if (pageModule.equals("en")) {
@@ -84,30 +91,7 @@ public class InterceptorApiController {
         modelAndView.addObject("result", result);
         modelAndView.addObject("filestoreId", filestoreId);
         modelAndView.addObject("userType", userType);
-        // fixme : send filestore id in custom header, discuss with suresh first
-//        HttpHeaders headers = new HttpHeaders();
-//        String redirectUri = configs.getRedirectUrl();
-//        redirectUri = redirectUri + userType + "/dristi";
-//
-//        HashMap<String, String> map = new HashMap<>();
-//        map.put("result", result);
-//        map.put("filestoreId", filestoreId);
-//
-//        StringBuilder params = new StringBuilder();
-//        for (Map.Entry<String, String> entry : map.entrySet()) {
-//            params.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-//        }
-//
-//        redirectUri += "?" + params;
-//        redirectUri = redirectUri.endsWith("&") ? redirectUri.substring(0, redirectUri.length() - 1) : redirectUri;
-//
-//
-////        HttpHeaders headers = new HttpHeaders();
-////        String redirectUri = configs.getRedirectUrl();
-////        redirectUri = redirectUri + userType + "/dristi?result=" + result + "filestoreId=" + filestoreId;
-//
-//        headers.setLocation(URI.create(redirectUri));
-//        return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);
+
         return modelAndView;
 
     }
