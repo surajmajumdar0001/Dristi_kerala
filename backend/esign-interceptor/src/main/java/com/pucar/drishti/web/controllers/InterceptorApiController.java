@@ -39,7 +39,8 @@ public class InterceptorApiController {
 
 
         // Construct the final redirect URL
-        String redirectUri = configs.getRedirectUrl() + userType + "/dristi";
+        String redirectUri = configs.getRedirectUrl();
+        redirectUri += (userType.equals("*") ? "dristi" : userType + "/dristi");
         redirectUri += "?result=" + result + "&filestoreId=" + filestoreId;
 
         HttpHeaders headers = new HttpHeaders();
@@ -70,13 +71,11 @@ public class InterceptorApiController {
 
         }
 
-        String userType;
+        String userType = "*";
         if (pageModule.equals("en")) {
             userType = "employee";
         } else if (pageModule.equals("ci")) {
             userType = "citizen";
-        } else {
-            throw new RuntimeException("Invalid pageModule: " + pageModule);
         }
 
         // Redirect to the GET handler with parameters
