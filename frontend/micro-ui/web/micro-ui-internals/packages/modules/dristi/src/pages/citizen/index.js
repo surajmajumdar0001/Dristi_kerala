@@ -122,7 +122,7 @@ const App = ({ stateCode, tenantId, result }) => {
 
   if (isUserLoggedIn && esignProcess && splitUrl && splitUrl.includes("addSignature")) {
     console.log("sifn");
-    history.push(splitUrl);
+    history.push(`${path}/home/${splitUrl}`);
     localStorage.removeItem("esignProcess");
     localStorage.removeItem("windowLocation");
   }
