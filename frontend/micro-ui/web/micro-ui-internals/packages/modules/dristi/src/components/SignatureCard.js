@@ -4,7 +4,7 @@ import EsignAdharModal from "./EsignAdharModal";
 import UploadSignatureModal from "./UploadSignatureModal";
 import Button from "./Button";
 import { DRISTIService } from "../services";
-function SignatureCard({ input, data, t, index, onSelect, formData, configKey }) {
+function SignatureCard({ input, data, t, index, onSelect, formData, configKey, handleAadharClick }) {
   const [openUploadSignatureModal, setOpenUploadSignatureModal] = useState(false);
   const [openAadharModal, setOpenAadharModal] = useState(false);
   const name = `${data?.[input?.config?.title]} ${index}`;
@@ -40,56 +40,6 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey })
     }
   };
 
-  const handleAadharClick = async () => {
-    try {
-      const eSignResponse = await DRISTIService.eSignService({
-        ESignParameter: {
-          uidToken: "3456565",
-          consent: "6564",
-          authType: "6546",
-          fileStoreId: "2aefb901-edc6-4a45-95f8-3ea383a513f5",
-          tenantId: "kl",
-          pageModule: "ci",
-        },
-      });
-      if (eSignResponse) {
-        // debugger;
-        // Create and submit the form programmatically
-        localStorage.setItem("esignProcess", true);
-
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = "https://es-staging.cdac.in/esignlevel1/2.1/form/signdoc";
-
-        const eSignRequestInput = document.createElement("input");
-        eSignRequestInput.type = "hidden";
-        eSignRequestInput.name = "eSignRequest";
-        eSignRequestInput.value = eSignResponse?.ESignForm?.eSignRequest;
-
-        const aspTxnIDInput = document.createElement("input");
-        aspTxnIDInput.type = "hidden";
-        aspTxnIDInput.name = "aspTxnID";
-        aspTxnIDInput.value = eSignResponse?.ESignForm?.aspTxnID;
-
-        const contentTypeInput = document.createElement("input");
-        contentTypeInput.type = "hidden";
-        contentTypeInput.name = "Content-Type";
-        contentTypeInput.value = "application/xml";
-
-        form.appendChild(eSignRequestInput);
-        form.appendChild(aspTxnIDInput);
-        form.appendChild(contentTypeInput);
-
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-      }
-      console.log(eSignResponse);
-    } catch (error) {
-      console.error("API call failed:", error);
-    }
-  };
-
   const currentValue = (formData && formData[configKey] && formData[configKey][name]) || [];
   const isSigned = currentValue.length > 0;
   return (
@@ -117,7 +67,7 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey })
           <Button
             label={t("CS_ESIGN_AADHAR")}
             onButtonClick={() => {
-              handleAadharClick();
+              handleAadharClick(index, data, input);
             }}
             className={"aadhar-sign-in"}
             labelClassName={"aadhar-sign-in"}
