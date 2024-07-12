@@ -37,7 +37,6 @@ public class InterceptorApiController {
     public ResponseEntity<?> redirectHandler(@RequestParam("result") String result, @RequestParam("filestoreId") String filestoreId, @RequestParam("userType") String userType) {
         log.info("redirecting through get method");
 
-
         // Construct the final redirect URL
         String redirectUri = configs.getRedirectUrl() + userType + "/dristi";
         redirectUri += "?result=" + result + "&filestoreId=" + filestoreId;
@@ -56,13 +55,6 @@ public class InterceptorApiController {
         log.info(espId);
 
 
-        return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);
-    }
-
-
-
-    @RequestMapping(value = "/v1/_intercept", method = RequestMethod.POST)
-    public ModelAndView eSignV1Interceptor(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId) {
         String filestoreId = "";
         String result = "error";
 
