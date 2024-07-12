@@ -119,7 +119,7 @@ const App = ({ stateCode, tenantId, result }) => {
 
   if (isUserLoggedIn && eSignWindowObject) {
     console.log("Esign");
-    history.push(`/${eSignWindowObject?.path}${eSignWindowObject?.param}}`, { status: { isSignSuccess: result } });
+    history.push(`/${eSignWindowObject?.path}${eSignWindowObject?.param}}`, { state: { isSignSuccess: result } });
     localStorage.removeItem("eSignWindowObject");
   }
   if (isLoading) {

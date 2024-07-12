@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import SignatureCard from "./SignatureCard";
 import { DRISTIService } from "../services";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
@@ -29,9 +29,14 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
       });
     } else onSelect(config.key, { ...formData[config.key], [input]: value });
   }
-  const location = useLocation();
-  const isSignSuccess = location.state.status.isSignSuccess;
-  console.log(isSignSuccess);
+  // const location = useLocation();
+  // const isSignSuccess = location?.state?.state?.isSignSuccess ?? false;
+  // console.log(isSignSuccess);
+  // useEffect(() => {
+  //   if (isSignSuccess) {
+  //     console.log(isSignSuccess, "fgdf");
+  //   }
+  // }, [isSignSuccess]);
   const handleAadharClick = async (index, data, input) => {
     try {
       const eSignResponse = await DRISTIService.eSignService({
