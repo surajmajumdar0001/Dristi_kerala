@@ -100,7 +100,8 @@ const App = ({ stateCode, tenantId, result }) => {
   const registerScreenRoute = [`${path}/home/login`, `${path}/home/registration/mobile-number`, `${path}/home/registration/otp`];
   const locationEsign = localStorage.getItem("windowLocation");
   const esignProcess = localStorage.getItem("esignProcess");
-
+  const splitUrl = locationEsign?.split("/home/")[1];
+  console.log(splitUrl);
   console.log(locationEsign, "location");
   if (!isUserLoggedIn && !whiteListedRoutes.includes(location.pathname)) {
     history.push(`${path}/home/login`);
@@ -119,10 +120,12 @@ const App = ({ stateCode, tenantId, result }) => {
     console.log(result);
   }
 
-  // if (isUserLoggedIn && eSign && locationEsign && locationEsign.includes("addSignature")) {
-  //   console.log("sifn");
-  //   history.replace(locationEsign);
-  // }
+  if (isUserLoggedIn && esignProcess && splitUrl && splitUrl.includes("addSignature")) {
+    console.log("sifn");
+    history.push(splitUrl);
+    localStorage.removeItem("esignProcess");
+    localStorage.removeItem("windowLocation");
+  }
   if (isLoading) {
     return <Loader />;
   }
