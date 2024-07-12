@@ -137,7 +137,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
         setPaymentLoader(false);
         const billAfterPayment = await DRISTIService.callSearchBill({}, { tenantId, consumerCode: caseDetails?.filingNumber, service: "case" });
         console.log(billAfterPayment?.ResposneInfo?.status);
-        if (billAfterPayment?.ResposneInfo?.status === "200 OK") {
+        if (billAfterPayment?.Bill?.[0]?.status === "ACTIVE") {
           history.push(`${path}/e-filing-payment-response`, {
             state: {
               success: true,
@@ -245,7 +245,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                 DEPARTMENT_ID: bill?.Bill?.[0]?.billDetails?.[0]?.id,
                 TSB_RECEIPTS: "N",
               },
-              billId: bill?.Bill?.[0]?.billDetails?.[0]?.id,
+              billId: bill?.Bill?.[0]?.billDetails?.[0]?.billId,
               serviceNumber: caseDetails?.filingNumber,
               businessService: "case",
               totalDue: totalAmount,
