@@ -1,5 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import SignatureCard from "./SignatureCard";
+import { DRISTIService } from "../services";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 
 function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
   const inputs = useMemo(
@@ -16,6 +18,71 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
     [config?.populators?.inputs]
   );
 
+  function setValue(value, input) {
+    if (Array.isArray(input)) {
+      onSelect(config.key, {
+        ...formData[config.key],
+        ...input.reduce((res, curr) => {
+          res[curr] = value[curr];
+          return res;
+        }, {}),
+      });
+    } else onSelect(config.key, { ...formData[config.key], [input]: value });
+  }
+  const location = useLocation();
+  const isSignSuccess = location.state.status.isSignSuccess;
+  console.log(isSignSuccess);
+  const handleAadharClick = async (index, data, input) => {
+    try {
+      const eSignResponse = await DRISTIService.eSignService({
+        ESignParameter: {
+          uidToken: "3456565",
+          consent: "6564",
+          authType: "6546",
+          fileStoreId: "2aefb901-edc6-4a45-95f8-3ea383a513f5",
+          tenantId: "kl",
+          pageModule: "ci",
+        },
+      });
+      if (eSignResponse) {
+        // debugger;
+        // Create and submit the form programmatically
+        const eSignData = {
+          path: window.location.pathname,
+          param: window.location.search,
+          isEsign: true,
+          data: data,
+        };
+        localStorage.setItem("eSignWindowObject", JSON.stringify(eSignData));
+        localStorage.setItem("esignProcess", true);
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "https://es-staging.cdac.in/esignlevel1/2.1/form/signdoc";
+        const eSignRequestInput = document.createElement("input");
+        eSignRequestInput.type = "hidden";
+        eSignRequestInput.name = "eSignRequest";
+        eSignRequestInput.value = eSignResponse?.ESignForm?.eSignRequest;
+        const aspTxnIDInput = document.createElement("input");
+        aspTxnIDInput.type = "hidden";
+        aspTxnIDInput.name = "aspTxnID";
+        aspTxnIDInput.value = eSignResponse?.ESignForm?.aspTxnID;
+        const contentTypeInput = document.createElement("input");
+        contentTypeInput.type = "hidden";
+        contentTypeInput.name = "Content-Type";
+        contentTypeInput.value = "application/xml";
+        form.appendChild(eSignRequestInput);
+        form.appendChild(aspTxnIDInput);
+        form.appendChild(contentTypeInput);
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+        const name = `${data?.[input?.config?.title]} ${index}`;
+        setValue(["aadharsignature"], name);
+      }
+    } catch (error) {
+      console.error("API call failed:", error);
+    }
+  };
   return (
     <div className="select-signature-main">
       {inputs.map((input, inputIndex) => (
@@ -34,6 +101,7 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
                 formData={formData}
                 onSelect={onSelect}
                 configKey={config.key}
+                handleAadharClick={handleAadharClick}
               />
             ))}
           </div>
