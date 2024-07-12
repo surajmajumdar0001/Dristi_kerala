@@ -36,7 +36,7 @@ public class MdmsUtil {
     private ApplicationConfiguration configs;
 
     public Map<String, Map<String, JSONArray>> fetchMdmsData(RequestInfo requestInfo, String tenantId,
-                                                             String moduleName, List<String> masterNameList) {
+                                                             String moduleName, HashMap<String, String> masterNameList) {
         StringBuilder uri = new StringBuilder();
         uri.append(configs.getMdmsHost()).append(configs.getMdmsEndPoint());
         MdmsCriteriaReq mdmsCriteriaReq = getMdmsRequest(requestInfo, tenantId, moduleName, masterNameList);
@@ -60,11 +60,12 @@ public class MdmsUtil {
     }
 
     private MdmsCriteriaReq getMdmsRequest(RequestInfo requestInfo, String tenantId, String moduleName,
-                                           List<String> masterNameList) {
+                                           HashMap<String, String> masterNameList) {
         List<MasterDetail> masterDetailList = new ArrayList<>();
-        for (String masterName : masterNameList) {
+        for(Map.Entry<String, String> entrySet : masterNameList.entrySet()) {
             MasterDetail masterDetail = new MasterDetail();
-            masterDetail.setName(masterName);
+            masterDetail.setName(entrySet.getKey());
+            masterDetail.setFilter(entrySet.getValue());
             masterDetailList.add(masterDetail);
         }
 

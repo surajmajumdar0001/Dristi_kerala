@@ -29,9 +29,11 @@ public class MessageConstruction {
 
     public String constructMessage(Email email){
         String templateId = email.getTemplateId();
+        String filter = "[?(@['name'] == '"+ email.getTemplateName() + "')]";
+
         String moduleName = Constants.EMAIL_TEMPLATE_MODULE_NAME;
-        List<String> masterName = new ArrayList<>();
-        masterName.add(templateId);
+        HashMap<String, String> masterName = new HashMap<>();
+        masterName.put(templateId, filter);
 
         RequestInfo requestInfo = new RequestInfo();
 

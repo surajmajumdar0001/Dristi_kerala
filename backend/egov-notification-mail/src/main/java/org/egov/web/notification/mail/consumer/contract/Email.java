@@ -28,5 +28,5 @@ public class Email {
 	@JsonProperty("isHTML")
 	private boolean isHTML;
 	private String templateId;
-
+	private String templateName;
 }
