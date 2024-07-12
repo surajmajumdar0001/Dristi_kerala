@@ -120,8 +120,8 @@ const App = ({ stateCode, tenantId, result }) => {
   }
   console.log(retrievedObject, "retrievedObject");
   if (isUserLoggedIn && retrievedObject) {
-    console.log("Esign");
-    history.push(`${retrievedObject?.path}${retrievedObject?.param}}`, { state: { isSignSuccess: result } });
+    console.log("Esign", `${retrievedObject?.path}${retrievedObject?.param}`);
+    history.push(`${retrievedObject?.path}${retrievedObject?.param}`, { state: { isSignSuccess: result } });
     localStorage.removeItem("eSignWindowObject");
   }
   if (isLoading) {
