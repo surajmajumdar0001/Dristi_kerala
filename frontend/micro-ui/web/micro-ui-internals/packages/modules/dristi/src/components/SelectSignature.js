@@ -30,7 +30,7 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
     } else onSelect(config.key, { ...formData[config.key], [input]: value });
   }
   const location = useLocation();
-  const isSignSuccess = location.state.status.isSignSuccess;
+  const isSignSuccess = location?.state?.status?.isSignSuccess;
   console.log(isSignSuccess);
   const handleAadharClick = async (index, data, input) => {
     try {
