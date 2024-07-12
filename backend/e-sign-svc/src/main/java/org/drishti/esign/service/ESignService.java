@@ -90,7 +90,10 @@ public class ESignService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String sigendFileStoreId = fileStoreUtil.storeFileInFileStore(multipartFile, tenantId);
+        String sigendFileStoreId = null;
+
+            sigendFileStoreId = fileStoreUtil.storeFileInFileStore(multipartFile, tenantId);
+
 
 
         return sigendFileStoreId;
