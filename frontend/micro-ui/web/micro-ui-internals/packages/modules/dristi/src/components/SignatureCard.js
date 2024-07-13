@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AdvocateIcon, FileUploadIcon, LitigentIcon } from "../icons/svgIndex";
 import EsignAdharModal from "./EsignAdharModal";
 import UploadSignatureModal from "./UploadSignatureModal";
@@ -42,10 +42,14 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey, h
   }
   const isSignSuccess = useMemo(() => localStorage.getItem("isSignSuccess"), []);
   console.log(isSignSuccess, "IN card");
-  if (isSignSuccess === "success") {
-    setValue(["aadharsignature"], name);
-    localStorage.removeItem("isSignSuccess");
-  }
+  useEffect(() => {
+    if (isSignSuccess) {
+      if (isSignSuccess === "success") {
+        setValue(["aadharsignature"], name);
+      }
+      localStorage.removeItem("isSignSuccess");
+    }
+  }, [isSignSuccess]);
 
   const Icon = ({ icon }) => {
     switch (icon) {
