@@ -31,26 +31,24 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey, h
   }, [configKey, name]);
   function setValue(value, input) {
     if (Array.isArray(input)) {
-      onSelect(config.key, {
-        ...formData[config.key],
+      onSelect(uploadModalConfig.key, {
+        ...formData[uploadModalConfig.key],
         ...input.reduce((res, curr) => {
           res[curr] = value[curr];
           return res;
         }, {}),
       });
-    } else onSelect(config.key, { ...formData[config.key], [input]: value });
+    } else onSelect(uploadModalConfig.key, { ...formData[uploadModalConfig.key], [input]: value });
   }
   const isSignSuccess = useMemo(() => localStorage.getItem("isSignSuccess"), []);
-  if (isSignSuccess === "sucess") {
-    setValue(["aadharsignature"], name);
+  console.log(isSignSuccess, "IN card");
+  if (isSignSuccess) {
+    if (isSignSuccess === "success") {
+      setValue(["aadharsignature"], name);
+    }
     localStorage.removeItem("isSignSuccess");
   }
-  console.log(isSignSuccess, "IN card");
-  const location = useLocation();
-  const isSignSuccess2 = useMemo(() => location?.state?.state?.isSignSuccess, [location]);
-  if (isSignSuccess2 === "sucess") {
-    console.log(isSignSuccess2);
-  }
+
   const Icon = ({ icon }) => {
     switch (icon) {
       case "LitigentIcon":
