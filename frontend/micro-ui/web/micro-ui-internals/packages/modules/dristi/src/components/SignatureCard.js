@@ -3,7 +3,8 @@ import { AdvocateIcon, FileUploadIcon, LitigentIcon } from "../icons/svgIndex";
 import EsignAdharModal from "./EsignAdharModal";
 import UploadSignatureModal from "./UploadSignatureModal";
 import Button from "./Button";
-import { DRISTIService } from "../services";
+import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
+
 function SignatureCard({ input, data, t, index, onSelect, formData, configKey, handleAadharClick }) {
   const [openUploadSignatureModal, setOpenUploadSignatureModal] = useState(false);
   const [openAadharModal, setOpenAadharModal] = useState(false);
@@ -28,7 +29,28 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey, h
       },
     };
   }, [configKey, name]);
-
+  function setValue(value, input) {
+    if (Array.isArray(input)) {
+      onSelect(config.key, {
+        ...formData[config.key],
+        ...input.reduce((res, curr) => {
+          res[curr] = value[curr];
+          return res;
+        }, {}),
+      });
+    } else onSelect(config.key, { ...formData[config.key], [input]: value });
+  }
+  const isSignSuccess = useMemo(() => localStorage.getItem("isSignSuccess"), []);
+  if (isSignSuccess === "sucess") {
+    setValue(["aadharsignature"], name);
+    localStorage.removeItem("isSignSuccess");
+  }
+  console.log(isSignSuccess, "IN card");
+  const location = useLocation();
+  const isSignSuccess2 = useMemo(() => location?.state?.state?.isSignSuccess, [location]);
+  if (isSignSuccess2 === "sucess") {
+    console.log(isSignSuccess2);
+  }
   const Icon = ({ icon }) => {
     switch (icon) {
       case "LitigentIcon":
@@ -67,7 +89,7 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey, h
           <Button
             label={t("CS_ESIGN_AADHAR")}
             onButtonClick={() => {
-              handleAadharClick(index, data, input);
+              handleAadharClick(data);
             }}
             className={"aadhar-sign-in"}
             labelClassName={"aadhar-sign-in"}

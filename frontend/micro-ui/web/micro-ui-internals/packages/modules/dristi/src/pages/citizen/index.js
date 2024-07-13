@@ -117,6 +117,7 @@ const App = ({ stateCode, tenantId, result }) => {
   }
   if (result) {
     console.log(result);
+    localStorage.setItem("isSignSuccess", result);
   }
   console.log(retrievedObject, "retrievedObject");
   if (isUserLoggedIn && retrievedObject) {
