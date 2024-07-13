@@ -136,8 +136,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
       if (popup.closed) {
         setPaymentLoader(false);
         const billAfterPayment = await DRISTIService.callSearchBill({}, { tenantId, consumerCode: caseDetails?.filingNumber, service: "case" });
-        console.log(billAfterPayment?.ResposneInfo?.status);
-        if (billAfterPayment?.Bill?.[0]?.status === "ACTIVE") {
+        if (billAfterPayment?.Bill?.[0]?.status === "PAID") {
           history.push(`${path}/e-filing-payment-response`, {
             state: {
               success: true,
@@ -215,7 +214,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
             demandDetails: [
               {
                 taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
-                taxAmount: totalAmount,
+                taxAmount: parseFloat(totalAmount),
                 collectionAmount: 0,
               },
             ],
@@ -236,11 +235,11 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                 NO_OF_HEADS: "1",
                 HEADS_DET: [
                   {
-                    AMOUNT: "2",
+                    AMOUNT: totalAmount,
                     HEADID: "00374",
                   },
                 ],
-                CHALLAN_AMOUNT: "2",
+                CHALLAN_AMOUNT: totalAmount,
                 PARTY_NAME: caseDetails?.additionalDetails?.payerName,
                 DEPARTMENT_ID: bill?.Bill?.[0]?.billDetails?.[0]?.id,
                 TSB_RECEIPTS: "N",
@@ -248,7 +247,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
               billId: bill?.Bill?.[0]?.billDetails?.[0]?.billId,
               serviceNumber: caseDetails?.filingNumber,
               businessService: "case",
-              totalDue: totalAmount,
+              totalDue: parseFloat(totalAmount),
               mobileNumber: "9876543210",
               paidBy: "COMMON_OWNER",
             },
