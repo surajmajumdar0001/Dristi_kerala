@@ -43,7 +43,7 @@ public class InterceptorService {
         StringBuilder uri = new StringBuilder();
         uri.append(configs.getESignHost()).append(configs.getESignEndPoint());
 
-        Object result = restCall.fetchResult(uri, request);
+        Object result = restCall.callESign(uri, request);
 
         log.info("signed fileStore id {} :", result.toString());
 
