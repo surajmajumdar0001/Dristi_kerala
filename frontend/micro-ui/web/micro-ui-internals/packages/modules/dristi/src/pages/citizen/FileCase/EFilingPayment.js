@@ -214,7 +214,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
             demandDetails: [
               {
                 taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
-                taxAmount: parseFloat(totalAmount),
+                taxAmount: 4,
                 collectionAmount: 0,
               },
             ],
@@ -235,11 +235,11 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                 NO_OF_HEADS: "1",
                 HEADS_DET: [
                   {
-                    AMOUNT: totalAmount,
+                    AMOUNT: "4",
                     HEADID: "00374",
                   },
                 ],
-                CHALLAN_AMOUNT: totalAmount,
+                CHALLAN_AMOUNT: "4",
                 PARTY_NAME: caseDetails?.additionalDetails?.payerName,
                 DEPARTMENT_ID: bill?.Bill?.[0]?.billDetails?.[0]?.id,
                 TSB_RECEIPTS: "N",
@@ -247,7 +247,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
               billId: bill?.Bill?.[0]?.billDetails?.[0]?.billId,
               serviceNumber: caseDetails?.filingNumber,
               businessService: "case",
-              totalDue: parseFloat(totalAmount),
+              totalDue: 4.0,
               mobileNumber: "9876543210",
               paidBy: "COMMON_OWNER",
             },
