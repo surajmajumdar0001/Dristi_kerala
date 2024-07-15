@@ -18,8 +18,14 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
     [config?.populators?.inputs]
   );
 
-  const handleAadharClick = async (data) => {
+  const storedObj = useMemo(() => localStorage.getItem("signStatus"), []);
+  const parsedObj = JSON.parse(storedObj) || [];
+  const handleAadharClick = async (data, name) => {
     try {
+      const newSignStatuses = [...parsedObj, { name: name, isSigned: true }];
+      localStorage.setItem("signStatus", JSON.stringify(newSignStatuses));
+      localStorage.setItem("isSignSuccess", "success");
+
       const eSignResponse = await DRISTIService.eSignService({
         ESignParameter: {
           uidToken: "3456565",
@@ -31,8 +37,6 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
         },
       });
       if (eSignResponse) {
-        // debugger;
-        // Create and submit the form programmatically
         const eSignData = {
           path: window.location.pathname,
           param: window.location.search,
