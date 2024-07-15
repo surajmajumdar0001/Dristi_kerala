@@ -9,16 +9,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.egov.common.contract.response.ResponseInfo;
 import org.pucar.dristi.service.AdvocateService;
+import org.pucar.dristi.service.NotificationService;
 import org.pucar.dristi.util.ResponseInfoFactory;
 import org.pucar.dristi.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -39,6 +37,9 @@ public class AdvocateApiController {
 
 	@Autowired
 	private AdvocateService advocateService;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	@Autowired
 	private ResponseInfoFactory responseInfoFactory;
@@ -106,5 +107,11 @@ public class AdvocateApiController {
 		AdvocateResponse advocateResponse = AdvocateResponse.builder().advocates(Collections.singletonList(advocateList)).responseInfo(responseInfo).build();
 		return new ResponseEntity<>(advocateResponse, HttpStatus.OK);
 		}
+
+	@RequestMapping(value = "/advocate/v1/_sendmail", method = RequestMethod.POST)
+	public ResponseEntity<String> sendEmail(@Parameter(in = ParameterIn.DEFAULT, required = true, schema = @Schema()) @Valid @RequestBody EmailRequest emailRequest) {
+		notificationService.sendEmail(emailRequest);
+		return ResponseEntity.ok("Email sent successfully");
+	}
 
 }

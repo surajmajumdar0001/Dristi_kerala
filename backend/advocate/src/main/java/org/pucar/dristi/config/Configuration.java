@@ -132,4 +132,8 @@ public class Configuration {
 	// Advocate clerk application number Id name
 	@Value("${egov.idgen.advocate.clerk.application.number.id.name}")
 	private String advClerkApplicationNumberConfig;
+
+	//Email Notification Topic
+	@Value("${egov.mail.notification.topic}")
+	private String emailNotificationTopic;
 }
