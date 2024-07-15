@@ -18,26 +18,7 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
     [config?.populators?.inputs]
   );
 
-  function setValue(value, input) {
-    if (Array.isArray(input)) {
-      onSelect(config.key, {
-        ...formData[config.key],
-        ...input.reduce((res, curr) => {
-          res[curr] = value[curr];
-          return res;
-        }, {}),
-      });
-    } else onSelect(config.key, { ...formData[config.key], [input]: value });
-  }
-  // const location = useLocation();
-  // const isSignSuccess = location?.state?.state?.isSignSuccess ?? false;
-  // console.log(isSignSuccess);
-  // useEffect(() => {
-  //   if (isSignSuccess) {
-  //     console.log(isSignSuccess, "fgdf");
-  //   }
-  // }, [isSignSuccess]);
-  const handleAadharClick = async (index, data, input) => {
+  const handleAadharClick = async (data) => {
     try {
       const eSignResponse = await DRISTIService.eSignService({
         ESignParameter: {
@@ -81,8 +62,6 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
         document.body.appendChild(form);
         form.submit();
         document.body.removeChild(form);
-        const name = `${data?.[input?.config?.title]} ${index}`;
-        setValue(["aadharsignature"], name);
       }
     } catch (error) {
       console.error("API call failed:", error);
