@@ -30,9 +30,6 @@ public class Email {
 	@JsonProperty("isHTML")
 	private boolean isHTML;
 
-	// template master name in mdms
-	private String templateId;
-
 	//template code in mdms
 	private String templateCode;
 }

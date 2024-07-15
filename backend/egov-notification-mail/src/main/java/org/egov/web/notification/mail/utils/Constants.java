@@ -7,4 +7,5 @@ public class Constants {
 
 	public static final String SMS_REQ_MSG_KEY_NAME = "message";
 	public static final String EMAIL_TEMPLATE_MODULE_NAME = "mail-template";
+	public static final String EMAIL_TEMPLATE_MASTER_NAME = "email-template";
 }

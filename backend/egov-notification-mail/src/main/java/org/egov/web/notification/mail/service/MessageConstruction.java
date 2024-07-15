@@ -5,7 +5,6 @@ import com.github.jknack.handlebars.Template;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.egov.web.notification.mail.config.ApplicationConfiguration;
@@ -28,7 +27,7 @@ public class MessageConstruction {
 
 
     public String constructMessage(Email email){
-        String templateId = email.getTemplateId();
+        String templateId = Constants.EMAIL_TEMPLATE_MASTER_NAME;
         String filter = "[?(@['code'] == '"+ email.getTemplateCode() + "')]";
 
         String moduleName = Constants.EMAIL_TEMPLATE_MODULE_NAME;
