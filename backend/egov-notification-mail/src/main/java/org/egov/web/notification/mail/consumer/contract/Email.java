@@ -22,11 +22,17 @@ public class Email {
 
 	private Set<String> emailTo;
 	private String subject;
+
+	//need to be json string of with key value pair of data that need to be sent in email
 	private String body;
 	Map<String, String> fileStoreId;
 	private String tenantId;
 	@JsonProperty("isHTML")
 	private boolean isHTML;
+
+	// template master name in mdms
 	private String templateId;
-	private String templateName;
+
+	//template code in mdms
+	private String templateCode;
 }
