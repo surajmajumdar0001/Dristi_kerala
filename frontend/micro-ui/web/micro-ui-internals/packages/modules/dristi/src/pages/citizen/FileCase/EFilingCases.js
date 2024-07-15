@@ -433,7 +433,7 @@ function EFilingCases({ path }) {
       (selected === "witnessDetails" ? [{}] : [{ isenabled: true, data: {}, displayindex: 0 }]);
     setFormdata(data);
 
-    if (selected === "addSignature" && !caseDetails?.additionalDetails?.["reviewCaseFile"]?.isCompleted) {
+    if (selected === "addSignature" && !caseDetails?.additionalDetails?.["reviewCaseFile"]?.isCompleted && !isLoading) {
       setShowReviewCorrectionModal(true);
     }
   }, [selected, caseDetails]);
@@ -1552,6 +1552,7 @@ function EFilingCases({ path }) {
     );
     setPrevSelected(selected);
     history.push(`${path}/e-filing-payment?caseId=${caseId}`);
+    localStorage.removeItem("signStatus");
   };
 
   const getFormClassName = useCallback(() => {
