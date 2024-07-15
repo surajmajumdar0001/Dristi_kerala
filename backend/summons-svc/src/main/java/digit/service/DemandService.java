@@ -38,7 +38,7 @@ public class DemandService {
     public BillResponse fetchPaymentDetailsAndGenerateDemandAndBill(TaskRequest taskRequest) {
         Task task = taskRequest.getTask();
         List<Calculation> calculationList = generatePaymentDetails(taskRequest.getRequestInfo(), task);
-        List<Demand> demands = generateDemands(taskRequest.getRequestInfo(), calculationList);
+        generateDemands(taskRequest.getRequestInfo(), calculationList);
         return getBill(taskRequest.getRequestInfo(), task);
     }
 

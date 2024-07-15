@@ -34,25 +34,31 @@ public class SummonsConsumer {
         this.demandService = demandService;
     }
 
-    @KafkaListener(topics = "generate-summons-document")
+    @KafkaListener(topics = "save-task-application")
     @Async
     public void listenForGenerateSummonsDocument(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         try {
             TaskRequest taskRequest = objectMapper.convertValue(record, TaskRequest.class);
-            log.info(taskRequest.getTask().toString());
-            summonsService.generateSummonsDocument(taskRequest);
+            String taskType = taskRequest.getTask().getTaskType().toLowerCase();
+            if (taskType.equals("summons") || taskType.equals("bail") || taskType.equals("warrant")) {
+                log.info(taskRequest.getTask().toString());
+                summonsService.generateSummonsDocument(taskRequest);
+            }
         } catch (final Exception e) {
             log.error("Error while listening to value: {}: ", record, e);
         }
     }
 
-    @KafkaListener(topics = "generate-summons-bill")
+    @KafkaListener(topics = "save-task-application")
     @Async
     public void listenForGenerateSummonsBill(final HashMap<String, Object> record, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         try {
             TaskRequest taskRequest = objectMapper.convertValue(record, TaskRequest.class);
-            log.info(taskRequest.getTask().toString());
-            demandService.fetchPaymentDetailsAndGenerateDemandAndBill(taskRequest);
+            String taskType = taskRequest.getTask().getTaskType().toLowerCase();
+            if (taskType.equals("summons") || taskType.equals("bail") || taskType.equals("warrant")) {
+                log.info(taskRequest.getTask().toString());
+                demandService.fetchPaymentDetailsAndGenerateDemandAndBill(taskRequest);
+            }
         } catch (final Exception e) {
             log.error("Error while listening to value: {}: ", record, e);
         }

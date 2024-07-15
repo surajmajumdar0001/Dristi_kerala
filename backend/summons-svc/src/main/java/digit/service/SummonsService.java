@@ -119,10 +119,10 @@ public class SummonsService {
                 .requestInfo(request.getRequestInfo()).criteria(taskCriteria).build();
         TaskListResponse taskListResponse = taskUtil.callSearchTask(searchRequest);
         Task task = taskListResponse.getList().get(0);
-        if (task.getTaskType().equalsIgnoreCase("summons")) {
+        if (task.getTaskType().equalsIgnoreCase("summon")) {
             Workflow workflow = Workflow.builder().action("SERVE").build();
             task.setWorkflow(workflow);
-        } else if (task.getTaskType().equalsIgnoreCase("warrants")) {
+        } else if (task.getTaskType().equalsIgnoreCase("warrant")) {
             Workflow workflow = Workflow.builder().action("DELIVERED").build();
             task.setWorkflow(workflow);
         }
