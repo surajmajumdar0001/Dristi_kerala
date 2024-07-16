@@ -30,6 +30,6 @@ public class Email {
 	@JsonProperty("isHTML")
 	private boolean isHTML;
 
-	//template code in mdms
+	//template code in mdms and messageCode for localization
 	private String templateCode;
 }
