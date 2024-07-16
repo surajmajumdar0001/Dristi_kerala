@@ -12,6 +12,7 @@ import org.pucar.dristi.validators.AdvocateRegistrationValidator;
 import org.pucar.dristi.web.models.Advocate;
 import org.pucar.dristi.web.models.AdvocateRequest;
 import org.pucar.dristi.web.models.AdvocateSearchCriteria;
+import org.pucar.dristi.web.models.IndividualSearchRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -31,6 +32,7 @@ public class AdvocateService {
     private final AdvocateRepository advocateRepository;
     private final Producer producer;
     private final Configuration config;
+    private final EmailNotificationService emailNotificationService;
 
     @Autowired
     public AdvocateService(
@@ -39,13 +41,14 @@ public class AdvocateService {
             WorkflowService workflowService,
             AdvocateRepository advocateRepository,
             Producer producer,
-            Configuration config) {
+            Configuration config, EmailNotificationService emailNotificationService) {
         this.validator = validator;
         this.enrichmentUtil = enrichmentUtil;
         this.workflowService = workflowService;
         this.advocateRepository = advocateRepository;
         this.producer = producer;
         this.config = config;
+        this.emailNotificationService = emailNotificationService;
     }
 
     public Advocate createAdvocate(AdvocateRequest body) {
@@ -63,6 +66,7 @@ public class AdvocateService {
             // Push the application to the topic for persister to listen and persist
 
             producer.push(config.getAdvocateCreateTopic(), body);
+
 
             return body.getAdvocate();
         } catch (CustomException e) {
@@ -167,6 +171,12 @@ public class AdvocateService {
             if (APPLICATION_ACTIVE_STATUS.equalsIgnoreCase(advocateRequest.getAdvocate().getStatus())) {
                 //setting true once application approved
                 advocateRequest.getAdvocate().setIsActive(true);
+            }
+            if(advocateRequest.getAdvocate().getWorkflow().getAction().equalsIgnoreCase("APPROVE")){
+                IndividualSearchRequest individualSearchRequest = new IndividualSearchRequest();
+                individualSearchRequest.setRequestInfo(advocateRequest.getRequestInfo());
+                individualSearchRequest.getIndividual().setIndividualId(advocateRequest.getAdvocate().getIndividualId());
+                emailNotificationService.sendEmailNotification(individualSearchRequest, false);
             }
 
             producer.push(config.getAdvocateUpdateTopic(), advocateRequest);
