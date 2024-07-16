@@ -97,6 +97,7 @@ module.exports = function (app) {
     "/order",
     "/hearing",
     "/order",
+    "/inbox",
     "/application",
     "/e-sign-svc",
     "/payment",

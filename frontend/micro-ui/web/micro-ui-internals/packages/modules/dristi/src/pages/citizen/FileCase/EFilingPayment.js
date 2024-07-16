@@ -329,7 +329,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
             actionSaveOnSubmit={() => onSubmitCase()}
             headerBarMain={<Heading label={t("CS_PAY_TO_FILE_CASE")} />}
           >
-            <div className="payment-due-wrapper" style={{ display: "flex", flexDirection: "column", maxHeight: "200px !important" }}>
+            <div className="payment-due-wrapper" style={{ display: "flex", flexDirection: "column" }}>
               <div className="payment-due-text" style={{ fontSize: "18px" }}>
                 {`${t("CS_DUE_PAYMENT")} `}
                 <span style={{ fontWeight: 700 }}>Rs {totalAmount}/-.</span>
