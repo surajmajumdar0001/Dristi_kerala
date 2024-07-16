@@ -83,6 +83,15 @@ public class ServiceConstants {
 	public static final String INWORKFLOW_STATUS ="INWORKFLOW";
     public static final String INVALID_LINKEDCASE_ID = "INVALID_LINKEDCASE_ID";
 
+	public static final String CASE_SUBMISSION = "CASE_SUBMISSION"
+	public static final String CASE_FILED = "CASE_FILED"
+	public static final String SCRUTINY_COMPLETE_CASE_REGISTERED = "SCRUTINY_COMPLETE_CASE_REGISTERED"
+	public static final String EFILING_ERRORS = "EFILING_ERRORS"
+	public static final String ERRORS_IDENTIFIED_CASE_FILE = "ERRORS_IDENTIFIED_CASE_FILE"
+	public static final String ADMISSION_HEARING_SCHEDULED = "ADMISSION_HEARING_SCHEDULED"
+	public static final String CASE_ADMITTED = "CASE_ADMITTED"
+	public static final String HEARING_REJECTED = "HEARING_REJECTED"
+
 	public static final String INDIVIDUAL_UTILITY_EXCEPTION = "INDIVIDUAL_UTILITY_EXCEPTION";
 
 	public static final String SAVE_DRAFT_CASE_WORKFLOW_ACTION = "SAVE_DRAFT";

@@ -83,23 +83,23 @@ public class NotificationService {
 
     private String getMessageBasedOnAction(CaseRequest request, String action, String statusBefore) {
         return switch (action.toUpperCase()) {
-            case "SUBMIT_CASE" -> getMessage(request, "CASE_SUBMISSION");
-            case "MAKE_PAYMENT" -> getMessage(request, "CASE_FILED");
-            case "VALIDATE" -> getMessage(request, "SCRUTINY_COMPLETE_CASE_REGISTERED");
+            case "SUBMIT_CASE" -> getMessage(request, CASE_SUBMISSION);
+            case "MAKE_PAYMENT" -> getMessage(request, CASE_FILED);
+            case "VALIDATE" -> getMessage(request, SCRUTINY_COMPLETE_CASE_REGISTERED);
             case "SEND_BACK" -> {
                 if (statusBefore == null) {
                     yield null;
                 } else {
                     yield switch (statusBefore) {
-                        case "UNDER_SCRUTINY" -> getMessage(request, "EFILING_ERRORS");
-                        case "PENDING_ADMISSION" -> getMessage(request, "ERRORS_IDENTIFIED_CASE_FILE");
+                        case "UNDER_SCRUTINY" -> getMessage(request, EFILING_ERRORS);
+                        case "PENDING_ADMISSION" -> getMessage(request, ERRORS_IDENTIFIED_CASE_FILE);
                         default -> null;
                     };
                 }
             }
-            case "SCHEDULE_ADMISSION_HEARING" -> getMessage(request, "ADMISSION_HEARING_SCHEDULED");
-            case "ADMIT" -> getMessage(request, "CASE_ADMITTED");
-            case "REJECT" -> getMessage(request, "HEARING_REJECTED");
+            case "SCHEDULE_ADMISSION_HEARING" -> getMessage(request, ADMISSION_HEARING_SCHEDULED);
+            case "ADMIT" -> getMessage(request, CASE_ADMITTED);
+            case "REJECT" -> getMessage(request, HEARING_REJECTED);
             default -> null;
         };
     }
