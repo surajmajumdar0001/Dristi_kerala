@@ -104,4 +104,11 @@ public class ServiceConstants {
 	public static final String INVALID_COMPLAINANT_DETAILS = "Invalid complainant details";
 	public static final String INVALID_DOCUMENT_DETAILS = "Invalid document details";
 	public static final String INVALID_ADVOCATE_DETAILS = "Invalid advocate details";
+
+	public static final String HIGH_COURT_LOCALIZATION_CODE = "HIGH_COURT_KERALA";
+	public static final String NOTIFICATION_ENG_LOCALE_CODE = "en_IN";
+	public static final String NOTIFICATION_MODULE_CODE = "notification";
+	public static final String NOTIFICATION_LOCALIZATION_CODES_JSONPATH = "$.messages.*.code";
+
+	public static final String NOTIFICATION_LOCALIZATION_MSGS_JSONPATH = "$.messages.*.message";
 }
