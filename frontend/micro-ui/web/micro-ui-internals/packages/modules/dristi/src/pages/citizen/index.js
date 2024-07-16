@@ -98,10 +98,8 @@ const App = ({ stateCode, tenantId, result }) => {
     `${path}/home/application-details`,
   ];
   const registerScreenRoute = [`${path}/home/login`, `${path}/home/registration/mobile-number`, `${path}/home/registration/otp`];
-
   const eSignWindowObject = localStorage.getItem("eSignWindowObject");
   const retrievedObject = JSON.parse(eSignWindowObject);
-  console.log(eSignWindowObject, "obj");
   if (!isUserLoggedIn && !whiteListedRoutes.includes(location.pathname)) {
     history.push(`${path}/home/login`);
   }
@@ -116,12 +114,9 @@ const App = ({ stateCode, tenantId, result }) => {
     history.push(`${path}/home/registration/user-name`);
   }
   if (result) {
-    console.log(result);
     localStorage.setItem("isSignSuccess", result);
   }
-  console.log(retrievedObject, "retrievedObject");
   if (isUserLoggedIn && retrievedObject) {
-    console.log("Esign", `${retrievedObject?.path}${retrievedObject?.param}`);
     history.push(`${retrievedObject?.path}${retrievedObject?.param}`);
     localStorage.removeItem("eSignWindowObject");
   }
@@ -157,7 +152,7 @@ const App = ({ stateCode, tenantId, result }) => {
             </PrivateRoute>
           </div>
 
-          <PrivateRoute exact path={`${path}/home/admitted-case`} component={(props) => <AdmittedCases isJudge={false} />} />
+          <PrivateRoute exact path={`${path}/home/view-case`} component={(props) => <AdmittedCases isJudge={false} />} />
           <div
             className={
               location.pathname.includes("/response") ||
