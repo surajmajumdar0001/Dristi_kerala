@@ -36,9 +36,9 @@ public class NotificationService {
         this.repository = repository;
     }
 
-    public void sendNotification(CaseRequest request) {
+    public void sendNotification(CaseRequest request, String statusBefore) {
         String action = request.getCases().getWorkflow().getAction();
-        String message = getMessageBasedOnAction(request, action);
+        String message = getMessageBasedOnAction(request, action, statusBefore);
         if (StringUtils.isEmpty(message)) {
             log.info("SMS content has not been configured for this case");
             return;
@@ -81,12 +81,22 @@ public class NotificationService {
         return smsDetails;
     }
 
-    private String getMessageBasedOnAction(CaseRequest request, String action) {
+    private String getMessageBasedOnAction(CaseRequest request, String action, String statusBefore) {
         return switch (action.toUpperCase()) {
             case "SUBMIT_CASE" -> getMessage(request, "CASE_SUBMISSION");
             case "MAKE_PAYMENT" -> getMessage(request, "CASE_FILED");
             case "VALIDATE" -> getMessage(request, "SCRUTINY_COMPLETE_CASE_REGISTERED");
-            case "SEND_BACK" -> getMessage(request, "EFILING_ERRORS");
+            case "SEND_BACK" -> {
+                if (statusBefore == null) {
+                    yield null;
+                } else {
+                    yield switch (statusBefore) {
+                        case "UNDER_SCRUTINY" -> getMessage(request, "EFILING_ERRORS");
+                        case "PENDING_ADMISSION" -> getMessage(request, "ERRORS_IDENTIFIED_CASE_FILE");
+                        default -> null;
+                    };
+                }
+            }
             case "SCHEDULE_ADMISSION_HEARING" -> getMessage(request, "ADMISSION_HEARING_SCHEDULED");
             case "ADMIT" -> getMessage(request, "CASE_ADMITTED");
             case "REJECT" -> getMessage(request, "HEARING_REJECTED");

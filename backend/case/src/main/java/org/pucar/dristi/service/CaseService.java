@@ -91,7 +91,7 @@ public class CaseService {
             workflowService.updateWorkflowStatus(body);
 
             if(config.getIsSMSEnabled()) {
-                notificationService.sendNotification(body);
+                notificationService.sendNotification(body, null);
             }
             producer.push(config.getCaseCreateTopic(), body);
             return body.getCases();
@@ -131,6 +131,7 @@ public class CaseService {
             // Enrich application upon update
             enrichmentUtil.enrichCaseApplicationUponUpdate(caseRequest);
 
+            String statusBefore = caseRequest.getCases().getStatus();
             workflowService.updateWorkflowStatus(caseRequest);
 
             if (CREATE_DEMAND_STATUS.equals(caseRequest.getCases().getStatus())) {
@@ -141,7 +142,7 @@ public class CaseService {
                 enrichmentUtil.enrichCaseNumberAndCNRNumber(caseRequest);
             }
             if(config.getIsSMSEnabled()) {
-                notificationService.sendNotification(caseRequest);
+                notificationService.sendNotification(caseRequest, statusBefore);
             }
             producer.push(config.getCaseUpdateTopic(), caseRequest);
 
