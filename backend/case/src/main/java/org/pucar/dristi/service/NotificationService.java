@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.pucar.dristi.config.ServiceConstants.*;
 
@@ -128,10 +129,10 @@ public class NotificationService {
      * @return
      */
     public String buildMessage(Map<String, String> userDetailsForSMS, String message) {
-        message = message.replace("{{caseId}}", userDetailsForSMS.get("caseId"))
-                .replace("{Efiling number}", userDetailsForSMS.get("Efiling number"))
-                .replace("{cnr}", userDetailsForSMS.get("cnr"))
-                .replace("{date}", userDetailsForSMS.get("date"));
+        message = message.replace("{{caseId}}", Optional.ofNullable(userDetailsForSMS.get("caseId")).orElse(""))
+                .replace("{{efilingNumber}}", Optional.ofNullable(userDetailsForSMS.get("efilingNumber")).orElse(""))
+                .replace("{{cnr}}", Optional.ofNullable(userDetailsForSMS.get("cnr")).orElse(""))
+                .replace("{{date}}", Optional.ofNullable(userDetailsForSMS.get("date")).orElse(""));
         return message;
     }
 
