@@ -99,7 +99,7 @@ public class ServiceConstants {
 	public static final String DELETE_DRAFT_WORKFLOW_ACTION = "DELETE_DRAFT";
 	public static final Long TAX_PERIOD_FROM = 1680287400000l;
 	public static final Long TAX_PERIOD_TO = 1711909799000l;
-	public static final BigDecimal TAX_AMOUNT = BigDecimal.valueOf(2000.00);
+	public static final BigDecimal TAX_AMOUNT = BigDecimal.valueOf(4.00);
 	public static final String TAX_HEADMASTER_CODE = "CASE_ADVANCE_CARRYFORWARD";
 	public static final String CREATE_DEMAND_STATUS = "PAYMENT_PENDING";
 	public static final String CASE_ADMIT_STATUS = "CASE_ADMITTED";
