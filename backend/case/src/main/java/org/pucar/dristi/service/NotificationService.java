@@ -43,8 +43,6 @@ public class NotificationService {
         if (StringUtils.isEmpty(message)) {
             log.info("SMS content has not been configured for this case");
             return;
-        } else {
-            message = getMessage(request, HIGH_COURT_LOCALIZATION_CODE) + message;
         }
         pushNotification(request, message);
     }
@@ -76,7 +74,8 @@ public class NotificationService {
         smsDetails.put("caseId", request.getCases().getCaseNumber());
         smsDetails.put("efilingNumber", request.getCases().getFilingNumber());
         smsDetails.put("cnr", request.getCases().getCnrNumber());
-        smsDetails.put("date", request.getCases().getFilingNumber());
+        smsDetails.put("date", "");
+        smsDetails.put("link", "");
         smsDetails.put("tenantId", request.getCases().getTenantId().split("\\.")[0]);
         smsDetails.put("mobileNumber", request.getRequestInfo().getUserInfo().getMobileNumber());
         return smsDetails;
@@ -118,7 +117,8 @@ public class NotificationService {
         RequestInfo requestInfo = request.getRequestInfo();
         Map<String, Map<String, String>> localizedMessageMap = getLocalisedMessages(requestInfo, rootTenantId,
                 NOTIFICATION_ENG_LOCALE_CODE, NOTIFICATION_MODULE_CODE);
-        return localizedMessageMap.get(NOTIFICATION_ENG_LOCALE_CODE + "|" + rootTenantId).get(msgCode);
+        return localizedMessageMap.get(NOTIFICATION_ENG_LOCALE_CODE + "|" + rootTenantId).get(HIGH_COURT_LOCALIZATION_CODE)
+                + localizedMessageMap.get(NOTIFICATION_ENG_LOCALE_CODE + "|" + rootTenantId).get(msgCode);
     }
 
     /**
@@ -132,6 +132,7 @@ public class NotificationService {
         message = message.replace("{{caseId}}", Optional.ofNullable(userDetailsForSMS.get("caseId")).orElse(""))
                 .replace("{{efilingNumber}}", Optional.ofNullable(userDetailsForSMS.get("efilingNumber")).orElse(""))
                 .replace("{{cnr}}", Optional.ofNullable(userDetailsForSMS.get("cnr")).orElse(""))
+                .replace("{{link}}", Optional.ofNullable(userDetailsForSMS.get("link")).orElse(""))
                 .replace("{{date}}", Optional.ofNullable(userDetailsForSMS.get("date")).orElse(""));
         return message;
     }
