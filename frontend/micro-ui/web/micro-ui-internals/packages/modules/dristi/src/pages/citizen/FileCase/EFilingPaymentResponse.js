@@ -4,6 +4,7 @@ import Button from "../../../components/Button";
 import { useHistory, useLocation } from "react-router-dom/cjs/react-router-dom.min";
 import CustomCopyTextDiv from "../../../components/CustomCopyTextDiv";
 import SelectCustomNote from "../../../components/SelectCustomNote";
+import { Urls } from "../../../hooks";
 
 const customNoteConfig = {
   populators: {
@@ -43,6 +44,10 @@ function EFilingPaymentResponse({ t, setShowModal, header, subHeader, submitModa
   const location = useLocation();
   const receiptData = location.state.state.receiptData;
   const isSuccess = location.state.state.success;
+  const fileStoreId = location.state.state.fileStoreId;
+  const tenantId = Digit.ULBService.getCurrentTenantId();
+
+  const uri = `${window.location.origin}${Urls.FileFetchById}?tenantId=${tenantId}&fileStoreId=${fileStoreId}`;
   return (
     <div className=" user-registration">
       <div className="e-filing-payment" style={{ minHeight: "100%", height: "100%" }}>
@@ -77,13 +82,29 @@ function EFilingPaymentResponse({ t, setShowModal, header, subHeader, submitModa
           <SelectCustomNote t={t} config={customNoteConfig} />
         )}
         <div className="button-field" style={{ width: "100%", marginTop: 16 }}>
-          <Button
-            variation={"secondary"}
-            className={"secondary-button-selector"}
-            label={t("CS_PRINT_RECEIPT")}
-            labelClassName={"secondary-label-selector"}
-            onButtonClick={() => {}}
-          />
+          <a
+            href={uri}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              display: "flex",
+              color: "#505A5F",
+              textDecoration: "none",
+              // width: 250,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            <Button
+              variation={"secondary"}
+              className={"secondary-button-selector"}
+              label={t("CS_PRINT_RECEIPT")}
+              labelClassName={"secondary-label-selector"}
+              onButtonClick={() => {}}
+              isDisabled={!fileStoreId}
+            />
+          </a>
           <Button
             className={"tertiary-button-selector"}
             label={t("CS_GO_TO_HOME")}
