@@ -59,14 +59,11 @@ public class IndividualService {
             StringBuilder uri = new StringBuilder(config.getIndividualHost()).append(config.getIndividualSearchEndpoint());
             uri.append("?limit=1000").append("&offset=0").append("&tenantId=").append(requestInfo.getUserInfo().getTenantId()).append("&includeDeleted=true");
             return individualUtils.getEmailByIndividualId(individualSearchRequest, uri, individualUserUUID);
-
-
-        } catch(CustomException e){
-            throw e;
         }
         catch (Exception e){
             log.error("Error in search individual service :: {}", e.toString());
-            throw new CustomException(INDIVIDUAL_SERVICE_EXCEPTION,"Error in search individual service"+e.getMessage());
+            log.error("Email Not found");
+            return null;
         }
     }
 }

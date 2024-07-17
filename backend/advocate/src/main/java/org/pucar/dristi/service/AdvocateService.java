@@ -3,16 +3,14 @@ package org.pucar.dristi.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.egov.common.contract.request.RequestInfo;
+import org.egov.common.models.individual.Individual;
 import org.egov.tracer.model.CustomException;
 import org.pucar.dristi.config.Configuration;
 import org.pucar.dristi.enrichment.AdvocateRegistrationEnrichment;
 import org.pucar.dristi.kafka.Producer;
 import org.pucar.dristi.repository.AdvocateRepository;
 import org.pucar.dristi.validators.AdvocateRegistrationValidator;
-import org.pucar.dristi.web.models.Advocate;
-import org.pucar.dristi.web.models.AdvocateRequest;
-import org.pucar.dristi.web.models.AdvocateSearchCriteria;
-import org.pucar.dristi.web.models.IndividualSearchRequest;
+import org.pucar.dristi.web.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -175,7 +173,8 @@ public class AdvocateService {
             if(advocateRequest.getAdvocate().getWorkflow().getAction().equalsIgnoreCase("APPROVE")){
                 IndividualSearchRequest individualSearchRequest = new IndividualSearchRequest();
                 individualSearchRequest.setRequestInfo(advocateRequest.getRequestInfo());
-                individualSearchRequest.getIndividual().setIndividualId(advocateRequest.getAdvocate().getIndividualId());
+                IndividualSearch individual = IndividualSearch.builder().individualId(advocateRequest.getAdvocate().getIndividualId()).build();
+                individualSearchRequest.setIndividual(individual);
                 emailNotificationService.sendEmailNotification(individualSearchRequest, false);
             }
 
