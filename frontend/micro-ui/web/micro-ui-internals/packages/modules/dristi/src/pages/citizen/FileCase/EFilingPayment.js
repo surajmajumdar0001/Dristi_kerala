@@ -72,7 +72,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     }),
     [caseDetails]
   );
-  const { data: calculationResponse, isLoading: isPaymentLoading } = usePaymentCalculator(
+  const { data: calculationResponse, isLoading: isPaymentLoading } = Digit.Hooks.dristi.usePaymentCalculator(
     {
       EFillingCalculationCriteria: [
         {
@@ -87,10 +87,16 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     "dristi",
     Boolean(chequeDetails?.data?.chequeAmount)
   );
+  const { data: billResponse, isLoading: isBillLoading } = Digit.Hooks.dristi.useBillSearch(
+    {},
+    { tenantId, consumerCode: caseDetails?.filingNumber, service: "case" },
+    "dristi",
+    Boolean(caseDetails?.filingNumber)
+  );
 
   const totalAmount = useMemo(() => {
     const totalAmount = calculationResponse?.Calculation?.[0]?.totalAmount || 0;
-    return totalAmount;
+    return parseFloat(totalAmount).toFixed(2);
   }, [calculationResponse?.Calculation]);
   const paymentCalculation = useMemo(() => {
     const breakdown = calculationResponse?.Calculation?.[0]?.breakDown || [];
@@ -163,6 +169,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                 showTable: true,
                 showCopytext: true,
               },
+              fileStoreId: billAfterPayment?.Bill?.[0]?.fileStoreId,
             },
           });
         } else {
@@ -202,26 +209,27 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
   };
   const onSubmitCase = async () => {
     try {
-      const demandResponse = await DRISTIService.createDemand({
-        Demands: [
-          {
-            tenantId,
-            consumerCode: caseDetails?.filingNumber,
-            consumerType: "case",
-            businessService: "case",
-            taxPeriodFrom: Date.now().toString(),
-            taxPeriodTo: Date.now().toString(),
-            demandDetails: [
-              {
-                taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
-                taxAmount: 4,
-                collectionAmount: 0,
-              },
-            ],
-          },
-        ],
-      });
-
+      if (billResponse?.Bill?.length === 0) {
+        await DRISTIService.createDemand({
+          Demands: [
+            {
+              tenantId,
+              consumerCode: caseDetails?.filingNumber,
+              consumerType: "case",
+              businessService: "case",
+              taxPeriodFrom: Date.now().toString(),
+              taxPeriodTo: Date.now().toString(),
+              demandDetails: [
+                {
+                  taxHeadMasterCode: "CASE_ADVANCE_CARRYFORWARD",
+                  taxAmount: 4,
+                  collectionAmount: 0,
+                },
+              ],
+            },
+          ],
+        });
+      }
       const bill = await DRISTIService.callFetchBill({}, { consumerCode: caseDetails?.filingNumber, tenantId, businessService: "case" });
 
       if (bill) {
@@ -270,7 +278,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     }
   };
 
-  if (isLoading || isPaymentLoading || paymentLoader) {
+  if (isLoading || isPaymentLoading || paymentLoader || isBillLoading) {
     return <Loader />;
   }
   return (
