@@ -1,5 +1,6 @@
 package org.pucar.dristi.service;
 
+import org.egov.common.contract.models.Workflow;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,9 @@ import static org.pucar.dristi.config.ServiceConstants.ADVOCATE_CREATE_EXCEPTION
 
     @Mock
     private Configuration config;
+
+    @Mock
+    private EmailNotificationService notificationService;
 
     @BeforeEach
     public void setup() {
@@ -164,7 +168,10 @@ import static org.pucar.dristi.config.ServiceConstants.ADVOCATE_CREATE_EXCEPTION
     @Test
      void testUpdateAdvocateSuccess() {
         AdvocateRequest request = mock(AdvocateRequest.class);
-        Advocate advocate = mock(Advocate.class);
+        Advocate advocate = new Advocate();
+        Workflow workflow = new Workflow();
+        workflow.setAction("APPROVE");
+        advocate.setWorkflow(workflow);
         when(request.getAdvocate()).thenReturn(advocate);
 
         Advocate existingAdvocate = advocate; // Use the same advocate mock instance
@@ -174,7 +181,7 @@ import static org.pucar.dristi.config.ServiceConstants.ADVOCATE_CREATE_EXCEPTION
         doNothing().when(workflowService).updateWorkflowStatus(request);
         when(config.getAdvocateUpdateTopic()).thenReturn("advocateUpdateTopic");
         doNothing().when(producer).push(anyString(), any());
-
+        doNothing().when(notificationService).sendEmailNotification(any(), anyBoolean());
         Advocate result = advocateService.updateAdvocate(request);
 
         assertEquals(existingAdvocate, result); // Both should refer to the same mock instance

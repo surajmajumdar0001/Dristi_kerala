@@ -1,5 +1,6 @@
 package org.pucar.dristi.service;
 
+import org.egov.common.contract.models.Workflow;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.request.User;
 import org.egov.tracer.model.CustomException;
@@ -53,6 +54,9 @@ import static org.mockito.Mockito.*;
 
     @Mock
     private Configuration config;
+
+    @Mock
+    private EmailNotificationService notificationService;
 
     @BeforeEach
     public void setup() {
@@ -394,6 +398,9 @@ import static org.mockito.Mockito.*;
         // Arrange
         AdvocateClerkRequest advocateClerkRequest = new AdvocateClerkRequest();
         AdvocateClerk clerk = new AdvocateClerk();
+        Workflow workflow = new Workflow();
+        workflow.setAction("APPROVE");
+        clerk.setWorkflow(workflow);
         // Populate clerks with test data
         advocateClerkRequest.setClerk(clerk);
 
@@ -402,7 +409,7 @@ import static org.mockito.Mockito.*;
         doNothing().when(workflowService).updateWorkflowStatus((AdvocateClerkRequest) any());
         when(config.getAdvClerkUpdateTopic()).thenReturn("testTopic");
         doNothing().when(producer).push(anyString(), any());
-
+        doNothing().when(notificationService).sendEmailNotification(any(), anyBoolean());
         // Act
         AdvocateClerk result = advocateClerkService.updateAdvocateClerk(advocateClerkRequest);
 
@@ -419,6 +426,9 @@ import static org.mockito.Mockito.*;
         AdvocateClerk clerk = new AdvocateClerk();
         clerk.setApplicationNumber("appNum1");
         clerk.setTenantId("tenantId");
+        Workflow workflow = new Workflow();
+        workflow.setAction("APPROVE");
+        clerk.setWorkflow(workflow);
         advocateClerkRequest.setClerk(clerk);
 
         when(validator.validateApplicationExistence(any())).thenReturn(clerk);
@@ -426,10 +436,10 @@ import static org.mockito.Mockito.*;
         doNothing().when(workflowService).updateWorkflowStatus((AdvocateClerkRequest) any());
         when(config.getAdvClerkUpdateTopic()).thenReturn("testTopic");
         doNothing().when(producer).push(anyString(), any());
+        doNothing().when(notificationService).sendEmailNotification(any(), anyBoolean());
 
         // Act
         AdvocateClerk result = advocateClerkService.updateAdvocateClerk(advocateClerkRequest);
-
         // Assert
         assertNotNull(result);
         assertEquals(clerk, result);
