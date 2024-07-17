@@ -24,14 +24,13 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
     try {
       const newSignStatuses = [...parsedObj, { name: name, isSigned: true }];
       localStorage.setItem("signStatus", JSON.stringify(newSignStatuses));
-      localStorage.setItem("isSignSuccess", "success");
 
       const eSignResponse = await DRISTIService.eSignService({
         ESignParameter: {
           uidToken: "3456565",
           consent: "6564",
           authType: "6546",
-          fileStoreId: "2aefb901-edc6-4a45-95f8-3ea383a513f5",
+          fileStoreId: "30bf596b-f4e4-461e-bc92-3ccd778b7ebc",
           tenantId: "kl",
           pageModule: "ci",
         },
