@@ -169,7 +169,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                 showTable: true,
                 showCopytext: true,
               },
-              fileStoreId: billAfterPayment?.Bill?.[0]?.fileStoreId,
+              fileStoreId: "c162c182-103f-463e-99b6-18654ed7a5b1",
             },
           });
         } else {
