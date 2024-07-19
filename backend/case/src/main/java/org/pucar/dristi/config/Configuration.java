@@ -181,4 +181,10 @@ public class Configuration {
 
 	@Value("${egov.localization.statelevel}")
 	private Boolean isLocalizationStateLevel;
+	
+	@Value("${egov.email.notification.topic}")
+	private String emailNotificationTopic;
+
+	@Value("${egov.statelevel.tenant.id}")
+	private String stateLevelTenantId;
 }
