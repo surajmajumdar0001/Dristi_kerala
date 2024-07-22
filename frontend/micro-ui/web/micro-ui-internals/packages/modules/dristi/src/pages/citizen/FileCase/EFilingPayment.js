@@ -358,7 +358,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                   >
                     <span>{item.key}</span>
                     <span>
-                      {item.currency} {item.value}
+                      {item.currency} {parseFloat(item.value).toFixed(2)}
                     </span>
                   </div>
                 ))}
@@ -367,11 +367,10 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                 <InfoCard
                   variant={"default"}
                   label={t("CS_COMMON_NOTE")}
-                  style={{ margin: "16px 0 0 0", backgroundColor: "#ECF3FD" }}
+                  style={{ margin: "50px 0 0 0", backgroundColor: "#ECF3FD" }}
                   additionalElements={[
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                       <span>{t("CS_OFFLINE_PAYMENT_STEP_TEXT")}</span>
-                      <Link style={{ fontWeight: 700, color: "#0A0A0A" }}>{t("CS_LEARN_MORE")}</Link>
                     </div>,
                   ]}
                   inline
