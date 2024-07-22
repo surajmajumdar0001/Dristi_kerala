@@ -167,7 +167,7 @@ const HomeView = () => {
           tenantId,
           criteria: [
             {
-              litigantId: individualId,
+              ...(advocateId ? { advocateId } : { litigantId: individualId }),
 
               pagination: { offSet: 0, limit: 1 },
             },
