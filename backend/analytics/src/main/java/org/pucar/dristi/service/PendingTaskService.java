@@ -18,18 +18,22 @@ public class PendingTaskService {
 
     private final Configuration config;
     private final IndexerUtils indexerUtils;
-
+    private final EmailNotificationService emailNotificationService;
 
     @Autowired
-    public PendingTaskService(Configuration config, IndexerUtils indexerUtils) {
+    public PendingTaskService(Configuration config, IndexerUtils indexerUtils, EmailNotificationService emailNotificationService) {
         this.config = config;
         this.indexerUtils = indexerUtils;
+        this.emailNotificationService = emailNotificationService;
     }
 
     public PendingTask createPendingTask(PendingTaskRequest pendingTaskRequest) {
         try {
 
             log.info("Inside Pending Task service:: PendingTaskRequest: {}", pendingTaskRequest);
+            if(pendingTaskRequest.getPendingTask().getEntityType().equals("case")) {
+                emailNotificationService.sendEmailNotification(pendingTaskRequest);
+            }
             String bulkRequest = indexerUtils.buildPayload(pendingTaskRequest.getPendingTask());
             if (!bulkRequest.isEmpty()) {
                 String uri = config.getEsHostUrl() + config.getBulkPath();

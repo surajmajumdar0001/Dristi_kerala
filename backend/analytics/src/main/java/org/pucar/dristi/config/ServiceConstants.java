@@ -9,6 +9,7 @@ public class ServiceConstants {
 
 	public static final String EXTERNAL_SERVICE_EXCEPTION = "External Service threw an Exception: ";
 	public static final String SEARCHER_SERVICE_EXCEPTION = "Exception while fetching from searcher: ";
+	public static final String PENDING_TASK_CASE = "PENDING_TASK_CASE";
 
 	//Consumer
 	public static final String ES_INDEX_HEADER_FORMAT = "{\"index\":{\"_index\":\"%s\",\"_id\":\"%s\"}}\n";

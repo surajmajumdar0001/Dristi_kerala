@@ -87,4 +87,9 @@ public class Configuration {
 
 	@Value("${api.call.delay.in.seconds}")
 	private Integer apiCallDelayInSeconds;
+
+	// Email Notification topic
+	@Value("${egov.email.notification.topic}")
+	private String emailNotificationTopic;
+
 }
