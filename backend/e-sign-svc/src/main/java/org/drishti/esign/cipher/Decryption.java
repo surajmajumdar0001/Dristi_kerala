@@ -2,6 +2,10 @@ package org.drishti.esign.cipher;
 
 
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
 import java.io.*;
@@ -9,9 +13,12 @@ import java.security.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
+@Component
 public class Decryption {
+
+    @Autowired
+    private ResourceLoader resourceLoader;
     /**
      * New function to get public key from .cer file
      *
@@ -40,7 +47,9 @@ public class Decryption {
     private String getKey(String filename) throws IOException {
         // Read key from file
         String strKeyPEM = "";
-        BufferedReader br = new BufferedReader(new FileReader(filename));
+        Resource resource = resourceLoader.getResource("classpath:"+filename);
+        File file = resource.getFile();
+        BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
         while ((line = br.readLine()) != null) {
             strKeyPEM += line + "\n";
@@ -109,21 +118,17 @@ public class Decryption {
      * @throws GeneralSecurityException
      */
     public PublicKey getPublicKeyFromString(String key) throws IOException, GeneralSecurityException {
-        String publicKeyPEM = key;
+        key = key.replace("-----BEGIN CERTIFICATE-----", "")
+                .replace("-----END CERTIFICATE-----", "")
+                .replaceAll("\\s", "");
 
-        publicKeyPEM = publicKeyPEM.substring(28, publicKeyPEM.indexOf("\n-----END CERTIFICATE-----"));
-        System.out.println(publicKeyPEM);
-        // Base64 decode data
-        publicKeyPEM = publicKeyPEM.trim();
-        java.security.Security.addProvider(
-                new org.bouncycastle.jce.provider.BouncyCastleProvider()
+        byte[] certificateData = Base64.decodeBase64(key);
+
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(
+                new ByteArrayInputStream(certificateData)
         );
-        byte[] encoded = Base64.decodeBase64(publicKeyPEM);
-
-        X509EncodedKeySpec spec =
-                new X509EncodedKeySpec(encoded);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
+        return certificate.getPublicKey();
     }
 
     /**
@@ -156,7 +161,7 @@ public class Decryption {
         Signature sign = Signature.getInstance("SHA1withRSA");
         sign.initVerify(publicKey);
         sign.update(message.getBytes("UTF-8"));
-        return sign.verify(Base64.decodeBase64(signature.getBytes("UTF-8")));
+        return sign.verify(Base64.decodeBase64(signature));
     }
 
     /**

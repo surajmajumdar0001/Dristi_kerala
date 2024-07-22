@@ -5,7 +5,9 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.drishti.esign.cipher.Decryption;
 import org.drishti.esign.util.ByteArrayMultipartFile;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.Calendar;
@@ -25,6 +28,9 @@ import java.util.List;
 public class PdfEmbedder {
 
     PdfSignatureAppearance appearance;
+
+    @Autowired
+    Decryption decryption;
 
     public MultipartFile signPdfWithDSAndReturnMultipartFile(Resource resource, String response) throws IOException {
 
@@ -72,7 +78,10 @@ public class PdfEmbedder {
             List<Certificate> certificates = List.of(cert);
             appearance.setCrypto(null, certificates.toArray(new Certificate[0]), null, null);
 
-
+            PublicKey publicKey = decryption.getPublicKey("publicKey.cer");
+            String signature = response.substring(response.indexOf("<DocSignature error=\"NA\" id=\"1\" sigHashAlgorithm=\"SHA256\">"),response.indexOf("</DocSignature>")).
+                    replaceAll("<DocSignature error=\"NA\" id=\"1\" sigHashAlgorithm=\"SHA256\">","");
+            boolean b = decryption.verify(publicKey,"",signature);
 
 
             int contentEstimated = 8192;
