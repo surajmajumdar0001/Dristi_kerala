@@ -161,7 +161,7 @@ public class Decryption {
         Signature sign = Signature.getInstance("SHA1withRSA");
         sign.initVerify(publicKey);
         sign.update(message.getBytes("UTF-8"));
-        return sign.verify(Base64.decodeBase64(signature));
+        return sign.verify(Base64.decodeBase64(signature.getBytes("UTF-8")));
     }
 
     /**
