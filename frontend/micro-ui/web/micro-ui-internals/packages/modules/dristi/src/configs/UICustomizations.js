@@ -462,8 +462,6 @@ export const UICustomizations = {
           return <span>NIA S138</span>;
         case "Stage":
           return <span>E-filing</span>;
-        case "Amount Due":
-          return <span>Rs 2000</span>;
         case "Action":
           return (
             <span className="action-link">
