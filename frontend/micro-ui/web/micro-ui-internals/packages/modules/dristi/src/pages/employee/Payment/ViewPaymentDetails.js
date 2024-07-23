@@ -242,9 +242,9 @@ const ViewPaymentDetails = ({ location, match }) => {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 40 }}>
+        <div style={{ marginTop: 40, marginBottom: "150px" }}>
           <div className="payment-case-name">{`${t("CS_CASE_ID")}: ${caseDetails?.filingNumber}`}</div>
-          <div className="payment-case-detail-wrapper" style={{ maxHeight: 800 }}>
+          <div className="payment-case-detail-wrapper">
             <LabelFieldPair>
               <CardLabel>{`${t("CORE_COMMON_PAYER")}`}</CardLabel>
               <TextInput
