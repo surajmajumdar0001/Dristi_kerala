@@ -132,4 +132,18 @@ public class Configuration {
 
     @Value("${egov.order.path}")
     private String orderPath;
+
+    @Value("${egov.individual.host}")
+    private String individualHost;
+
+    @Value("${egov.individual.search.path}")
+    private String individualSearchEndpoint;
+
+    // tenant
+    @Value("${egov.state.level.tenant.id}")
+    private String stateLevelTenantId;
+
+    // Email Notification topic
+    @Value("${egov.email.notification.topic}")
+    private String emailNotificationTopic;
 }
