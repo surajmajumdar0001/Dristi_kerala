@@ -62,4 +62,9 @@ public class ServiceConstants {
     public static final String BUSINESS_SERVICES = "&businessServices=";
     public static final String JUDGEMENT = "JUDGEMENT";
 
+    public static final String ORDER_UPDATE = "ORDER_UPDATE";
+    public static final String ORDER_SUBJECT = "ORDER_SUBJECT";
+    public static final String INDIVIDUAL_UTILITY_EXCEPTION = "INDIVIDUAL_UTILITY_EXCEPTION";
+    public static final String INDIVIDUAL_SERVICE_EXCEPTION = "INDIVIDUAL_SERVICE_EXCEPTION";
+
 }

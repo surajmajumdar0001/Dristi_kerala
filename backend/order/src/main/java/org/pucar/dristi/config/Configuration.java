@@ -87,6 +87,13 @@ public class Configuration {
     @Value("${egov.sms.notification.topic}")
     private String smsNotificationTopic;
 
+    //EmailNotification
+    @Value("${egov.email.notification.topic}")
+    private String emailNotificationTopic;
+
+    @Value("${egov.state.level.tenant.id}")
+    private String stateLevelTenantId;
+
     //save order kafka topic
     @Value("${egov.kafka.order.save.topic}")
     private String saveOrderKafkaTopic;
@@ -108,4 +115,11 @@ public class Configuration {
     // Order Workflow/Business Service name
     @Value("${egov.workflow.order.judgement.business.service.name}")
     private String orderJudgementBusinessServiceName;
+
+    //Individual
+    @Value("${egov.individual.host}")
+    private String individualHost;
+
+    @Value("${egov.individual.search.path}")
+    private String individualSearchEndpoint;
 }
