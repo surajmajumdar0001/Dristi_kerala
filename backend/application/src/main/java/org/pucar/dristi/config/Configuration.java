@@ -109,4 +109,22 @@ public class Configuration {
 
     @Value("${application.kafka.update.topic}")
     private String applicationUpdateTopic;
+
+    // Email Notification topic
+    @Value("${egov.email.notification.topic}")
+    private String emailNotificationTopic;
+
+    // tenant
+    @Value("${egov.state.level.tenant.id}")
+    private String stateLevelTenantId;
+
+    //Individual Service
+    @Value("${egov.individual.host}")
+    private String individualHost;
+
+    @Value("${egov.individual.path}")
+    private String individualCreatePath;
+
+    @Value("${egov.individual.search.path}")
+    private String individualSearchPath;
 }

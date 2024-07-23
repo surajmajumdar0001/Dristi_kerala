@@ -69,5 +69,7 @@ public class ServiceConstants {
     public static final String ASYNSUBMISSIONWITHRESPONSE = "asynsubmissionwithresponse";
     public static final String ASYNCSUBMISSIONWITHOUTRESPONSE = "asyncsubmissionwithoutresponse";
 
+    public static final String INDIVIDUAL_SERVICE_EXCEPTION = "INDIVIDUAL_SERVICE_EXCEPTION";
+    public static final String INDIVIDUAL_UTILITY_EXCEPTION = "INDIVIDUAL_UTILITY_EXCEPTION";
 
 }
