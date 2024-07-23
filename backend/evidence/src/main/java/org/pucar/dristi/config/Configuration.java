@@ -122,4 +122,27 @@ public class Configuration {
 
 	@Value("${egov.hearing.path}")
 	private String hearingExistsPath;
+
+	//Individual Service
+	@Value("${egov.individual.host}")
+	private String individualHost;
+
+	@Value("${egov.individual.path}")
+	private String individualPath;
+
+	@Value("${egov.individual.create.path}")
+	private String individualCreateEndpoint;
+
+	@Value("${egov.individual.search.path}")
+	private String individualSearchEndpoint;
+
+	@Value("${egov.individual.update.path}")
+	private String individualUpdateEndpoint;
+
+//	Email kafka topice
+	@Value("${egov.email.kafka.topic}")
+	private String emailNotificationTopic;
+
+	@Value("${egov.state.level.tenant.id}")
+	private String stateLevelTenantId;
 }
