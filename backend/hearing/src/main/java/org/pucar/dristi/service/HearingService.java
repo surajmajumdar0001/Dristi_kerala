@@ -26,6 +26,7 @@ public class HearingService {
     private final HearingRepository hearingRepository;
     private final Producer producer;
     private final Configuration config;
+    private final EmailNotificationService emailNotificationService;
 
     @Autowired
     public HearingService(
@@ -34,13 +35,14 @@ public class HearingService {
             WorkflowService workflowService,
             HearingRepository hearingRepository,
             Producer producer,
-            Configuration config) {
+            Configuration config, EmailNotificationService emailNotificationService) {
         this.validator = validator;
         this.enrichmentUtil = enrichmentUtil;
         this.workflowService = workflowService;
         this.hearingRepository = hearingRepository;
         this.producer = producer;
         this.config = config;
+        this.emailNotificationService = emailNotificationService;
     }
 
     public Hearing createHearing(HearingRequest body) {
@@ -56,6 +58,14 @@ public class HearingService {
             workflowService.updateWorkflowStatus(body);
 
             // Push the application to the topic for persister to listen and persist
+
+            for (int i = 0 ; i<body.getHearing().getAttendees().size();i++) {
+                IndividualSearchRequest individualSearchRequest = new IndividualSearchRequest();
+                individualSearchRequest.setRequestInfo(body.getRequestInfo());
+                IndividualSearch individual = IndividualSearch.builder().individualId(body.getHearing().getAttendees().get(0).getIndividualId()).build();
+                individualSearchRequest.setIndividual(individual);
+                emailNotificationService.sendEmailNotification(individualSearchRequest);
+            }
 
             producer.push(config.getHearingCreateTopic(), body);
 
@@ -105,6 +115,14 @@ public class HearingService {
 
             // Enrich application upon update
             enrichmentUtil.enrichHearingApplicationUponUpdate(hearingRequest);
+
+            for (int i = 0 ; i<hearingRequest.getHearing().getAttendees().size();i++) {
+                IndividualSearchRequest individualSearchRequest = new IndividualSearchRequest();
+                individualSearchRequest.setRequestInfo(hearingRequest.getRequestInfo());
+                IndividualSearch individual = IndividualSearch.builder().individualId(hearingRequest.getHearing().getAttendees().get(0).getIndividualId()).build();
+                individualSearchRequest.setIndividual(individual);
+                emailNotificationService.sendEmailNotification(individualSearchRequest);
+            }
 
             producer.push(config.getHearingUpdateTopic(), hearingRequest);
 

@@ -136,4 +136,12 @@ public class Configuration {
 
     @Value("${verify.attendee.individual.id}")
     private Boolean verifyAttendeeIndividualId;
+
+    // Email Notification topic
+    @Value("${egov.email.notification.topic}")
+    private String emailNotificationTopic;
+
+    // tenant
+    @Value("${egov.state.level.tenant.id}")
+    private String stateLevelTenantId;
 }
