@@ -199,6 +199,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                 showTable: true,
                 showCopytext: true,
               },
+              caseId: caseId,
             },
           });
         }
