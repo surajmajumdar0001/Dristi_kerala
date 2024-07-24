@@ -11,8 +11,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-import static org.egov.eTreasury.config.ServiceConstants.EXTERNAL_SERVICE_EXCEPTION;
-import static org.egov.eTreasury.config.ServiceConstants.SEARCHER_SERVICE_EXCEPTION;
+import static org.pucar.dristi.config.ServiceConstants.EXTERNAL_SERVICE_EXCEPTION;
+import static org.pucar.dristi.config.ServiceConstants.SEARCHER_SERVICE_EXCEPTION;
 
 @Repository
 @Slf4j
