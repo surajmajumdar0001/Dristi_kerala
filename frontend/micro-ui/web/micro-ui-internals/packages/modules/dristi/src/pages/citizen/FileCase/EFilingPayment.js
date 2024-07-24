@@ -73,7 +73,6 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     if (debtLiability?.liabilityType?.code === "PARTIAL_LIABILITY") {
       return {
         totalAmount: debtLiability?.totalAmount,
-        data: { chequeAmount: debtLiability?.totalAmount },
       };
     } else {
       const chequeData = caseDetails?.caseDetails?.chequeDetails?.formdata || [];
@@ -82,7 +81,6 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
       }, 0);
       return {
         totalAmount: totalAmount.toString(),
-        data: { chequeAmount: totalAmount.toString() },
       };
     }
   }, [caseDetails]);
