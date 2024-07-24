@@ -3,6 +3,7 @@ package org.pucar.dristi.service;
 import org.pucar.dristi.config.EPostConfiguration;
 import org.pucar.dristi.model.ChannelMessage;
 import org.pucar.dristi.model.EPostTracker;
+import org.pucar.dristi.model.EPostTrackerSearchRequest;
 import org.pucar.dristi.model.TaskRequest;
 import org.pucar.dristi.repository.EPostRepository;
 import org.pucar.dristi.util.IdgenUtil;
@@ -24,8 +25,8 @@ public class EPostService {
         ePostRepository.sendEPost(body,processNumber);
         return null;
     }
-    public List<EPostTracker> getEPost(TaskRequest body){
-        return null;
+    public List<EPostTracker> getEPost(EPostTrackerSearchRequest searchRequest){
+        return ePostRepository.getEPost(searchRequest.getEPostTrackerSearchCriteria());
     }
     public EPostTracker updateEPost(EPostTracker ePostTracker){
         return null;
