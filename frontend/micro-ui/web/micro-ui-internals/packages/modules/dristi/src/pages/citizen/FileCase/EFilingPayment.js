@@ -144,13 +144,30 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     };
   }, [caseDetails?.filingNumber]);
 
-  const openPopupWindow = (htmlContent) => {
-    const popup = window.open("", "Popup", "width=1000,height=1000");
+  const handleButtonClick = (url, data, header) => {
+    const popup = window.open("", "popupWindow", "width=1000,height=1000,scrollbars=yes");
+    if (popup) {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = url;
 
-    popup.document.open();
-    popup.document.write(htmlContent);
-    setPaymentLoader(true);
-    popup.document.close();
+      const inputDataField = document.createElement("input");
+      inputDataField.type = "hidden";
+      inputDataField.name = "input_data";
+      inputDataField.value = data;
+      form.appendChild(inputDataField);
+
+      const inputHeadersField = document.createElement("input");
+      inputHeadersField.type = "hidden";
+      inputHeadersField.name = "input_headers";
+      inputHeadersField.value = header;
+      form.appendChild(inputHeadersField);
+
+      popup.document.body.appendChild(form);
+      form.submit();
+      setPaymentLoader(true);
+      popup.document.body.removeChild(form);
+    }
     const checkPopupClosed = setInterval(async () => {
       if (popup.closed) {
         setPaymentLoader(false);
@@ -246,7 +263,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
       }
       const bill = await DRISTIService.callFetchBill({}, { consumerCode: caseDetails?.filingNumber, tenantId, businessService: "case" });
 
-      if (bill) {
+      if (bill?.Bill?.length) {
         const gateway = await DRISTIService.callETreasury(
           {
             ChallanData: {
@@ -278,11 +295,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
         );
 
         if (gateway) {
-          const updatedHtmlString = gateway?.htmlPage?.htmlString.replace(
-            "ChallanGeneration.php",
-            "https://www.stagingetreasury.kerala.gov.in/api/eTreasury/service/ChallanGeneration.php"
-          );
-          openPopupWindow(updatedHtmlString);
+          handleButtonClick(gateway?.payload?.url, gateway?.payload?.data, gateway?.payload?.headers);
         } else {
           handleError("Error calling e-Treasury.");
         }
