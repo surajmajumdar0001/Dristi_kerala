@@ -84,17 +84,32 @@ const ViewPaymentDetails = ({ location, match }) => {
       enabled: Boolean(tenantId && caseDetails?.filingNumber),
     }
   );
-  const chequeDetails = useMemo(
-    () => ({
-      ...caseDetails?.caseDetails?.chequeDetails?.formdata?.[0],
-    }),
-    [caseDetails]
-  );
+
+  const chequeDetails = useMemo(() => {
+    const debtLiability = caseDetails?.caseDetails?.debtLiabilityDetails?.formdata?.[0]?.data;
+    if (debtLiability?.liabilityType?.code === "PARTIAL_LIABILITY") {
+      return {
+        totalAmount: debtLiability?.totalAmount,
+        data: { chequeAmount: debtLiability?.totalAmount },
+      };
+    } else {
+      const chequeData = caseDetails?.caseDetails?.chequeDetails?.formdata || [];
+      const totalAmount = chequeData.reduce((sum, item) => {
+        return sum + parseFloat(item.data.chequeAmount);
+      }, 0);
+      return {
+        totalAmount: totalAmount.toString(),
+        data: { chequeAmount: totalAmount.toString() },
+      };
+    }
+  }, [caseDetails]);
+
+  
   const { data: calculationResponse, isLoading: isPaymentLoading } = Digit.Hooks.dristi.usePaymentCalculator(
     {
       EFillingCalculationCriteria: [
         {
-          checkAmount: chequeDetails?.data?.chequeAmount.toString(),
+          checkAmount: chequeDetails?.totalAmount,
           numberOfApplication: 1,
           tenantId: tenantId,
           caseId: caseId,
@@ -103,8 +118,29 @@ const ViewPaymentDetails = ({ location, match }) => {
     },
     {},
     "dristi",
-    Boolean(chequeDetails?.data?.chequeAmount)
+    Boolean(chequeDetails?.totalAmount && chequeDetails.totalAmount !== "0")
   );
+  // const chequeDetails = useMemo(
+  //   () => ({
+  //     ...caseDetails?.caseDetails?.chequeDetails?.formdata?.[0],
+  //   }),
+  //   [caseDetails]
+  // );
+  // const { data: calculationResponse, isLoading: isPaymentLoading } = Digit.Hooks.dristi.usePaymentCalculator(
+  //   {
+  //     EFillingCalculationCriteria: [
+  //       {
+  //         checkAmount: chequeDetails?.data?.chequeAmount.toString(),
+  //         numberOfApplication: 1,
+  //         tenantId: tenantId,
+  //         caseId: caseId,
+  //       },
+  //     ],
+  //   },
+  //   {},
+  //   "dristi",
+  //   Boolean(chequeDetails?.data?.chequeAmount)
+  // );
   const totalAmount = useMemo(() => {
     const totalAmount = calculationResponse?.Calculation?.[0]?.totalAmount || 0;
     return parseFloat(totalAmount).toFixed(2);

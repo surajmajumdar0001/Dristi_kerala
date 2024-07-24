@@ -66,17 +66,32 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     }),
     [caseData]
   );
-  const chequeDetails = useMemo(
-    () => ({
-      ...caseDetails?.caseDetails?.chequeDetails?.formdata?.[0],
-    }),
-    [caseDetails]
-  );
+
+  // check for partial Liability
+  const chequeDetails = useMemo(() => {
+    const debtLiability = caseDetails?.caseDetails?.debtLiabilityDetails?.formdata?.[0]?.data;
+    if (debtLiability?.liabilityType?.code === "PARTIAL_LIABILITY") {
+      return {
+        totalAmount: debtLiability?.totalAmount,
+        data: { chequeAmount: debtLiability?.totalAmount },
+      };
+    } else {
+      const chequeData = caseDetails?.caseDetails?.chequeDetails?.formdata || [];
+      const totalAmount = chequeData.reduce((sum, item) => {
+        return sum + parseFloat(item.data.chequeAmount);
+      }, 0);
+      return {
+        totalAmount: totalAmount.toString(),
+        data: { chequeAmount: totalAmount.toString() },
+      };
+    }
+  }, [caseDetails]);
+
   const { data: calculationResponse, isLoading: isPaymentLoading } = Digit.Hooks.dristi.usePaymentCalculator(
     {
       EFillingCalculationCriteria: [
         {
-          checkAmount: chequeDetails?.data?.chequeAmount.toString(),
+          checkAmount: chequeDetails?.totalAmount,
           numberOfApplication: 1,
           tenantId: tenantId,
           caseId: caseId,
@@ -85,7 +100,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
     },
     {},
     "dristi",
-    Boolean(chequeDetails?.data?.chequeAmount)
+    Boolean(chequeDetails?.totalAmount && chequeDetails.totalAmount !== "0")
   );
   const { data: billResponse, isLoading: isBillLoading } = Digit.Hooks.dristi.useBillSearch(
     {},
