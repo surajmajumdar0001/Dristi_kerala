@@ -13,6 +13,7 @@ public class EPostTracker {
     private String processNumber;
     private String tenantId;
     private String taskNumber;
+    private String fileStoreId;
     private String trackingNumber;
     private String address;
     private String pinCode;

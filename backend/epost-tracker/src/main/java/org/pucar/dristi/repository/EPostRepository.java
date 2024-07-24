@@ -23,12 +23,10 @@ public class EPostRepository {
         this.ePostQueryBuilder = ePostQueryBuilder;
         this.ePostRowMapper = ePostRowMapper;
     }
-    public void sendEPost(TaskRequest body,String processNumber){
 
-    }
-    public List<EPostTracker> getEPost(EPostTrackerSearchCriteria searchCriteria){
-        List<String> preparedStmtList = new ArrayList<>();
-        String query = ePostQueryBuilder.getEPostTracker(searchCriteria, preparedStmtList);
+    public List<EPostTracker> getEPost(EPostTrackerSearchCriteria searchCriteria, Integer limit, Integer offset){
+        List<Object> preparedStmtList = new ArrayList<>();
+        String query = ePostQueryBuilder.getEPostTracker(searchCriteria, preparedStmtList, limit, offset);
         log.debug("Final query: " + query);
         return jdbcTemplate.query(query, preparedStmtList.toArray(), ePostRowMapper);
     }

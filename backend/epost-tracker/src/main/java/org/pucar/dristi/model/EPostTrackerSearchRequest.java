@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.egov.common.contract.request.RequestInfo;
 import org.egov.common.contract.response.ResponseInfo;
 import org.springframework.validation.annotation.Validated;
 
@@ -17,9 +18,9 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class EPostTrackerSearchRequest {
 
-    @JsonProperty("ResponseInfo")
+    @JsonProperty("RequestInfo")
     @Valid
-    private ResponseInfo responseInfo = null;
+    private RequestInfo requestInfo = null;
 
     @JsonProperty("ePostTrackerSearchCriteria")
     @Valid

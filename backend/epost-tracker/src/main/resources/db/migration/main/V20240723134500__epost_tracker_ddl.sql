@@ -1,6 +1,7 @@
 CREATE TABLE dristi_epost_tracker (
     process_number varchar(64) NOT NULL PRIMARY KEY,
     tenant_id varchar(64) NOT NULL,
+    file_store_id varchar(64) NOT NULL,
     task_number varchar(64) NOT NULL,
     tracking_number varchar(64) NOT NULL,
     pincode varchar(64) NOT NULL,
