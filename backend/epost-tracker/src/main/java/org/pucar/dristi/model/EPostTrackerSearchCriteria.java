@@ -14,10 +14,19 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 @Builder
 public class EPostTrackerSearchCriteria {
+
     @JsonProperty("processNumber")
     private String processNumber;
+
     @JsonProperty("trackingNumber")
     private  String trackingNumber;
+
     @JsonProperty("deliveryStatus")
     private String deliveryStatus;
+
+    @JsonProperty("bookingDate")
+    private String bookingDate;
+
+    @JsonProperty("receivedDate")
+    private  String receivedDate;
 }

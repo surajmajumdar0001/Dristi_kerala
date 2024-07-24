@@ -35,6 +35,16 @@ public class EPostQueryBuilder {
             query.append(" tracking_number = ? ");
             preparedStmtList.add(searchCriteria.getTrackingNumber());
         }
+        if(!ObjectUtils.isEmpty(searchCriteria.getBookingDate())){
+            addClauseIfRequired(query,preparedStmtList);
+            query.append(" booking_date = ? ");
+            preparedStmtList.add(searchCriteria.getTrackingNumber());
+        }
+        if(!ObjectUtils.isEmpty(searchCriteria.getReceivedDate())){
+            addClauseIfRequired(query,preparedStmtList);
+            query.append(" received_date = ? ");
+            preparedStmtList.add(searchCriteria.getTrackingNumber());
+        }
         return query.toString();
     }
 
