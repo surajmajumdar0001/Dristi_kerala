@@ -9,7 +9,6 @@ import { isEqual } from "lodash";
 function SignatureCard({ input, data, t, index, onSelect, formData, configKey, handleAadharClick }) {
   const [openUploadSignatureModal, setOpenUploadSignatureModal] = useState(false);
   const [openAadharModal, setOpenAadharModal] = useState(false);
-  const [formDataCopy, setFormData] = useState({});
   const name = `${data?.[input?.config?.title]} ${index}`;
   const uploadModalConfig = useMemo(() => {
     return {
@@ -42,23 +41,7 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey, h
       });
     } else onSelect(uploadModalConfig.key, { ...formData[uploadModalConfig.key], [input]: value });
   }
-  const isSignSuccess = useMemo(() => localStorage.getItem("isSignSuccess"), []);
-  const storedESignObj = useMemo(() => localStorage.getItem("signStatus"), []);
-  const parsedESignObj = JSON.parse(storedESignObj);
 
-  useEffect(() => {
-    if (isSignSuccess) {
-      const matchedSignStatus = parsedESignObj.find((obj) => obj.name === name && obj.isSigned == true);
-      if (isSignSuccess === "success" && matchedSignStatus) {
-        if (!isEqual(formData, formDataCopy)) {
-          setValue(["aadharsignature"], name);
-          setFormData(formData);
-        }
-      }
-      localStorage.removeItem("name");
-      localStorage.removeItem("isSignSuccess");
-    }
-  }, [isSignSuccess, formData]);
   const Icon = ({ icon }) => {
     switch (icon) {
       case "LitigentIcon":

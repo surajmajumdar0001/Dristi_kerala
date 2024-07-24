@@ -15,6 +15,7 @@ import usePaymentCalculator from "./dristi/usePaymentCalculator";
 import { useToast } from "../components/Toast/useToast.js";
 import useCreateHearings from "./dristi/useCreateHearings.js";
 import useBillSearch from "./dristi/useBillSearch";
+import useCreateDemand from "./dristi/useCreateDemand";
 
 export const Urls = {
   Authenticate: "/user/oauth/token",
@@ -63,6 +64,7 @@ const dristi = {
   useGetSubmissions,
   useToast,
   useBillSearch,
+  useCreateDemand,
 };
 
 const Hooks = {
