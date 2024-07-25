@@ -37,7 +37,7 @@ jobs:
       - name: Build and Push Docker image for CaseManagement_DB
         run: |
           docker build  -t pucarsolutionsdev.azurecr.io/pucar_casemanagement_db:v1.0.0-${{ env.Merge_Commit }} -f  Dockerfile .
-          docker push pucarsolutionsdev.azurecr.io/pucar_casemanagement:v1.0.0-${{ env.Merge_Commit }}
+          docker push pucarsolutionsdev.azurecr.io/pucar_casemanagement_db:v1.0.0-${{ env.Merge_Commit }}
         working-directory: backend/casemanagement/src/main/resources/db
 
 
