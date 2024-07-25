@@ -18,7 +18,7 @@ import org.springframework.validation.annotation.Validated;
 @Builder
 public class EPostTrackerSearchRequest {
 
-    @JsonProperty("RequestInfo")
+    @JsonProperty("requestInfo")
     @Valid
     private RequestInfo requestInfo = null;
 
