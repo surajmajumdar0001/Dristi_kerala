@@ -17,8 +17,13 @@ import java.security.spec.PKCS8EncodedKeySpec;
 @Component
 public class Decryption {
 
+    private final ResourceLoader resourceLoader;
+
     @Autowired
-    private ResourceLoader resourceLoader;
+    public Decryption(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
     /**
      * New function to get public key from .cer file
      *
