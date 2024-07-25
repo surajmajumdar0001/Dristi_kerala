@@ -5,6 +5,7 @@ import org.pucar.dristi.model.EPostResponse;
 import org.pucar.dristi.model.EPostTracker;
 import org.pucar.dristi.model.EPostTrackerSearchCriteria;
 import org.pucar.dristi.model.Pagination;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -16,9 +17,12 @@ import java.util.List;
 public class EPostRepository {
 
     private final JdbcTemplate jdbcTemplate;
+
     private final EPostQueryBuilder queryBuilder;
+
     private final EPostRowMapper rowMapper;
 
+    @Autowired
     public EPostRepository(JdbcTemplate jdbcTemplate, EPostQueryBuilder queryBuilder, EPostRowMapper rowMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.queryBuilder = queryBuilder;
@@ -36,7 +40,7 @@ public class EPostRepository {
     public List<EPostTracker> getEPostTrackerList(EPostTrackerSearchCriteria searchCriteria){
         List<Object> preparedStmtList = new ArrayList<>();
         String query = queryBuilder.getEPostTrackerSearchQuery(searchCriteria, preparedStmtList);
-        queryBuilder.addPaginationQuery(query, preparedStmtList, searchCriteria.getPagination());
+        query = queryBuilder.addPaginationQuery(query, preparedStmtList, searchCriteria.getPagination());
         log.debug("Final query: " + query);
         return jdbcTemplate.query(query, preparedStmtList.toArray(), rowMapper);
     }

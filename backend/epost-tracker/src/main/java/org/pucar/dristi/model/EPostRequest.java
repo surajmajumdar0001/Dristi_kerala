@@ -14,11 +14,11 @@ import org.egov.common.contract.request.RequestInfo;
 @Builder
 public class EPostRequest {
 
-    @JsonProperty("requestInfo")
+    @JsonProperty("RequestInfo")
     @Valid
     private RequestInfo requestInfo;
 
-    @JsonProperty("ePostTracker")
+    @JsonProperty("EPostTracker")
     @Valid
     private EPostTracker ePostTracker;
 }
