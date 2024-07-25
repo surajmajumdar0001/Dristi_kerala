@@ -202,4 +202,12 @@ export const DRISTIService = {
       data,
       params,
     }),
+  fetchBillFileStoreId: (data, params) =>
+    Request({
+      url: Urls.dristi.billFileStoreId,
+      useCache: false,
+      userService: false,
+      data,
+      params,
+    }),
 };
