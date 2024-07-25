@@ -44,10 +44,10 @@ public class EPostController {
         return new ResponseEntity<>(channelResponse, HttpStatus.OK);
     }
     @RequestMapping(value = "epost/v1/_getEPost", method = RequestMethod.POST)
-    public ResponseEntity<EPostResponse> getEPost(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody EPostTrackerSearchRequest request, @NotNull @Min(0) @Max(1000) @ApiParam(value = "Pagination - limit records in response", required = true) @Valid @RequestParam(value = "limit", required = true) Integer limit, @NotNull @Min(1) @ApiParam(value = "Pagination - pageNo for which response is returned", required = true) @Valid @RequestParam(value = "offset", required = true) Integer offset) {
-        List<EPostTracker> ePostTrackers = ePostService.getEPost(request, limit, offset);
+    public ResponseEntity<EPostResponse> getEPost(@Parameter(in = ParameterIn.DEFAULT, description = "Hearing Details and Request Info", required = true, schema = @Schema()) @Valid @RequestBody EPostTrackerSearchRequest request) {
+        EPostResponse ePostResponse = ePostService.getEPost(request);
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(request.getRequestInfo(), true);
-        EPostResponse ePostResponse = EPostResponse.builder().responseInfo(responseInfo).ePostTrackers(ePostTrackers).build();
+        ePostResponse.setResponseInfo(responseInfo);
         return new ResponseEntity<>(ePostResponse, HttpStatus.OK);
     }
 

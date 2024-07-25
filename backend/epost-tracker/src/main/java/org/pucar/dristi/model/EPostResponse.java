@@ -23,4 +23,8 @@ public class EPostResponse {
     @JsonProperty("EPostTracker")
     @Valid
     private List<EPostTracker> ePostTrackers = null;
+
+    @JsonProperty("pagination")
+    @Valid
+    private Pagination pagination = null;
 }

@@ -2,7 +2,9 @@ package org.pucar.dristi.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pucar.dristi.model.EPostTrackerSearchCriteria;
+import org.pucar.dristi.model.Pagination;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
@@ -15,17 +17,22 @@ public class EPostQueryBuilder {
 
     private static final String FROM_TABLES = " FROM dristi_epost_tracker ";
 
-//    private final String ORDER_BY = " ORDER BY cl.case_date, cl.judge_id, cl.hearing_type";
-
     private final String LIMIT_OFFSET = " LIMIT ? OFFSET ?";
 
-    public String getEPostTracker(EPostTrackerSearchCriteria searchCriteria, List<Object> preparedStmtList, Integer limit, Integer offset){
+    private  static  final String TOTAL_COUNT_QUERY = "SELECT COUNT(*) FROM ({baseQuery}) total_result";
+
+    public String getEPostTrackerSearchQuery(EPostTrackerSearchCriteria searchCriteria, List<Object> preparedStmtList) {
         StringBuilder query = new StringBuilder(BASE_APPLICATION_QUERY);
         query.append(FROM_TABLES);
         if(!ObjectUtils.isEmpty(searchCriteria.getDeliveryStatus())){
             addClauseIfRequired(query,preparedStmtList);
             query.append(" delivery_status = ? ");
             preparedStmtList.add(searchCriteria.getDeliveryStatus());
+        }
+        if(!CollectionUtils.isEmpty(searchCriteria.getDeliveryStatusList())){
+            addClauseIfRequired(query,preparedStmtList);
+            query.append(" delivery_status in ( ").append(createQuery(searchCriteria.getDeliveryStatusList())).append(" ) ");
+            addToPreparedStatement(preparedStmtList, searchCriteria.getDeliveryStatusList());
         }
         if(!ObjectUtils.isEmpty(searchCriteria.getProcessNumber())){
             addClauseIfRequired(query,preparedStmtList);
@@ -47,12 +54,17 @@ public class EPostQueryBuilder {
             query.append(" received_date = ? ");
             preparedStmtList.add(searchCriteria.getTrackingNumber());
         }
-        if (!ObjectUtils.isEmpty(limit) && ObjectUtils.isEmpty(offset)) {
-            query.append(LIMIT_OFFSET);
-            preparedStmtList.add(limit);
-            preparedStmtList.add(offset);
-        }
         return query.toString();
+    }
+
+    public String getTotalCountQuery(String baseQuery) {
+        return TOTAL_COUNT_QUERY.replace("{baseQuery}", baseQuery);
+    }
+
+    public String addPaginationQuery(String query, List<Object> preparedStmtList, Pagination pagination) {
+        preparedStmtList.add(pagination.getLimit());
+        preparedStmtList.add(pagination.getOffSet());
+        return query + LIMIT_OFFSET;
     }
 
     private void addClauseIfRequired(StringBuilder query, List<Object> preparedStmtList) {
@@ -61,5 +73,22 @@ public class EPostQueryBuilder {
         } else {
             query.append(" AND ");
         }
+    }
+
+    private String createQuery(List<String> statusList) {
+        StringBuilder builder = new StringBuilder();
+        int length = statusList.size();
+        for (int i = 0; i < length; i++) {
+            builder.append(" ?");
+            if (i != length - 1)
+                builder.append(",");
+        }
+        return builder.toString();
+    }
+
+    private void addToPreparedStatement(List<Object> preparedStmtList, List<String> ids) {
+        ids.forEach(id -> {
+            preparedStmtList.add(id);
+        });
     }
 }
