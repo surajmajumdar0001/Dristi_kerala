@@ -43,6 +43,7 @@ export const Urls = {
     searchBill: "/billing-service/bill/v2/_search",
 
     eTreasury: "/etreasury/payment/v1/_processChallan",
+    billFileStoreId: "/etreasury/payment/v1/_getPaymentReceipt",
   },
   FileFetchById: "/filestore/v1/files/id",
 };

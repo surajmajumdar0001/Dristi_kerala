@@ -173,35 +173,37 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
         setPaymentLoader(false);
         const billAfterPayment = await DRISTIService.callSearchBill({}, { tenantId, consumerCode: caseDetails?.filingNumber, service: "case" });
         if (billAfterPayment?.Bill?.[0]?.status === "PAID") {
-          history.push(`${path}/e-filing-payment-response`, {
-            state: {
-              success: true,
-              receiptData: {
-                ...mockSubmitModalInfo,
-                caseInfo: [
-                  {
-                    key: "Mode of Payment",
-                    value: "Online",
-                    copyData: false,
-                  },
-                  {
-                    key: "Amount",
-                    value: totalAmount,
-                    copyData: false,
-                  },
-                  {
-                    key: "Transaction ID",
-                    value: caseDetails?.filingNumber,
-                    copyData: true,
-                  },
-                ],
-                isArrow: false,
-                showTable: true,
-                showCopytext: true,
+          const fileStoreId = await DRISTIService.fetchBillFileStoreId({}, { billId: billAfterPayment?.Bill?.[0]?.id });
+          fileStoreId &&
+            history.push(`${path}/e-filing-payment-response`, {
+              state: {
+                success: true,
+                receiptData: {
+                  ...mockSubmitModalInfo,
+                  caseInfo: [
+                    {
+                      key: "Mode of Payment",
+                      value: "Online",
+                      copyData: false,
+                    },
+                    {
+                      key: "Amount",
+                      value: totalAmount,
+                      copyData: false,
+                    },
+                    {
+                      key: "Transaction ID",
+                      value: caseDetails?.filingNumber,
+                      copyData: true,
+                    },
+                  ],
+                  isArrow: false,
+                  showTable: true,
+                  showCopytext: true,
+                },
+                fileStoreId: fileStoreId?.Document?.fileStore,
               },
-              fileStoreId: "c162c182-103f-463e-99b6-18654ed7a5b1",
-            },
-          });
+            });
         } else {
           history.push(`${path}/e-filing-payment-response`, {
             state: {
