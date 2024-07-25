@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -50,10 +52,10 @@ public class EPostController {
     }
 
     @RequestMapping(value = "epost/v1/_updateEPost", method = RequestMethod.POST)
-    public ResponseEntity<ChannelResponse> updateEPost(@RequestBody TaskRequest body){
-        ChannelMessage channelMessage = ePostService.sendEPost(body);
+    public ResponseEntity<EPostResponse> updateEPost(@RequestBody EPostRequest body){
+        EPostTracker ePostTracker = ePostService.updateEPost(body);
         ResponseInfo responseInfo = responseInfoFactory.createResponseInfoFromRequestInfo(body.getRequestInfo(), true);
-        ChannelResponse channelResponse = ChannelResponse.builder().channelMessage(channelMessage).responseInfo(responseInfo).build();
-        return new ResponseEntity<>(channelResponse, HttpStatus.OK);
+        EPostResponse ePostResponse = EPostResponse.builder().ePostTrackers(Collections.singletonList(ePostTracker)).responseInfo(responseInfo).build();
+        return new ResponseEntity<>(ePostResponse, HttpStatus.OK);
     }
 }

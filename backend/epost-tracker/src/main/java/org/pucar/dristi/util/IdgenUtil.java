@@ -7,7 +7,7 @@ import org.egov.common.contract.idgen.IdRequest;
 import org.egov.common.contract.idgen.IdResponse;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
-import org.pucar.dristi.config.PaymentConfiguration;
+import org.pucar.dristi.config.EPostConfiguration;
 import org.pucar.dristi.repository.ServiceRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ public class IdgenUtil {
     @Autowired
     private ServiceRequestRepository restRepo;
     @Autowired
-    private PaymentConfiguration configs;
+    private EPostConfiguration configs;
     public List<String> getIdList(RequestInfo requestInfo, String tenantId, String idName, String idformat,
                                   Integer count) {
         List<IdRequest> reqList = new ArrayList<>();

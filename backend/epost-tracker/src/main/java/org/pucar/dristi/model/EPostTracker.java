@@ -1,8 +1,7 @@
 package org.pucar.dristi.model;
 
 import lombok.*;
-import org.egov.tracer.model.AuditDetails;
-import org.springframework.validation.annotation.Validated;
+import org.egov.common.contract.models.AuditDetails;
 
 @Getter
 @Setter
@@ -17,7 +16,7 @@ public class EPostTracker {
     private String trackingNumber;
     private String address;
     private String pinCode;
-    private String deliveryStatus;
+    private DeliveryStatus deliveryStatus;
     private String remarks;
     private Object additionalDetails;
     private Integer rowVersion;

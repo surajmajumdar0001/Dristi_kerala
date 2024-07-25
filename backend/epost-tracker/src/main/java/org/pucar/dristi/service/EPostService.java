@@ -2,13 +2,9 @@ package org.pucar.dristi.service;
 
 import org.pucar.dristi.config.EPostConfiguration;
 import org.pucar.dristi.kafka.Producer;
-import org.pucar.dristi.model.ChannelMessage;
-import org.pucar.dristi.model.EPostTracker;
-import org.pucar.dristi.model.EPostTrackerSearchRequest;
-import org.pucar.dristi.model.TaskRequest;
+import org.pucar.dristi.model.*;
 import org.pucar.dristi.repository.EPostRepository;
 import org.pucar.dristi.util.EpostUtil;
-import org.pucar.dristi.util.IdgenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,18 +34,23 @@ public class EPostService {
 
         EPostTracker ePostTracker = epostUtil.createPostTrackerBody(request);
 
-        //TODO - should send E Post Tracker + Request Info
-        producer.push("save-epost-tracker", ePostTracker);
+        EPostRequest ePostRequest = EPostRequest.builder().requestInfo(request.getRequestInfo()).ePostTracker(ePostTracker).build();
+        producer.push("save-epost-tracker", ePostRequest);
 
-        // TODO - generate channel message from processNo and return it
-        return null;
+        return ChannelMessage.builder().processNumber(ePostTracker.getProcessNumber()).build();
     }
 
     public List<EPostTracker> getEPost(EPostTrackerSearchRequest searchRequest, Integer limit, Integer offset) {
         return ePostRepository.getEPost(searchRequest.getEPostTrackerSearchCriteria(), limit, offset);
     }
 
-    public EPostTracker updateEPost(EPostTracker ePostTracker) {
-        return null;
+    public EPostTracker updateEPost(EPostRequest ePostRequest) {
+
+        EPostTracker ePostTracker = epostUtil.updateEPostTracker(ePostRequest);
+
+        EPostRequest postRequest = EPostRequest.builder().requestInfo(ePostRequest.getRequestInfo()).ePostTracker(ePostTracker).build();
+        producer.push("update-epost-tracker",postRequest);
+
+        return ePostTracker;
     }
 }
