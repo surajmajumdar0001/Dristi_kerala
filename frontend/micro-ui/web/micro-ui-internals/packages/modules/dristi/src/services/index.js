@@ -109,6 +109,15 @@ export const DRISTIService = {
       params,
     });
   },
+  startHearing: ({ hearing }, params) => {
+    return Request({
+      url: Urls.dristi.updateHearings,
+      useCache: false,
+      userService: false,
+      data: { hearing: { ...hearing, workflow: { action: "START" } } },
+      params,
+    });
+  },
   createHearings: (data, params) => {
     return Request({
       url: Urls.dristi.createHearings,
@@ -153,60 +162,11 @@ export const DRISTIService = {
       data,
       params,
     }),
-  eSignService: (data, params) => {
-    return Request({
-      url: Urls.dristi.eSign,
-      useCache: false,
-      userService: false,
-      data,
-      params,
-    });
-  },
-  createDemand: (data, params) =>
+  customApiService: (url, data, params, useCache = false, userService = true) =>
     Request({
-      url: Urls.dristi.demandCreate,
-      useCache: false,
+      url: url,
+      useCache: useCache,
       userService: true,
-      data,
-      params,
-    }),
-  getPaymentBreakup: (data, params) =>
-    Request({
-      url: Urls.dristi.paymentCalculator,
-      useCache: false,
-      userService: false,
-      data,
-      params,
-    }),
-  callFetchBill: (data, params) =>
-    Request({
-      url: Urls.dristi.fetchBill,
-      useCache: false,
-      userService: true,
-      data,
-      params,
-    }),
-  callETreasury: (data, params) =>
-    Request({
-      url: Urls.dristi.eTreasury,
-      useCache: false,
-      userService: true,
-      data,
-      params,
-    }),
-  callSearchBill: (data, params) =>
-    Request({
-      url: Urls.dristi.searchBill,
-      useCache: false,
-      userService: true,
-      data,
-      params,
-    }),
-  fetchBillFileStoreId: (data, params) =>
-    Request({
-      url: Urls.dristi.billFileStoreId,
-      useCache: false,
-      userService: false,
       data,
       params,
     }),

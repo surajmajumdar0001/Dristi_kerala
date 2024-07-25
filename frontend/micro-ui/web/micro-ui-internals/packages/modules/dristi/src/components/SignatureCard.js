@@ -1,12 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { AdvocateIcon, FileUploadIcon, LitigentIcon } from "../icons/svgIndex";
 import EsignAdharModal from "./EsignAdharModal";
 import UploadSignatureModal from "./UploadSignatureModal";
 import Button from "./Button";
-import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
-import { isEqual } from "lodash";
 
-function SignatureCard({ input, data, t, index, onSelect, formData, configKey, handleAadharClick }) {
+function SignatureCard({ input, data, t, index, onSelect, formData, configKey }) {
   const [openUploadSignatureModal, setOpenUploadSignatureModal] = useState(false);
   const [openAadharModal, setOpenAadharModal] = useState(false);
   const name = `${data?.[input?.config?.title]} ${index}`;
@@ -30,17 +28,6 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey, h
       },
     };
   }, [configKey, name]);
-  function setValue(value, input) {
-    if (Array.isArray(input)) {
-      onSelect(uploadModalConfig.key, {
-        ...formData[uploadModalConfig.key],
-        ...input.reduce((res, curr) => {
-          res[curr] = value[curr];
-          return res;
-        }, {}),
-      });
-    } else onSelect(uploadModalConfig.key, { ...formData[uploadModalConfig.key], [input]: value });
-  }
 
   const Icon = ({ icon }) => {
     switch (icon) {
@@ -52,7 +39,6 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey, h
         return <LitigentIcon />;
     }
   };
-
   const currentValue = (formData && formData[configKey] && formData[configKey][name]) || [];
   const isSigned = currentValue.length > 0;
   return (
@@ -76,7 +62,7 @@ function SignatureCard({ input, data, t, index, onSelect, formData, configKey, h
           <Button
             label={t("CS_ESIGN_AADHAR")}
             onButtonClick={() => {
-              handleAadharClick(data, name);
+              setOpenAadharModal(true);
             }}
             className={"aadhar-sign-in"}
             labelClassName={"aadhar-sign-in"}
