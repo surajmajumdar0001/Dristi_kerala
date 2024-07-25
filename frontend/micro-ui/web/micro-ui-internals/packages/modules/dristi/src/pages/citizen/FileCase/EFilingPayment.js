@@ -173,8 +173,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
         setPaymentLoader(false);
         const billAfterPayment = await DRISTIService.callSearchBill({}, { tenantId, consumerCode: caseDetails?.filingNumber, service: "case" });
         if (billAfterPayment?.Bill?.[0]?.status === "PAID") {
-          const fileStoreId = await DRISTIService.fetchBillFileStoreId({}, { billId: billAfterPayment?.Bill?.[0]?.billDetails?.[0]?.id });
-          console.log(fileStoreId, "filestore");
+          const fileStoreId = await DRISTIService.fetchBillFileStoreId({}, { billId: billAfterPayment?.Bill?.[0]?.id });
           fileStoreId &&
             history.push(`${path}/e-filing-payment-response`, {
               state: {
@@ -202,7 +201,7 @@ function EFilingPayment({ t, setShowModal, header, subHeader, submitModalInfo = 
                   showTable: true,
                   showCopytext: true,
                 },
-                fileStoreId: "c162c182-103f-463e-99b6-18654ed7a5b1",
+                fileStoreId: fileStoreId?.Document?.fileStore,
               },
             });
         } else {
