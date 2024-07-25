@@ -38,4 +38,22 @@ public class Configuration {
 
     @Value("${drishti.oath.endpoint}")
     private String oathEndPoint;
+
+    @Value("${dristhi.oath.username}")
+    private String userName;
+
+    @Value("${dristhi.oath.password}")
+    private String password;
+
+    @Value("${dristhi.oath.tenantId}")
+    private String tenantId;
+
+    @Value("${dristhi.oath.usertype}")
+    private String userType;
+
+    @Value("${dristhi.oath.scope}")
+    private String scope;
+
+    @Value("${dristhi.oath.grantType}")
+    private String grantType;
 }

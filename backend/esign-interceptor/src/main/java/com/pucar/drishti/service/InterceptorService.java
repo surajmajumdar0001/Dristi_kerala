@@ -74,12 +74,12 @@ public class InterceptorService {
         StringBuilder uri = new StringBuilder();
         uri.append(configs.getOathHost()).append(configs.getOathEndPoint());
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("username", USERNAME);
-        map.add("password", PASSWORD);
-        map.add("tenantId", TENANTID);
-        map.add("userType", USERTYPE);
-        map.add("scope", SCOPE);
-        map.add("grant_type", GRANTTYPE);
+        map.add("username", configs.getUserName());
+        map.add("password", configs.getPassword());
+        map.add("tenantId", configs.getTenantId());
+        map.add("userType", configs.getUserType());
+        map.add("scope", configs.getScope());
+        map.add("grant_type", configs.getGrantType());
 
 
         HttpHeaders headers = new HttpHeaders();
