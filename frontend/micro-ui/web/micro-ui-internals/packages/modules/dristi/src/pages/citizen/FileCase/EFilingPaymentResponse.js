@@ -52,24 +52,14 @@ function EFilingPaymentResponse({ t, setShowModal, header, subHeader, submitModa
   return (
     <div className=" user-registration">
       <div className="e-filing-payment" style={{ minHeight: "100%", height: "100%" }}>
-        {isSuccess ? (
-          <Banner
-            whichSvg={"tick"}
-            successful={true}
-            message={t(submitModalInfo?.header)}
-            headerStyles={{ fontSize: "32px" }}
-            style={{ minWidth: "100%", marginTop: "10px" }}
-          ></Banner>
-        ) : (
-          <Banner
-            whichSvg={"tick"}
-            successful={false}
-            message={t("CS_PAYMENT_FAILED")}
-            headerStyles={{ fontSize: "32px" }}
-            style={{ minWidth: "100%", marginTop: "10px" }}
-          ></Banner>
-        )}
-        {submitModalInfo?.subHeader && isSuccess && <CardLabel className={"e-filing-card-label"}>{t(submitModalInfo?.subHeader)}</CardLabel>}
+        <Banner
+          whichSvg={"tick"}
+          successful={true}
+          message={t(submitModalInfo?.header)}
+          headerStyles={{ fontSize: "32px" }}
+          style={{ minWidth: "100%", marginTop: "10px" }}
+        ></Banner>
+        {submitModalInfo?.subHeader && <CardLabel className={"e-filing-card-label"}>{t(submitModalInfo?.subHeader)}</CardLabel>}
         {receiptData ? (
           <CustomCopyTextDiv
             t={t}

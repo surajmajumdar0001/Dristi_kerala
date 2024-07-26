@@ -52,7 +52,7 @@ import CustomCopyTextDiv from "./components/CustomCopyTextDiv";
 export const DRISTIModule = ({ stateCode, userType, tenants }) => {
   const { path } = useRouteMatch();
   const history = useHistory();
-  const moduleCode = ["DRISTI", "CASE"];
+  const moduleCode = ["DRISTI", "CASE", "ORDERS"];
   const tenantID = tenants?.[0]?.code?.split(".")?.[0];
   const language = Digit.StoreData.getCurrentLanguage();
   const { isLoading } = Digit.Services.useStore({ stateCode, moduleCode, language });
@@ -61,13 +61,11 @@ export const DRISTIModule = ({ stateCode, userType, tenants }) => {
     return <Loader />;
   }
   Digit.SessionStorage.set("DRISTI_TENANTS", tenants);
-  const urlParams = new URLSearchParams(window.location.search);
-  const result = urlParams.get("result");
-  console.log(result, "result");
+
   if (userType === "citizen" && userInfo?.type !== "EMPLOYEE") {
     return (
       <ToastProvider>
-        <CitizenApp path={path} stateCode={stateCode} userType={userType} tenants={tenants} tenantId={tenantID} result={result} />
+        <CitizenApp path={path} stateCode={stateCode} userType={userType} tenants={tenants} tenantId={tenantID} />
       </ToastProvider>
     );
   }
