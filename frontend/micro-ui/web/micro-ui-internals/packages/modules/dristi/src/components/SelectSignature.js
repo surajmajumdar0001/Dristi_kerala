@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import SignatureCard from "./SignatureCard";
 import { DRISTIService } from "../services";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
@@ -120,7 +120,6 @@ function SelectSignature({ t, config, onSelect, formData = {}, errors }) {
                 formData={formData}
                 onSelect={onSelect}
                 configKey={config.key}
-                handleAadharClick={handleAadharClick}
               />
             ))}
           </div>
