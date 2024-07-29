@@ -41,19 +41,19 @@ public class ApplicationService {
     private Application fetchApplication(String fieldValue) throws IOException {
         LinkedHashMap<String, Object> sourceMap = elasticSearchService.getDocumentByField(ServiceConstants.APPLICATION_INDEX,ServiceConstants.APPLICATION_NUMBER,fieldValue);
         if(null == sourceMap || null == sourceMap.get("Data")){
-            log.error("No case data found for {}",fieldValue);
-            throw new CustomException("CASE_SEARCH_EMPTY", ServiceConstants.CASE_SEARCH_EMPTY);
+            log.error("No application data found for {}",fieldValue);
+            throw new CustomException("APPLICATION_SEARCH_EMPTY", ServiceConstants.APPLICATION_SEARCH_EMPTY);
         }
 
         ApplicationData data = objectMapper.convertValue(sourceMap.get("Data"), ApplicationData.class);
         return data.getApplicationDetails();
     }
 
-    public void updateApplication(Order order){
+    public void updateApplication(Order order,int index){
 
         try{
 
-           Application application = fetchApplication(order.getApplicationNumber().get(0));
+           Application application = fetchApplication(order.getApplicationNumber().get(index));
 
           application.setOrder(order);
           ApplicationRequest applicationRequest = new ApplicationRequest();

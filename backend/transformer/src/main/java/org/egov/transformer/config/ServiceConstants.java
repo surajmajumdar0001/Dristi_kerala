@@ -13,6 +13,7 @@ public class ServiceConstants {
    public static final String APPLICATION_INDEX = "application-index";
    public static final String APPLICATION_NUMBER = "Data.applicationDetails.applicationNumber";
    public static final String ERROR_APPLICATION_SEARCH = "error executing application search query";
+   public static final String APPLICATION_SEARCH_EMPTY = "No application data found for given filingNumber";
 
 
 }

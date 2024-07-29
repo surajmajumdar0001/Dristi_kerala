@@ -18,5 +18,5 @@ public class ApplicationData {
     private Application applicationDetails = null;
 
     @JsonProperty("history")
-    private Object history =null;
+    private Object history = null;
 }

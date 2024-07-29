@@ -21,6 +21,8 @@ public class OrderService {
     private  final OrderProducer producer;
     private final ApplicationService applicationService;
 
+
+
     @Autowired
     public OrderService(CaseService caseService, TransformerProperties properties, OrderProducer producer, ApplicationService applicationService) {
         this.caseService = caseService;
@@ -28,13 +30,19 @@ public class OrderService {
         this.producer = producer;
         this.applicationService = applicationService;
     }
+   public void addOrderDetailsToApplication(Order order)
+   {int index;
+       for(index=0;index<order.getApplicationNumber().size();index++)
+        {
 
+           applicationService.updateApplication(order,index);
+
+        }
+
+   }
     public void addOrderDetails(Order order){
 
-        if(order.getApplicationNumber().get(0)!=null)
-        {
-            applicationService.updateApplication(order);
-        }
+
         if (order.getFilingNumber() != null
                 && (order.getOrderType().equalsIgnoreCase(ServiceConstants.BAIL_ORDER_TYPE)
                     || order.getOrderType().equalsIgnoreCase(ServiceConstants.JUDGEMENT_ORDER_TYPE))) {

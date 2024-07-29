@@ -37,6 +37,20 @@ public class OrderConsumer {
         Order order = (objectMapper.readValue((String) payload.value(), new TypeReference<OrderRequest>() {})).getOrder();
         logger.info(objectMapper.writeValueAsString(order));
         orderService.addOrderDetails (order);
+        orderService.addOrderDetailsToApplication(order);
+        } catch (Exception exception) {
+            log.error("error in saving order", exception);
+        }
+    }
+
+    @KafkaListener(topics = { "${task.kafka.create.topic}","${task.kafka.update.topic}"})
+    public void TaskConsumerCreate(ConsumerRecord<String, Object> payload,
+                                    @Header(KafkaHeaders.RECEIVED_TOPIC) String topic){
+        try {
+            Order order = (objectMapper.readValue((String) payload.value(), new TypeReference<OrderRequest>() {})).getOrder();
+            logger.info(objectMapper.writeValueAsString(order));
+            orderService.addOrderDetails (order);
+            orderService.addOrderDetailsToApplication(order);
         } catch (Exception exception) {
             log.error("error in saving order", exception);
         }
