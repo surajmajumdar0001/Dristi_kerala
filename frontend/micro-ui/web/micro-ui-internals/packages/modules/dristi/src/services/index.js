@@ -118,6 +118,15 @@ export const DRISTIService = {
       params,
     });
   },
+  startHearing: ({ hearing }, params) => {
+    return Request({
+      url: Urls.dristi.updateHearings,
+      useCache: false,
+      userService: false,
+      data: { hearing: { ...hearing, workflow: { action: "START" } } },
+      params,
+    });
+  },
   createHearings: (data, params) => {
     return Request({
       url: Urls.dristi.createHearings,
@@ -154,14 +163,7 @@ export const DRISTIService = {
       params,
     });
   },
-  createDemand: (data, params) =>
-    Request({
-      url: Urls.dristi.demandCreate,
-      useCache: false,
-      userService: false,
-      data,
-      params,
-    }),
+
   customApiService: (url, data, params, useCache = false, userService = true) =>
     Request({
       url: url,
@@ -170,6 +172,7 @@ export const DRISTIService = {
       data,
       params,
     }),
+  //Solutions
   eSignService: (data, params) => {
     return Request({
       url: Urls.dristi.eSign,
@@ -179,6 +182,14 @@ export const DRISTIService = {
       params,
     });
   },
+  createDemand: (data, params) =>
+    Request({
+      url: Urls.dristi.demandCreate,
+      useCache: false,
+      userService: false,
+      data,
+      params,
+    }),
   getPaymentBreakup: (data, params) =>
     Request({
       url: Urls.dristi.paymentCalculator,
