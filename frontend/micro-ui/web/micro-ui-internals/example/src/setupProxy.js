@@ -103,6 +103,10 @@ module.exports = function (app) {
     "/application",
     "/task/v1/search",
     "/analytics",
+    "/e-sign-svc",
+    "/payment",
+    "/etreasury",
+    "/payment-calculator",
   ].forEach((location) => app.use(location, createProxy));
   ["/pb-egov-assets"].forEach((location) => app.use(location, assetsProxy));
   ["/mdms-v2/v2/_create"].forEach((location) => app.use(location, mdmsProxy));

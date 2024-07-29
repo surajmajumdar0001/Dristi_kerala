@@ -10,8 +10,11 @@ import useGetOrders from "./dristi/useGetOrders";
 import useGetSubmissions from "./dristi/useGetSubmissions";
 import useInboxCustomHook from "./dristi/useInboxCustomHook";
 import useSearchCaseService from "./dristi/useSearchCaseService";
+import usePaymentCalculator from "./dristi/usePaymentCalculator";
 import { useToast } from "../components/Toast/useToast.js";
 import useCreateHearings from "./dristi/useCreateHearings.js";
+import useBillSearch from "./dristi/useBillSearch";
+import useCreateDemand from "./dristi/useCreateDemand";
 import useApplicationDetails from "./dristi/useApplicationDetails.js";
 import useEvidenceDetails from "./dristi/useEvidenceDetails.js";
 
@@ -38,6 +41,13 @@ export const Urls = {
     submissionsSearch: "/application/v1/search",
     submissionsUpdate: "/application/v1/update",
     pendingTask: "/analytics/pending_task/v1/create",
+    billFileStoreId: "/etreasury/payment/v1/_getPaymentReceipt",
+    eSign: "/e-sign-svc/v1/_esign",
+    paymentCalculator: "/payment-calculator/v1/case/fees/_calculate",
+    fetchBill: "/billing-service/bill/v2/_fetchbill",
+    searchBill: "/billing-service/bill/v2/_search",
+
+    eTreasury: "/etreasury/payment/v1/_processChallan",
   },
   FileFetchById: "/filestore/v1/files/id",
 };
@@ -50,6 +60,7 @@ const dristi = {
   useGetIndividualUser,
   useInboxCustomHook,
   useSearchCaseService,
+  usePaymentCalculator,
   useCreateHearings,
   useGetEvidence,
   useGetOrders,
@@ -57,6 +68,8 @@ const dristi = {
   useApplicationDetails,
   useEvidenceDetails,
   useToast,
+  useBillSearch,
+  useCreateDemand,
 };
 
 const Hooks = {

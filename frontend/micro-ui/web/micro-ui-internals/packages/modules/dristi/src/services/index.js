@@ -170,4 +170,53 @@ export const DRISTIService = {
       data,
       params,
     }),
+  eSignService: (data, params) => {
+    return Request({
+      url: Urls.dristi.eSign,
+      useCache: false,
+      userService: false,
+      data,
+      params,
+    });
+  },
+  getPaymentBreakup: (data, params) =>
+    Request({
+      url: Urls.dristi.paymentCalculator,
+      useCache: false,
+      userService: false,
+      data,
+      params,
+    }),
+  callFetchBill: (data, params) =>
+    Request({
+      url: Urls.dristi.fetchBill,
+      useCache: false,
+      userService: true,
+      data,
+      params,
+    }),
+  callETreasury: (data, params) =>
+    Request({
+      url: Urls.dristi.eTreasury,
+      useCache: false,
+      userService: true,
+      data,
+      params,
+    }),
+  callSearchBill: (data, params) =>
+    Request({
+      url: Urls.dristi.searchBill,
+      useCache: false,
+      userService: true,
+      data,
+      params,
+    }),
+  fetchBillFileStoreId: (data, params) =>
+    Request({
+      url: Urls.dristi.billFileStoreId,
+      useCache: false,
+      userService: false,
+      data,
+      params,
+    }),
 };

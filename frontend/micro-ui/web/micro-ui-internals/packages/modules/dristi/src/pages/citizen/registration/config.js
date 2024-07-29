@@ -127,7 +127,7 @@ export const newConfig = [
             },
             title: "",
             patternType: "Name",
-            minLength: 2,
+            minLength: 1,
           },
         },
       },
@@ -277,13 +277,13 @@ export const newConfig = [
         isMandatory: true,
         populators: {
           name: "firstName",
-          error: "FIRST_LAST_NAME_MANDATORY_MESSAGE",
+          error: "FIRST_LAST_NAME_MANDATORY_MESSAGE_ONE_CHAR",
           validation: {
             pattern: {
               message: "CORE_COMMON_APPLICANT_NAME_INVALID",
               value: /^[^{0-9}^\$\"<>?\\\\~!@#$%^()+={}\[\]*,/_:;“”‘’]{1,50}$/i,
             },
-            minLength: 2,
+            minLength: 1,
             title: "",
             patternType: "Name",
           },
@@ -310,13 +310,13 @@ export const newConfig = [
         isMandatory: true,
         populators: {
           name: "lastName",
-          error: "FIRST_LAST_NAME_MANDATORY_MESSAGE",
+          error: "FIRST_LAST_NAME_MANDATORY_MESSAGE_ONE_CHAR",
           validation: {
             pattern: {
               message: "CORE_COMMON_APPLICANT_NAME_INVALID",
               value: /^[^{0-9}^\$\"<>?\\\\~!@#$%^()+={}\[\]*,/_:;“”‘’]{1,50}$/i,
             },
-            minLength: 2,
+            minLength: 1,
             title: "",
             patternType: "Name",
           },
@@ -533,9 +533,10 @@ export const advocateClerkConfig = [
               name: "barRegistrationNumber",
               validation: {
                 isRequired: true,
-                pattern: /^[0-9A-Z/]{0,20}$/,
+                pattern: /^[0-9A-Z/]{0,8}$/,
                 errMsg: "BAR_REGISTRATION_NUMBER_INVALID",
-                maxlength: 20,
+                maxlength: 8,
+                minlength: 8,
               },
               isMandatory: true,
               isDependentOn: "selectUserType",

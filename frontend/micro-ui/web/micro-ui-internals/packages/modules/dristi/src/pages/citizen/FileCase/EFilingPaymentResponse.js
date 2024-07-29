@@ -4,6 +4,7 @@ import Button from "../../../components/Button";
 import { useHistory, useLocation } from "react-router-dom/cjs/react-router-dom.min";
 import CustomCopyTextDiv from "../../../components/CustomCopyTextDiv";
 import SelectCustomNote from "../../../components/SelectCustomNote";
+import { Urls } from "../../../hooks";
 
 const customNoteConfig = {
   populators: {
@@ -38,10 +39,16 @@ const Heading = (props) => {
   return <h1 className="heading-m">{props.label}</h1>;
 };
 
-function EFilingPaymentResponse({ t, setShowModal, header, subHeader, submitModalInfo = mockSubmitModalInfo, amount = 2000 }) {
+function EFilingPaymentResponse({ t, setShowModal, header, subHeader, submitModalInfo = mockSubmitModalInfo, amount = 2000, path }) {
   const history = useHistory();
   const location = useLocation();
   const receiptData = location.state.state.receiptData;
+  const isSuccess = location.state.state.success;
+  const fileStoreId = location.state.state.fileStoreId;
+  const tenantId = Digit.ULBService.getCurrentTenantId();
+  const caseId = location.state.state.caseId;
+
+  const uri = `${window.location.origin}${Urls.FileFetchById}?tenantId=${tenantId}&fileStoreId=${fileStoreId}`;
   return (
     <div className=" user-registration">
       <div className="e-filing-payment" style={{ minHeight: "100%", height: "100%" }}>
@@ -66,13 +73,41 @@ function EFilingPaymentResponse({ t, setShowModal, header, subHeader, submitModa
           <SelectCustomNote t={t} config={customNoteConfig} />
         )}
         <div className="button-field" style={{ width: "100%", marginTop: 16 }}>
-          <Button
-            variation={"secondary"}
-            className={"secondary-button-selector"}
-            label={t("CS_PRINT_RECEIPT")}
-            labelClassName={"secondary-label-selector"}
-            onButtonClick={() => {}}
-          />
+          {!fileStoreId && caseId ? (
+            <Button
+              variation={"secondary"}
+              className={"secondary-button-selector"}
+              label={t("Retry Payment")}
+              labelClassName={"secondary-label-selector"}
+              onButtonClick={() => {
+                history.push(`${path}/e-filing-payment?caseId=${caseId}`);
+              }}
+            />
+          ) : (
+            <a
+              href={uri}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: "flex",
+                color: "#505A5F",
+                textDecoration: "none",
+                // width: 250,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              <Button
+                variation={"secondary"}
+                className={"secondary-button-selector"}
+                label={t("CS_PRINT_RECEIPT")}
+                labelClassName={"secondary-label-selector"}
+                onButtonClick={() => {}}
+              />
+            </a>
+          )}
+
           <Button
             className={"tertiary-button-selector"}
             label={t("CS_GO_TO_HOME")}
