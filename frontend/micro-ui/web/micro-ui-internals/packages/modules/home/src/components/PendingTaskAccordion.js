@@ -35,6 +35,15 @@ function PendingTaskAccordion({
         style={{ cursor: "default", marginBottom: isOpen && totalCount ? 16 : 0, transition: "margin-bottom 0.25s" }}
         onClick={handleAccordionClick}
       >
+        {isHighlighted && (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22ZM11 7L13 7L13 13L11 13L11 7ZM11 15L13 15L13 17L11 17L11 15Z"
+              fill="#9E400A"
+            />
+          </svg>
+        )}
+
         <span
           style={{
             color: isHighlighted ? "#9E400A" : "black",
