@@ -26,5 +26,7 @@ public class TransformerProperties {
     @Value("${transformer.producer.update.order.case.topic}")
     private String CaseUpdateTopic;
 
+    @Value("${transformer.producer.update.order.application.topic}")
+    private String ApplicationUpdateTopic;
 
 }
