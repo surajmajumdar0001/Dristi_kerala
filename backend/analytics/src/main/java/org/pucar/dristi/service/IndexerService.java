@@ -1,5 +1,6 @@
 package org.pucar.dristi.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
@@ -25,11 +26,14 @@ public class IndexerService {
 
     private final Util util;
 
-    @Autowired
-    public IndexerService(IndexerUtils indexerUtils, Configuration config, Util util) {
+	private final ObjectMapper mapper;
+
+	@Autowired
+    public IndexerService(IndexerUtils indexerUtils, Configuration config, RestTemplate restTemplate, Util util, ObjectMapper mapper) {
         this.indexerUtils = indexerUtils;
         this.config = config;
         this.util = util;
+        this.mapper = mapper;
     }
 
     public void esIndexer(String topic, String kafkaJson) {
@@ -56,14 +60,12 @@ public class IndexerService {
 		}
 	}
 
-	StringBuilder buildBulkRequest(JSONArray kafkaJsonArray, JSONObject requestInfo) {
+	private StringBuilder buildBulkRequest(JSONArray kafkaJsonArray, JSONObject requestInfo) {
 		StringBuilder bulkRequest = new StringBuilder();
-		try {
-			for (int i = 0; i < kafkaJsonArray.length(); i++) {
-				JSONObject jsonObject = kafkaJsonArray.optJSONObject(i);
-				if (jsonObject != null) {
-					processJsonObject(jsonObject, bulkRequest,requestInfo);
-				}
+		for (int i = 0; i < kafkaJsonArray.length(); i++) {
+			JSONObject jsonObject = kafkaJsonArray.optJSONObject(i);
+			if (jsonObject != null) {
+				processJsonObject(jsonObject, bulkRequest,requestInfo);
 			}
 		} catch (JSONException e){
 			log.error("Error processing JSON array", e);
@@ -72,7 +74,7 @@ public class IndexerService {
 		return bulkRequest;
 	}
 
-	void processJsonObject(JSONObject jsonObject, StringBuilder bulkRequest, JSONObject requestInfo) {
+	private void processJsonObject(JSONObject jsonObject, StringBuilder bulkRequest, JSONObject requestInfo) {
 		try {
 			String stringifiedObject = indexerUtils.buildString(jsonObject);
 			String payload = indexerUtils.buildPayload(stringifiedObject,requestInfo);
