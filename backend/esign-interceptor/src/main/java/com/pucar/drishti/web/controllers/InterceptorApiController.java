@@ -35,6 +35,7 @@ public class InterceptorApiController {
 
     @RequestMapping(value = "/v1/redirect", method = RequestMethod.GET)
     public ResponseEntity<?> redirectHandler(@RequestParam("result") String result, @RequestParam("filestoreId") String filestoreId, @RequestParam("userType") String userType) {
+        log.info("api=/v1/redirect, result = IN_PROGRESS result = {}, filestoreId = {}, userType = {}",result,filestoreId,userType);
         log.info("redirecting through get method");
 
         // Construct the final redirect URL
@@ -44,16 +45,14 @@ public class InterceptorApiController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUri));
         log.info("redirectUri {}", redirectUri);
+        log.info("api=/v1/redirect, result = SUCCESS result = {}, filestoreId = {}, userType = {}",result,filestoreId,userType);
         return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);
     }
 
 
     @RequestMapping(value = "/v1/_intercept", method = RequestMethod.POST)
     public ModelAndView eSignV1Interceptor(@RequestParam("eSignResponse") String response, @RequestParam("espTxnID") String espId) {
-
-        log.info(response);
-        log.info(espId);
-
+        log.info("api=/v1/_intercept, result = IN_PROGRESS eSignResponse = {}, espTxnID = {}",response,espId);
 
         String filestoreId = "";
         String result = "error";
@@ -91,7 +90,7 @@ public class InterceptorApiController {
         modelAndView.addObject("result", result);
         modelAndView.addObject("filestoreId", filestoreId);
         modelAndView.addObject("userType", userType);
-
+        log.info("api=/v1/_intercept, result = SUCCESS eSignResponse = {}, espTxnID = {}",response,espId);
         return modelAndView;
 
     }
