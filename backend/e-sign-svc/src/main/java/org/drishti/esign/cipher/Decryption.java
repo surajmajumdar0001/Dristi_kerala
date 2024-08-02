@@ -3,6 +3,10 @@ package org.drishti.esign.cipher;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
 import java.io.*;
@@ -10,10 +14,18 @@ import java.security.*;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 
+@Component
 @Slf4j
 public class Decryption {
+
+    private final ResourceLoader resourceLoader;
+
+    @Autowired
+    public Decryption(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
     /**
      * New function to get public key from .cer file
      *
@@ -39,7 +51,9 @@ public class Decryption {
     private String getKey(String filename) throws IOException {
         // Read key from file
         StringBuilder strKeyPEM = new StringBuilder();
-        BufferedReader br = new BufferedReader(new FileReader(filename));
+        Resource resource = resourceLoader.getResource("classpath:"+filename);
+        File file = resource.getFile();
+        BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
         while ((line = br.readLine()) != null) {
             strKeyPEM.append(line).append("\n");
@@ -105,22 +119,19 @@ public class Decryption {
      * @return RSA Public Key
      * @throws GeneralSecurityException
      */
+
     public PublicKey getPublicKeyFromString(String key) throws GeneralSecurityException {
-        String publicKeyPEM = key;
+        key = key.replace("-----BEGIN CERTIFICATE-----", "")
+                .replace("-----END CERTIFICATE-----", "")
+                .replaceAll("\\s", "");
 
-        publicKeyPEM = publicKeyPEM.substring(28, publicKeyPEM.indexOf("\n-----END CERTIFICATE-----"));
-        log.info(publicKeyPEM);
-        // Base64 decode data
-        publicKeyPEM = publicKeyPEM.trim();
-        java.security.Security.addProvider(
-                new org.bouncycastle.jce.provider.BouncyCastleProvider()
+        byte[] certificateData = Base64.decodeBase64(key);
+
+        CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+        X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(
+                new ByteArrayInputStream(certificateData)
         );
-        byte[] encoded = Base64.decodeBase64(publicKeyPEM);
-
-        X509EncodedKeySpec spec =
-                new X509EncodedKeySpec(encoded);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
+        return certificate.getPublicKey();
     }
     String charSetName = "UTF-8";
     /**
