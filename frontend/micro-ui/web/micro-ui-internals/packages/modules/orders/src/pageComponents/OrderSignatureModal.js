@@ -3,22 +3,85 @@ import React, { useState } from "react";
 import Modal from "../../../dristi/src/components/Modal";
 import { Button } from "@egovernments/digit-ui-react-components";
 import { FileUploadIcon } from "../../../dristi/src/icons/svgIndex";
+import useESign from "../hooks/orders/useESign";
+import { Urls } from "../hooks/services/Urls";
+import useDocumentUpload from "../hooks/orders/useDocumentUpload";
 
-function OrderSignatureModal({ t, order, handleIssueOrder, handleGoBackSignatureModal }) {
-  const [isSigned, setIsSigned] = useState(false);
-  const Heading = (props) => {
-    return <h1 className="heading-m">{props.label}</h1>;
-  };
+const Heading = (props) => {
+  return <h1 className="heading-m">{props.label}</h1>;
+};
 
-  const CloseBtn = (props) => {
-    return (
-      <div onClick={props?.onClick} style={{ height: "100%", display: "flex", alignItems: "center", paddingRight: "20px", cursor: "pointer" }}>
-        <CloseSvg />
-      </div>
-    );
-  };
-
+const CloseBtn = (props) => {
   return (
+    <div onClick={props?.onClick} style={{ height: "100%", display: "flex", alignItems: "center", paddingRight: "20px", cursor: "pointer" }}>
+      <CloseSvg />
+    </div>
+  );
+};
+
+function OrderSignatureModal({ t, order, handleIssueOrder, handleGoBackSignatureModal, saveOnsubmitLabel, setSignedDocumentUploadID }) {
+  const [isSigned, setIsSigned] = useState(false);
+  const { handleEsign, checkSignStatus } = useESign();
+  const [formData, setFormData] = useState({}); // storing the file upload data
+  const [openUploadSignatureModal, setOpenUploadSignatureModal] = useState(false);
+  const UploadSignatureModal = window?.Digit?.ComponentRegistryService?.getComponent("UploadSignatureModal");
+  const [fileStoreId, setFileStoreId] = useState("c162c182-103f-463e-99b6-18654ed7a5b1"); // have to set the uploaded fileStoreID
+  const [eSignFIleId, setESignFileID] = useState("2aefb901-edc6-4a45-95f8-3ea383a513f5");
+  const [pageModule, setPageModule] = useState("en");
+  const tenantId = window?.Digit.ULBService.getCurrentTenantId();
+  const uri = `${window.location.origin}${Urls.FileFetchById}?tenantId=${tenantId}&fileStoreId=${fileStoreId}`;
+  const { uploadDocuments } = useDocumentUpload();
+  const name = "Signature";
+  const uploadModalConfig = useMemo(() => {
+    return {
+      key: "uploadSignature",
+      populators: {
+        inputs: [
+          {
+            name: name,
+            documentHeader: "Signature",
+            type: "DragDropComponent",
+            uploadGuidelines: "Ensure the image is not blurry and under 5MB.",
+            maxFileSize: 5,
+            maxFileErrorMessage: "CS_FILE_LIMIT_5_MB",
+            fileTypes: ["JPG", "PNG", "JPEG"],
+            isMultipleUpload: false,
+          },
+        ],
+        validation: {},
+      },
+    };
+  }, [name]);
+
+  const onSelect = (key, value) => {
+    if (value === null) {
+      setFormData({});
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [key]: value,
+      }));
+    }
+  };
+
+  // check the data from upload
+  useEffect(() => {
+    const upload = async () => {
+      if (formData?.uploadSignature?.Signature?.length > 0) {
+        const uploadedFileId = await uploadDocuments(formData?.uploadSignature?.Signature, tenantId);
+        setSignedDocumentUploadID(uploadedFileId?.[0]?.fileStoreId);
+        setIsSigned(true);
+      }
+    };
+
+    upload();
+  }, [formData]);
+
+  useEffect(() => {
+    checkSignStatus(name, formData, uploadModalConfig, onSelect, setIsSigned);
+  }, [checkSignStatus]);
+
+  return !openUploadSignatureModal ? (
     <Modal
       headerBarMain={<Heading label={t("ADD_SIGNATURE")} />}
       headerBarEnd={<CloseBtn onClick={handleGoBackSignatureModal} />}
@@ -84,6 +147,16 @@ function OrderSignatureModal({ t, order, handleIssueOrder, handleGoBackSignature
         )}
       </div>
     </Modal>
+  ) : (
+    <UploadSignatureModal
+      t={t}
+      key={name}
+      name={name}
+      setOpenUploadSignatureModal={setOpenUploadSignatureModal}
+      onSelect={onSelect}
+      config={uploadModalConfig}
+      formData={formData}
+    />
   );
 }
 

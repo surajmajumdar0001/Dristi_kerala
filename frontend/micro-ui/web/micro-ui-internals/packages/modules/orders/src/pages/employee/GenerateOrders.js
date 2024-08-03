@@ -105,6 +105,8 @@ const GenerateOrders = () => {
   const [prevOrder, setPrevOrder] = useState();
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
   const [showErrorToast, setShowErrorToast] = useState(false);
+  const [signedDoucumentUploadedID, setSignedDocumentUploadID] = useState("");
+  const userInfo = Digit.UserService.getUser()?.info || {};
   const history = useHistory();
   const todayDate = new Date().getTime();
   const roles = Digit.UserService.getUser()?.info?.roles;
@@ -823,7 +825,14 @@ const GenerateOrders = () => {
         />
       )}
       {showsignatureModal && (
-        <OrderSignatureModal t={t} order={currentOrder} handleIssueOrder={handleIssueOrder} handleGoBackSignatureModal={handleGoBackSignatureModal} />
+        <OrderSignatureModal
+          t={t}
+          order={currentOrder}
+          handleIssueOrder={handleIssueOrder}
+          handleGoBackSignatureModal={handleGoBackSignatureModal}
+          setSignedDocumentUploadID={setSignedDocumentUploadID}
+          saveOnsubmitLabel={"ISSUE_ORDER"}
+        />
       )}
       {showSuccessModal && <OrderSucessModal t={t} order={prevOrder} handleDownloadOrders={handleDownloadOrders} handleClose={handleClose} />}
       {showErrorToast && (
