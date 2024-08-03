@@ -64,7 +64,6 @@ const dristi = {
   useGetIndividualUser,
   useInboxCustomHook,
   useSearchCaseService,
-  useGetHearings,
   usePaymentCalculator,
   useCreateHearings,
   useGetEvidence,
