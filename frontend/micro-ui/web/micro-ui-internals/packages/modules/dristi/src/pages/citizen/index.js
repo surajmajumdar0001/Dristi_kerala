@@ -81,7 +81,6 @@ const App = ({ stateCode, tenantId, result }) => {
       searchResult?.[0]?.status === "INACTIVE"
     );
   }, [searchResult, userType]);
-
   const hideHomeCrumb = [`${path}/home`];
 
   const citizenCrumb = [

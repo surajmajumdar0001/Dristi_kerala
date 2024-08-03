@@ -5,6 +5,14 @@ import { useHistory } from "react-router-dom";
 import useSearchCaseService from "../../../hooks/dristi/useSearchCaseService";
 import { useToast } from "../../../components/Toast/useToast";
 import { DRISTIService } from "../../../services";
+import { Urls } from "../../../hooks";
+
+const paymentCalculation = [
+  { key: "Amount Due", value: 600, currency: "Rs" },
+  { key: "Court Fees", value: 400, currency: "Rs" },
+  { key: "Advocate Fees", value: 1000, currency: "Rs" },
+  { key: "Total Fees", value: 2000, currency: "Rs", isTotalFee: true },
+];
 
 const paymentOption = [
   {
@@ -167,9 +175,7 @@ const ViewPaymentDetails = ({ location, match }) => {
 
   const onSubmitCase = async () => {
     setIsDisabled(true);
-    const regenerateBill = await DRISTIService.callFetchBill({}, { consumerCode: caseDetails?.filingNumber, tenantId, businessService: "case" });
-    const billFetched = regenerateBill?.Bill ? regenerateBill?.Bill[0] : {};
-    if (!Object.keys(bill || regenerateBill || {}).length) {
+    if (!Object.keys(bill || {}).length) {
       toast.error(t("CS_BILL_NOT_AVAILABLE"));
       history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox`);
       return;
@@ -193,6 +199,20 @@ const ViewPaymentDetails = ({ location, match }) => {
           totalAmountPaid: totalAmount,
           instrumentNumber: additionDetails,
           instrumentDate: new Date().getTime(),
+        },
+      });
+      await DRISTIService.customApiService(Urls.dristi.pendingTask, {
+        pendingTask: {
+          name: "Pending Payment",
+          entityType: "case",
+          referenceId: `MANUAL_${caseDetails?.filingNumber}`,
+          status: "PAYMENT_PENDING",
+          cnrNumber: null,
+          filingNumber: caseDetails?.filingNumber,
+          isCompleted: true,
+          stateSla: null,
+          additionalDetails: {},
+          tenantId,
         },
       });
       history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox/response`, {
@@ -226,9 +246,7 @@ const ViewPaymentDetails = ({ location, match }) => {
       });
       setIsDisabled(false);
     } catch (err) {
-      history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox/response`, {
-        state: { success: false, amount: chequeDetails?.totalAmount },
-      });
+      history.push(`/${window?.contextPath}/employee/dristi/pending-payment-inbox/response`, { state: { success: false } });
       setIsDisabled(false);
     }
   };
